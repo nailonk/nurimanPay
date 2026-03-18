@@ -1,9 +1,14 @@
-const express = require('express');
-const router = express.Router();
-const { core } = require('../config/midtrans');
-const { createClient } = require('@supabase/supabase-js');
+import express from 'express';
+import { core } from '../config/midtrans.js';
+import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+const router = express.Router();
+
+// Inisialisasi Supabase client
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY
+);
 
 // Endpoint: Cek status transaksi dari Midtrans langsung
 router.get('/check/:orderId', async (req, res) => {
@@ -57,4 +62,4 @@ router.get('/donasi/:orderId', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;
