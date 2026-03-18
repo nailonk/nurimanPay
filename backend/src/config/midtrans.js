@@ -3,7 +3,7 @@ import 'dotenv/config';
 
 // Snap instance untuk transaksi
 const snap = new midtransClient.Snap({
-  isProduction: false, // ganti true untuk production
+  isProduction: false, // untuk testing
   serverKey: process.env.MIDTRANS_SERVER_KEY,
   clientKey: process.env.MIDTRANS_CLIENT_KEY
 });

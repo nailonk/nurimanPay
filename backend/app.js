@@ -4,8 +4,9 @@ import 'dotenv/config';
 import pool from './src/config/db.js';
 import authRoutes from './src/routes/authRoutes.js';
 // IMPORT ROUTES BARU
-import donasiRoutes from './src/routes/donasiRoutes.js';
+import transaksiRoutes from './src/routes/transaksiRoutes.js';
 import notificationRoutes from './src/routes/notificationRoutes.js';
+import programRoutes from './src/routes/programRoutes.js';
 
 const app = express();
 
@@ -29,15 +30,12 @@ app.use((req, res, next) => {
     next();
 });
 
-console.log('Registering routes...');
-console.log(' - Auth routes: /auth');
-console.log(' - Donasi routes: /api/donasi');
-console.log(' - Notification routes: /api');
-
 // Routes
 app.use('/auth', authRoutes);
-app.use('/api/donasi', donasiRoutes);           // <-- TAMBAHKAN INI
-app.use('/api', notificationRoutes);             // <-- TAMBAHKAN INI
+app.use('/transaksi', transaksiRoutes);           
+app.use('/midtrans-notification', notificationRoutes);   
+app.use('/create-program', programRoutes)
+app.use('/program', programRoutes);       
 
 // Root endpoint
 app.get('/', (req, res) => {
@@ -50,12 +48,16 @@ app.get('/', (req, res) => {
             auth: {
                 login: 'POST /auth/login'
             },
-            donasi: {
-                create: 'POST /api/donasi/create'
+            transaksi: {
+                create: 'POST /transaksi/create'
+            },
+            program: {
+                create: 'POST /program',
+                getAll: 'GET /program'
             },
             midtrans: {
-                notification: 'POST /api/midtrans-notification',
-                cekStatus: 'GET /api/status/:orderId'
+                notification: 'POST /midtrans-notification',
+                cekStatus: 'GET /status/:orderId'
             }
         }
     });

@@ -38,7 +38,7 @@ router.get('/check/:orderId', async (req, res) => {
 });
 
 // Endpoint: Cek status dari database
-router.get('/donasi/:orderId', async (req, res) => {
+router.get('/transaksi/:orderId', async (req, res) => {
   try {
     const { orderId } = req.params;
 

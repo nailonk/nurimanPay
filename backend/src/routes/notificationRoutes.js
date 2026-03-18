@@ -8,7 +8,7 @@ const router = express.Router();
 router.post('/midtrans-notification', async (req, res) => {
   try {
     const notification = req.body;
-    console.log('🔔 Webhook received:', JSON.stringify(notification, null, 2));
+    console.log('Webhook received:', JSON.stringify(notification, null, 2));
 
     // Validasi notifikasi dengan Midtrans
     const statusResponse = await core.transaction.notification(notification);
@@ -46,7 +46,7 @@ router.post('/midtrans-notification', async (req, res) => {
     const updateResult = await pool.query(updateQuery, [dbStatus, paymentType, orderId]);
 
     if (updateResult.rows.length > 0) {
-      console.log(`✅ Status updated to ${dbStatus} for order ${orderId}`);
+      console.log(`Status updated to ${dbStatus} for order ${orderId}`);
       
       if (dbStatus === 'success') {
         const donasi = updateResult.rows[0];

@@ -7,15 +7,4 @@ const pool = new Pool({
     rejectUnauthorized: false
   }
 });
-
-// log saat koneksi berhasil dibuat
-pool.on("connect", () => {
-  console.log("Connected to Supabase DB");
-});
-
-// handle error
-pool.on("error", (err) => {
-  console.error("Unexpected DB error:", err);
-});
-
 export default pool;

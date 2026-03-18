@@ -7,12 +7,12 @@ const router = express.Router();
 // Endpoint: Buat transaksi donasi
 router.post('/create', async (req, res) => {
   try {
-    const { nama, no_hp, nominal, catatan, program_id } = req.body;
+    const { nama_donatur, nomor_hp, nominal, pesan, program_id } = req.body;
 
     // Validasi
-    if (!nama || !no_hp || !nominal || nominal < 1000) {
+    if (!nama_donatur || !nomor_hp || !nominal || nominal < 10000) {
       return res.status(400).json({ 
-        error: 'Data tidak lengkap atau nominal minimal Rp 1.000' 
+        error: 'Data tidak lengkap atau nominal minimal Rp 10.000' 
       });
     }
 
@@ -21,12 +21,12 @@ router.post('/create', async (req, res) => {
 
     // Simpan ke database
     const insertQuery = `
-      INSERT INTO donasi (nama_donatur, no_hp, nominal, catatan, program_id, order_id, status)
+      INSERT INTO transaksi (nama_donatur, nomor_hp, nominal, pesan, program_id, order_id, status)
       VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING id
     `;
     
-    const insertValues = [nama, no_hp, nominal, catatan, program_id || null, orderId, 'pending'];
+    const insertValues = [nama_donatur, nomor_hp, nominal, pesan, program_id || null, orderId, 'pending'];
     const insertResult = await pool.query(insertQuery, insertValues);
     const donasiId = insertResult.rows[0].id;
 
@@ -37,8 +37,8 @@ router.post('/create', async (req, res) => {
         gross_amount: nominal
       },
       customer_details: {
-        first_name: nama,
-        phone: no_hp
+        first_name: nama_donatur,
+        phone: nomor_hp
       },
       item_details: [{
         id: 'donasi-1',
@@ -54,7 +54,7 @@ router.post('/create', async (req, res) => {
 
     // Update token ke database
     const updateQuery = `
-      UPDATE donasi 
+      UPDATE transaksi 
       SET transaction_token = $1, redirect_url = $2 
       WHERE id = $3
     `;
