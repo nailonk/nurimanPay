@@ -5,6 +5,6 @@ const router = express.Router();
 
 // Jalur: GET /api/program
 router.get('/', getAllPrograms);
-router.post('/', createProgram);
+router.post('/create', createProgram);
 
 export default router;
