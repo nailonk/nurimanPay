@@ -1,21 +1,81 @@
-@import "tw-animate-css";
-@import "@fontsource-variable/geist";
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --border: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
+    --background: 255 255 255;
+    --foreground: 15 15 15;
+
+    --border: 230 230 230;
+    --ring: 180 180 180;
+
+    --card: 255 255 255;
+    --card-foreground: 15 15 15;
+
+    --popover: 255 255 255;
+    --popover-foreground: 15 15 15;
+
+    --primary: 40 40 40;
+    --primary-foreground: 255 255 255;
+
+    --secondary: 245 245 245;
+    --secondary-foreground: 40 40 40;
+
+    --muted: 245 245 245;
+    --muted-foreground: 120 120 120;
+
+    --accent: 245 245 245;
+    --accent-foreground: 40 40 40;
+
+    --destructive: 220 50 50;
+
+    --input: 230 230 230;
+    --radius: 0.625rem;
   }
 
+  /* 🌞 LIGHT */
   body {
-    background: var(--background);
-    color: var(--foreground);
-    font-family: "Geist Variable", sans-serif;
+    background-color: rgb(var(--background));
+    color: rgb(var(--foreground));
+    font-family: sans-serif;
+  }
+
+  /* 🌙 DARK */
+  .dark {
+    --background: 20 20 20;
+    --foreground: 255 255 255;
+
+    --card: 40 40 40;
+    --card-foreground: 255 255 255;
+
+    --popover: 40 40 40;
+    --popover-foreground: 255 255 255;
+
+    --primary: 230 230 230;
+    --primary-foreground: 40 40 40;
+
+    --secondary: 60 60 60;
+    --secondary-foreground: 255 255 255;
+
+    --muted: 60 60 60;
+    --muted-foreground: 180 180 180;
+
+    --accent: 60 60 60;
+    --accent-foreground: 255 255 255;
+
+    --destructive: 255 80 80;
+
+    --border: 255 255 255 / 10%;
+    --input: 255 255 255 / 15%;
+    --ring: 150 150 150;
+  }
+
+  * {
+    border-color: rgb(var(--border));
+  }
+
+  html {
+    font-family: sans-serif;
   }
 }
