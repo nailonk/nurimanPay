@@ -1,17 +1,26 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom"
+import { Routes, Route } from "react-router-dom"
+import UserLayout from "@/layout/UserLayout"
+import UserDashboard from "@/pages/user/UserDashboard"
+import DetailProgram from "@/components/user/dashboard/DetailProgram"
+import FormTransaction from "@/components/user/dashboard/FormTransaction"
+import ProgramSection from "@/components/user/dashboard/ProgramSection"
+import AboutSection from "@/components/user/dashboard/AboutSection"
 
-import AdminPage from "@/pages/admin/page"
-import UserPage from "@/pages/user/page"
-
-function AppRoutes() {
+export default function AppRoutes() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/admin" element={<AdminPage />} />
-        <Route path="/user" element={<UserPage />} />
-      </Routes>
-    </BrowserRouter>
+    <Routes>
+
+      {/* TANPA LAYOUT */}
+      <Route path="/form-transaction" element={<FormTransaction />} />
+
+      {/* USER LAYOUT */}
+      <Route element={<UserLayout />}>
+        <Route path="/" element={<UserDashboard />} />
+        <Route path="/program-section" element={<ProgramSection />} />
+        <Route path="/detail-program/:id" element={<DetailProgram />} />
+        <Route path="/about-section" element={<AboutSection />} />
+      </Route>
+
+    </Routes>
   )
 }
-
-export default AppRoutes
