@@ -1,11 +1,19 @@
-import pool from '../config/db.js';
+import * as authService from '../service/authService.js';
 
 export const login = async (req, res) => {
   try {
-    const result = await pool.query("SELECT * FROM users");
-    res.json(result.rows);
+    // req.body di sini sudah DIJAMIN valid dan bersih oleh middleware Joi
+    const { email, password } = req.body;
+
+    const result = await authService.loginService(email, password);
+
+    res.json({
+      success: true,
+      message: 'Login berhasil',
+      data: result
+    });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: error.message });
+    // Error dari Service (misal: user tidak ketemu) akan lari ke sini
+    res.status(401).json({ error: error.message });
   }
 };
