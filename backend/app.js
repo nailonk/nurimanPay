@@ -33,8 +33,7 @@ app.use((req, res, next) => {
 // Routes
 app.use('/auth', authRoutes);
 app.use('/transaksi', transaksiRoutes);           
-app.use('/midtrans-notification', notificationRoutes);   
-app.use('/create-program', programRoutes)
+app.use('/notif', notificationRoutes);   
 app.use('/program', programRoutes);       
 
 // Root endpoint
@@ -49,14 +48,15 @@ app.get('/', (req, res) => {
                 login: 'POST /auth/login'
             },
             transaksi: {
-                create: 'POST /transaksi/create'
+                create: 'POST /transaksi/create',
+                getAll: 'GET /transaksi'
             },
             program: {
-                create: 'POST /program',
+                create: 'POST /program/create',
                 getAll: 'GET /program'
             },
             midtrans: {
-                notification: 'POST /midtrans-notification',
+                notification: 'POST /notif',
                 cekStatus: 'GET /status/:orderId'
             }
         }

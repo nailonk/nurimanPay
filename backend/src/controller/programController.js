@@ -1,39 +1,31 @@
-import pool from '../config/db.js';
+import * as programService from '../service/programService.js';
+
 export const createProgram = async (req, res) => {
   try {
-    // Ambil data dari body (sesuaikan dengan kolom di tabel program kamu)
-    const { judul, deskripsi, target_dana } = req.body;
-
-    // Query INSERT (ID UUID akan digenerate otomatis oleh Supabase)
-    const query = `
-      INSERT INTO program (judul, deskripsi, target_dana, dana_terkumpul)
-      VALUES ($1, $2, $3, 0)
-      RETURNING *
-    `;
-    
-    const values = [judul, deskripsi, target_dana];
-    const result = await pool.query(query, values);
+    // Data di req.body sudah divalidasi dan disanitasi oleh Joi
+    const newProgram = await programService.createProgramService(req.body);
 
     res.status(201).json({
       success: true,
       message: 'Program berhasil ditambahkan',
-      data: result.rows[0]
+      data: newProgram
     });
   } catch (error) {
-    console.error('Error create program:', error);
-    res.status(500).json({ error: 'Gagal menambah program' });
+    console.error('Controller Error Create Program:', error);
+    res.status(500).json({ error: 'Gagal menambah program', details: error.message });
   }
 };
 
 export const getAllPrograms = async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM program ORDER BY created_at DESC');
+    const programs = await programService.getAllProgramsService();
+    
     res.json({
       success: true,
-      data: result.rows
+      data: programs
     });
   } catch (error) {
-    console.error('Error get programs:', error);
+    console.error('Controller Error Get Programs:', error);
     res.status(500).json({ error: 'Gagal mengambil data program' });
   }
 };

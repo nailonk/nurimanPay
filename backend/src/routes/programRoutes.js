@@ -1,10 +1,13 @@
 import express from 'express';
 import { getAllPrograms, createProgram } from '../controller/programController.js';
+import { validate } from '../middleware/validate.js'; // Pakai middleware universal
+import { createProgramSchema } from '../validator/programValidator.js'; // Import schema program
 
 const router = express.Router();
 
-// Jalur: GET /api/program
 router.get('/', getAllPrograms);
-router.post('/', createProgram);
+
+// Pasang Satpam Joi di sini
+router.post('/create', validate(createProgramSchema), createProgram);
 
 export default router;
