@@ -1,13 +1,9 @@
-// src/controller/authController.js
 import * as authService from '../service/authService.js';
 
 export const login = async (req, res) => {
   try {
+    // req.body di sini sudah DIJAMIN valid dan bersih oleh middleware Joi
     const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email dan password harus diisi' });
-    }
 
     const result = await authService.loginService(email, password);
 
@@ -17,6 +13,7 @@ export const login = async (req, res) => {
       data: result
     });
   } catch (error) {
+    // Error dari Service (misal: user tidak ketemu) akan lari ke sini
     res.status(401).json({ error: error.message });
   }
 };

@@ -2,13 +2,7 @@ import * as programService from '../service/programService.js';
 
 export const createProgram = async (req, res) => {
   try {
-    const { title, target_amount } = req.body;
-
-    // Validasi sederhana sebelum masuk ke service
-    if (!title || !target_amount) {
-      return res.status(400).json({ error: 'Judul dan Target Nominal harus diisi' });
-    }
-
+    // Data di req.body sudah divalidasi dan disanitasi oleh Joi
     const newProgram = await programService.createProgramService(req.body);
 
     res.status(201).json({
@@ -18,7 +12,7 @@ export const createProgram = async (req, res) => {
     });
   } catch (error) {
     console.error('Controller Error Create Program:', error);
-    res.status(500).json({ error: 'Gagal menambah program' });
+    res.status(500).json({ error: 'Gagal menambah program', details: error.message });
   }
 };
 
