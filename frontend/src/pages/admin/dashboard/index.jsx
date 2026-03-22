@@ -1,33 +1,37 @@
-import { useNavigate, Outlet } from "react-router-dom"
+import StatsCard from "@/components/admin/dashboard/StatsCard"
+import ChartSection from "@/components/admin/dashboard/ChartSection"
+import ProgramList from "@/components/admin/dashboard/ProgramList"
+import TransactionTable from "@/components/admin/dashboard/TransactionTable"
 
-export default function AdminPage() {
-  const navigate = useNavigate()
-
-  const handleLogout = () => {
-    localStorage.removeItem("token")
-    localStorage.removeItem("role")
-    navigate("/login")
-  }
-
+function DashboardPage() {
   return (
-    <div className="min-h-screen flex flex-col">
-      
-      {/* HEADER */}
-      <div className="flex justify-between items-center p-4 bg-gray-800 text-white">
-        <h1 className="text-xl font-bold">Admin Panel</h1>
+    <div className="space-y-6">
 
-        <button
-          onClick={handleLogout}
-          className="px-3 py-1 bg-red-500 rounded hover:bg-red-600"
-        >
-          Logout
-        </button>
+      {/* STATS */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6">
+        <StatsCard />
       </div>
 
-      {/* CONTENT */}
-      <div className="flex-1 p-6">
-        <Outlet />
+      {/* CHART + PROGRAM */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm p-4 sm:p-5">
+          <ChartSection />
+        </div>
+
+        <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-5">
+          <ProgramList />
+        </div>
+
       </div>
+
+      {/* TABLE */}
+      <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-5 overflow-x-auto">
+        <TransactionTable />
+      </div>
+
     </div>
   )
 }
+
+export default DashboardPage
