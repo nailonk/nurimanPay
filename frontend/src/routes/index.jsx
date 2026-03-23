@@ -10,6 +10,12 @@ import FormTransaction from "@/components/user/dashboard/FormTransaction"
 import AdminLayout from "@/pages/admin"
 import DashboardPage from "@/pages/admin/dashboard"
 import ProgramPage from "@/pages/admin/program"
+import ProgramCreate from "@/pages/admin/program/create"
+import ProgramEdit from "@/pages/admin/program/edit"
+import ProgramDetailAdmin from "@/pages/admin/program/detail"
+import Penyaluran from "@/pages/admin/penyaluran"
+import TransaksiPage from "@/pages/admin/transaksi"
+
 
 /* AUTH */
 import Login from "@/pages/auth/login"
@@ -19,20 +25,31 @@ export default function AppRoutes() {
   return (
     <Routes>
 
-      {/* ADMIN */}
+      {/* ================= ADMIN ================= */}
       <Route path="/admin" element={<AdminLayout />}>
+
         <Route path="dashboard" element={<DashboardPage />} />
+
+        {/* PROGRAM */}
         <Route path="program" element={<ProgramPage />} />
+        <Route path="program/create" element={<ProgramCreate />} />
+        <Route path="program/edit/:id" element={<ProgramEdit />} />
+        <Route path="program/:id" element={<ProgramDetailAdmin />} />
+
+        <Route path="penyaluran" element={<Penyaluran />} />
+        <Route path="transaksi" element={<TransaksiPage />} />
+        
+
       </Route>
 
-      {/* AUTH */}
+      {/* ================= AUTH ================= */}
       <Route path="/login" element={<Login />} />
       <Route path="/forgotpassword" element={<ForgotPassword />} />
 
-      {/* TANPA LAYOUT */}
+      {/* ================= TANPA LAYOUT ================= */}
       <Route path="/form-transaction" element={<FormTransaction />} />
 
-      {/* USER */}
+      {/* ================= USER ================= */}
       <Route element={<UserLayout />}>
         <Route path="/" element={<UserDashboard />} />
         <Route path="/detail-program/:id" element={<DetailProgram />} />

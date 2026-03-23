@@ -1,30 +1,32 @@
+import { useNavigate } from "react-router-dom"
+import { Plus } from "lucide-react"
+
 import ProgramList from "@/components/admin/program/ProgramList"
-import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 
 function ProgramPage() {
+  const navigate = useNavigate()
+
   return (
     <div className="p-4 md:p-6 space-y-6">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+
+      <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold">Program Donasi</h1>
           <p className="text-muted-foreground text-sm">
-            Kelola dan pantau seluruh inisiatif penggalangan dana masjid.
+            Kelola program donasi
           </p>
         </div>
 
-        <Button className="bg-green-600 hover:bg-green-700">
-          + Tambah Program Baru
+        <Button
+          onClick={() => navigate("/admin/program/create")}
+          className="bg-green-600 hover:bg-green-700 flex gap-2"
+        >
+          <Plus size={16} />
+          Tambah Program
         </Button>
       </div>
 
-      {/* Search */}
-      <div className="max-w-md">
-        <Input placeholder="Cari program donasi..." />
-      </div>
-
-      {/* List */}
       <ProgramList />
     </div>
   )

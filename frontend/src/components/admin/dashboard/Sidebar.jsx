@@ -9,6 +9,7 @@ import {
 
 import { useNavigate, useLocation } from "react-router-dom"
 import { useState } from "react"
+import logo from "@/assets/logo.png"
 
 function Sidebar({ isMobileOpen, setIsMobileOpen }) {
   const navigate = useNavigate()
@@ -20,8 +21,8 @@ function Sidebar({ isMobileOpen, setIsMobileOpen }) {
   const menus = [
     { name: "Dashboard", icon: LayoutDashboard, path: "/admin/dashboard" },
     { name: "Program Donasi", icon: HandHeart, path: "/admin/program" },
-    { name: "Penyaluran Dana", icon: Wallet, path: "/penyaluran" },
-    { name: "Riwayat Transaksi", icon: History, path: "/transaksi" },
+    { name: "Penyaluran Dana", icon: Wallet, path: "/admin/penyaluran" },
+    { name: "Riwayat Transaksi", icon: History, path: "/admin/transaksi" },
   ]
 
   const logout = () => {
@@ -73,15 +74,27 @@ function Sidebar({ isMobileOpen, setIsMobileOpen }) {
 
           {/* USER */}
           {isOpen && (
-            <div className="mb-8">
-              <h1 className="text-lg font-semibold leading-tight">
-                Nurul Iman
-              </h1>
-              <p className="text-sm text-green-100">
-                Admin Panel
-              </p>
-            </div>
-          )}
+            <div className="mb-8 flex items-center gap-3">
+
+  {/* LOGO */}
+  <img
+    src={logo}
+    alt="Logo"
+    className="w-10 h-10 object-contain"
+  />
+
+  {/* TEXT */}
+  <div>
+    <h1 className="text-lg font-semibold leading-tight">
+      Nurul Iman
+    </h1>
+    <p className="text-sm text-green-100">
+      Admin Panel
+    </p>
+  </div>
+
+</div>
+          )} 
 
           {/* MENU */}
           <ul className="space-y-2">
