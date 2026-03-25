@@ -4,7 +4,7 @@ import * as notificationController from '../controller/notificationController.js
 const router = express.Router();
 
 // Endpoint webhook untuk Midtrans
-router.post('/midtrans', notificationController.handleMidtransNotification);
+router.post('/', notificationController.handleMidtransNotification);
 
 // Endpoint cek status di DB
 router.get('/status/:orderId', notificationController.getStatus);
