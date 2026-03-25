@@ -1,8 +1,22 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const HeroSection = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleScrollToProgram = () => {
+    const sectionId = "program-section";
+    if (location.pathname !== "/") {
+      navigate("/");
+      setTimeout(() => {
+        document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
+      }, 300);
+    } else {
+      document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <section className="relative w-full h-[400px] md:h-[500px] overflow-hidden">
       {/* Background Image */}
@@ -36,12 +50,10 @@ const HeroSection = () => {
 
         {/* BUTTON */}
         <button 
-          onClick={() =>
-            navigate("/program-section")
-          }
-          className="mt-6 bg-[#A3C585] text-white px-6 py-3 rounded-xl font-medium"
-          >
-            Donasi Sekarang
+          onClick={handleScrollToProgram}
+          className="mt-6 bg-[#A3C585] hover:bg-[#92b874] transition-colors text-white px-6 py-3 rounded-xl font-medium"
+        >
+          Donasi Sekarang
         </button>
       </div>
     </section>

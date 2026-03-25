@@ -5,66 +5,15 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useNavigate } from "react-router-dom";
 
-const programs = [
-  {
-    title: "Infaq Pembangunan",
-    desc: "Bantu kami menyelesaikan renovasi lantai dua untuk ruang belajar TPA.",
-    image:
-      "https://awsimages.detik.net.id/visual/2025/11/14/pik-1763121943826_169.jpeg?w=650&q=90",
-    collected: 50000000,
-    progress: 65,
-  },
-  {
-    title: "Sedekah Jumat",
-    desc: "Penyaluran nasi kotak dan paket sembako untuk jamaah setiap Jumat.",
-    image:
-      "https://bucket-api.baznas.go.id/bucket-api/file?bucket=bzn-fdr-smb-p5739641&file=attachments/new_artikel/MzU4NTE3NDIzMjQwMjg.jpg",
-    collected: 5000000,
-    progress: 40,
-  },
-  {
-    title: "Bantuan Anak Yatim",
-    desc: "Santunan rutin dan biaya pendidikan untuk 50 anak yatim piatu di lingkungan masjid.",
-    image:
-      "https://i.pinimg.com/564x/fa/a0/68/faa06864fe248f4bd89331542b640206.jpg",
-    collected: 15000000,
-    progress: 80,
-  },
-  {
-    title: "Bantuan Anak Yatim",
-    desc: "Santunan rutin dan biaya pendidikan untuk 50 anak yatim piatu di lingkungan masjid.",
-    image:
-      "https://i.pinimg.com/564x/fa/a0/68/faa06864fe248f4bd89331542b640206.jpg",
-    collected: 15000000,
-    progress: 80,
-  },
-  {
-    title: "Bantuan Anak Yatim",
-    desc: "Santunan rutin dan biaya pendidikan untuk 50 anak yatim piatu di lingkungan masjid.",
-    image:
-      "https://i.pinimg.com/564x/fa/a0/68/faa06864fe248f4bd89331542b640206.jpg",
-    collected: 15000000,
-    progress: 80,
-  },
-  {
-    title: "Bantuan Anak Yatim",
-    desc: "Santunan rutin dan biaya pendidikan untuk 50 anak yatim piatu di lingkungan masjid.",
-    image:
-      "https://i.pinimg.com/564x/fa/a0/68/faa06864fe248f4bd89331542b640206.jpg",
-    collected: 15000000,
-    progress: 80,
-  },
-];
-
 const formatRupiah = (angka) => {
   return new Intl.NumberFormat("id-ID", {
     style: "currency",
     currency: "IDR",
     maximumFractionDigits: 0,
-  }).format(angka);
+  }).format(angka || 0);
 };
 
-const ProgramSection = () => {
+const ProgramSection = ({ programs = [] }) => {
   const scrollRef = useRef(null);
   const navigate = useNavigate();
 
@@ -91,14 +40,14 @@ const ProgramSection = () => {
         <div className="flex gap-2">
           <Button
             onClick={() => scroll("left")}
-            className="w-8 h-8 rounded-full border border-[#A3C585]/80 focus-visible:ring-0"
+            className="w-8 h-8 rounded-full border border-[#A3C585]/80"
           >
             <ChevronLeft className="text-white" />
           </Button>
 
           <Button
             onClick={() => scroll("right")}
-            className="w-8 h-8 rounded-full border border-[#A3C585]/80 focus-visible:ring-0"
+            className="w-8 h-8 rounded-full border border-[#A3C585]/80"
           >
             <ChevronRight className="text-white" />
           </Button>
@@ -110,33 +59,34 @@ const ProgramSection = () => {
         ref={scrollRef}
         className="flex gap-6 overflow-x-auto scroll-smooth pb-2"
       >
-        {programs.map((item, index) => (
+        {programs.map((item) => (
           <Card
-            key={index}
-            className="min-w-[280px] max-w-[280px] rounded-2xl border-0 shadow-md hover:shadow-xl ring-0 transition flex flex-col"
+            key={item.id}
+            className="min-w-[280px] max-w-[280px] rounded-2xl 
+            border-0 shadow-md hover:shadow-xl transition 
+            flex flex-col overflow-hidden 
+            ring-0 focus-visible:ring-0 focus:outline-none"
           >
-            {/* IMAGE */}
             <img
               src={item.image}
               alt={item.title}
-              className="h-40 w-full object-cover rounded-t-2xl"
+              className="h-40 w-full object-cover"
             />
 
-            {/* CONTENT */}
             <div className="p-4 flex flex-col h-full">
-              {/* TOP CONTENT */}
-              <div>
+              
+              {/* CONTENT ATAS */}
+              <div className="flex-1">
                 <h3 className="font-semibold text-gray-800">
                   {item.title}
                 </h3>
 
                 <p className="text-sm text-gray-500 mt-1 line-clamp-2">
-                  {item.desc}
+                  {item.description}
                 </p>
 
-                {/* PROGRESS */}
                 <div className="mt-4">
-                  <div className="flex justify-between items-center text-sm text-gray-600">
+                  <div className="flex justify-between text-sm text-gray-600">
                     <p>
                       Terkumpul:{" "}
                       <span className="font-semibold text-[#A3C585]/80">
@@ -145,12 +95,12 @@ const ProgramSection = () => {
                     </p>
 
                     <span className="font-semibold text-gray-700">
-                      {item.progress}%
+                      {item.progress || 0}%
                     </span>
                   </div>
 
                   <Progress
-                    value={item.progress}
+                    value={item.progress || 0}
                     className="mt-2 h-2 bg-gray-200 [&>div]:bg-[#A3C585]"
                   />
                 </div>
@@ -158,8 +108,12 @@ const ProgramSection = () => {
 
               {/* BUTTON (SELALU DI BAWAH) */}
               <Button
-                onClick={() => navigate("/user/UserDashboard/program-section")}
-                className="mt-4 w-full h-12 rounded-xl bg-[#A3C585]/20 text-[#A3C585]"
+                onClick={() =>
+                  navigate(`/detail-program/${item.id}`)
+                }
+                className="mt-4 w-full h-12 rounded-xl 
+                bg-[#A3C585]/20 text-[#A3C585]
+                focus-visible:ring-0 focus:outline-none"
               >
                 Donasi Sekarang
               </Button>
