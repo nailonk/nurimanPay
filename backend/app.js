@@ -63,13 +63,16 @@ app.get('/', (req, res) => {
     });
 });
 
+
 // 404 handler
 app.use((req, res) => {
     res.status(404).json({
         success: false,
-        error: 'Route tidak ditemukan'
+        error: 'Route tidak ditemukan',
+        requestedUrl: req.url
     });
 });
+
 
 // Error handler
 app.use((err, req, res, next) => {
