@@ -51,6 +51,10 @@ const DetailProgram = () => {
     );
   }
 
+  const progress = Math.round(
+    (data.collected_amount / data.target_amount) * 100
+  ) || 0;
+
   return (
     <div className="bg-[#f5f6f7] min-h-screen py-8 px-4 md:px-8">
       <div className="max-w-6xl mx-auto">
@@ -88,14 +92,14 @@ const DetailProgram = () => {
               </div>
 
               <h2 className="text-lg font-bold text-[#7da85f] mt-1">
-                {data.progress}%{" "}
+                {progress}%{" "}
                 <span className="text-gray-400 font-medium">
                   Tercapai
                 </span>
               </h2>
 
               <Progress
-                value={data.progress}
+                value={progress}
                 className="mt-3 h-2 bg-[#A3C585]/20 [&>div]:bg-[#A3C585]"
               />
 
@@ -108,7 +112,7 @@ const DetailProgram = () => {
                 <div>
                   <p className="text-gray-600">Terkumpul</p>
                   <p className="font-bold">
-                    {formatRupiah(data.collected)}
+                    {formatRupiah(data.collected_amount)}
                   </p>
                 </div>
 
@@ -143,7 +147,7 @@ const DetailProgram = () => {
             <div className="p-5">
               <Button
                 onClick={() => navigate("/form-transaction", { state: { programId: data.id } })} 
-                className="w-full h-12 bg-[#A3C585] text-white rounded-lg"
+                className="w-full h-12 bg-[#A3C585] text-white shadow-md border-0 hover:shadow-lg transition"
               >
                 <Heart size={16} />
                 Donasi Sekarang

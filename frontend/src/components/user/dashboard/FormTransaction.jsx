@@ -5,8 +5,7 @@ import { Textarea } from "@/components/ui/textarea"
 import logo from "@/assets/logo.png"
 import { useNavigate, useLocation } from "react-router-dom"
 import { useState, useEffect } from "react"
-// Import fungsi API yang sudah kamu buat
-import { createTransaction } from "@/api/transaction" 
+import { transactionApi } from "@/api/transaction"
 
 const nominalList = [10000, 20000, 50000, 100000]
 
@@ -96,7 +95,7 @@ const FormTransaction = () => {
     }
 
     try {
-      const response = await createTransaction(payload)
+      const response = await transactionApi.create(payload)
       
       if (response.data.success) {
         // Ambil redirect_url dari response backend
