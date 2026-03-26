@@ -24,6 +24,17 @@ import ForgotPassword from "@/pages/auth/forgotpassword"
 export default function AppRoutes() {
   return (
     <Routes>
+      {/* ================= ADMIN ================= */}
+      <Route path="/admin" element={<AdminLayout />}>
+        <Route path="dashboard" element={<DashboardPage />} />
+        {/* PROGRAM */}
+        <Route path="program" element={<ProgramPage />} />
+        <Route path="program/create" element={<ProgramCreate />} />
+        <Route path="program/edit/:id" element={<ProgramEdit />} />
+        <Route path="program/:id" element={<ProgramDetailAdmin />} />
+        <Route path="penyaluran" element={<Penyaluran />} />
+        <Route path="transaksi" element={<TransaksiPage />} />
+      </Route>
 
       {/* ================= ADMIN ================= */}
       <Route path="/admin" element={<AdminLayout />}>
@@ -54,7 +65,6 @@ export default function AppRoutes() {
         <Route path="/" element={<UserDashboard />} />
         <Route path="/detail-program/:id" element={<DetailProgram />} />
       </Route>
-
     </Routes>
   )
 }

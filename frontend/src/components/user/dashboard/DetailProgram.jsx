@@ -1,28 +1,11 @@
 import { useParams, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { Heart, ShieldCheck, CircleAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-
-const programs = [
-  {
-    title: "Infaq Pembangunan",
-    desc: "Bantu renovasi lantai dua untuk ruang belajar TPA.",
-    image:
-      "https://awsimages.detik.net.id/visual/2025/11/14/pik-1763121943826_169.jpeg?w=650&q=90",
-    collected: 50000000,
-    progress: 65,
-  },
-  {
-    title: "Sedekah Jumat",
-    desc: "Penyaluran nasi kotak & sembako setiap Jumat.",
-    image:
-      "https://bucket-api.baznas.go.id/bucket-api/file?bucket=bzn-fdr-smb-p5739641&file=attachments/new_artikel/MzU4NTE3NDIzMjQwMjg.jpg",
-    collected: 5000000,
-    progress: 40,
-  },
-];
+import { getPrograms } from "@/api/program";
 
 const formatRupiah = (angka) => {
   return new Intl.NumberFormat("id-ID", {
@@ -36,7 +19,29 @@ const DetailProgram = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const data = programs[id];
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await getPrograms();
+
+        const list = Array.isArray(res.data)
+          ? res.data
+          : res.data?.data || [];
+
+        const found = list.find(
+          (item) => String(item.id) === String(id)
+        );
+
+        setData(found);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    fetchData();
+  }, [id]);
 
   if (!data) {
     return (
@@ -75,21 +80,11 @@ const DetailProgram = () => {
           {/* LEFT */}
           <div className="md:col-span-2 space-y-6">
 
-            {/* PROGRESS */}
-            <Card className="p-5 rounded-xl bg-white border-0 shadow-md ring-0 focus-visible:ring-0 focus:outline-none">
+            <Card className="p-5 rounded-xl bg-white shadow-md border-0 hover:shadow-lg transition ring-0 focus-visible:ring-0 focus:outline-none">
               <div className="flex justify-between items-center">
                 <p className="text-sm text-gray-500">
                   Progress Pembangunan
                 </p>
-
-                <div className="text-right">
-                  <p className="text-[10px] text-gray-400">
-                    ESTIMASI SELESAI
-                  </p>
-                  <p className="text-xs font-medium">
-                    Desember 2027
-                  </p>
-                </div>
               </div>
 
               <h2 className="text-lg font-bold text-[#7da85f] mt-1">
@@ -110,26 +105,25 @@ const DetailProgram = () => {
               </div>
 
               <div className="grid grid-cols-3 text-sm mt-4">
-                <div className="space-y-1 text-left">
+                <div>
                   <p className="text-gray-600">Terkumpul</p>
                   <p className="font-bold">
                     {formatRupiah(data.collected)}
                   </p>
                 </div>
 
-                <div className="space-y-1 text-center">
+                <div className="text-center">
                   <p className="text-gray-600">Target</p>
                   <p className="font-bold">Rp 1 M</p>
                 </div>
 
-                <div className="space-y-1 text-right">
+                <div className="text-right">
                   <p className="text-gray-600">Donatur</p>
                   <p className="font-bold">1,240</p>
                 </div>
               </div>
             </Card>
 
-            {/* DESKRIPSI */}
             <div>
               <div className="border-b border-gray-200">
                 <span className="text-[#7da85f] font-semibold text-sm pb-1 border-b-2 border-[#7da85f]">
@@ -138,7 +132,7 @@ const DetailProgram = () => {
               </div>
 
               <p className="text-gray-600 pt-4 text-sm leading-relaxed">
-                {data.desc}
+                {data.description || data.desc}
               </p>
             </div>
           </div>
@@ -148,7 +142,7 @@ const DetailProgram = () => {
 
             <div className="p-5">
               <Button
-                onClick={() => navigate("/form-transaction")}
+                onClick={() => navigate("/form-transaction", { state: { programId: data.id } })} 
                 className="w-full h-12 bg-[#A3C585] text-white rounded-lg"
               >
                 <Heart size={16} />
@@ -161,17 +155,13 @@ const DetailProgram = () => {
               </div>
             </div>
 
-            {/* DONATUR */}
-            <Card className="p-5 rounded-xl bg-white border-0 shadow-md ring-0 focus-visible:ring-0 focus:outline-none">
+            <Card className="p-5 rounded-xl bg-white border-0 shadow-md hover:shadow-lg transition ring-0 focus-visible:ring-0 focus:outline-none">
               <h4 className="font-semibold mb-3">
                 Donatur Terakhir
               </h4>
 
               <div className="space-y-3">
-                {[
-                  { name: "Hamba Allah", amount: 500000 },
-                  { name: "Ahmad Basuki", amount: 150000 },
-                ].map((d, i) => (
+                {[{ name: "Hamba Allah", amount: 500000 }].map((d, i) => (
                   <div key={i} className="flex gap-2">
                     <Avatar className="h-8 w-8">
                       <AvatarFallback className="font-bold text-[#A3C585] bg-gray-50">
