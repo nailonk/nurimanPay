@@ -1,0 +1,102 @@
+@import "tw-animate-css";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* BASE RESET */
+@layer base {
+  html, body, #root {
+    height: 100%;
+  }
+
+  :root {
+    --background: 255 255 255;
+    --foreground: 15 15 15;
+
+    --border: 230 230 230;
+    --ring: 180 180 180;
+
+    --card: 255 255 255;
+    --card-foreground: 15 15 15;
+
+    --popover: 255 255 255;
+    --popover-foreground: 15 15 15;
+
+    --primary: 40 40 40;
+    --primary-foreground: 255 255 255;
+
+    --secondary: 245 245 245;
+    --secondary-foreground: 40 40 40;
+
+    --muted: 245 245 245;
+    --muted-foreground: 120 120 120;
+
+    --accent: 245 245 245;
+    --accent-foreground: 40 40 40;
+
+    --destructive: 220 50 50;
+
+    --input: 230 230 230;
+    --radius: 0.625rem;
+  }
+
+  /* 🌞 LIGHT */
+  body {
+    @apply bg-white text-gray-900 antialiased;
+    background-color: rgb(var(--background));
+    color: rgb(var(--foreground));
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* 🌙 DARK */
+  .dark {
+    --background: 20 20 20;
+    --foreground: 255 255 255;
+
+    --card: 40 40 40;
+    --card-foreground: 255 255 255;
+
+    --popover: 40 40 40;
+    --popover-foreground: 255 255 255;
+
+    --primary: 230 230 230;
+    --primary-foreground: 40 40 40;
+
+    --secondary: 60 60 60;
+    --secondary-foreground: 255 255 255;
+
+    --muted: 60 60 60;
+    --muted-foreground: 180 180 180;
+
+    --accent: 60 60 60;
+    --accent-foreground: 255 255 255;
+
+    --destructive: 255 80 80;
+
+    --border: 255 255 255 / 10%;
+    --input: 255 255 255 / 15%;
+    --ring: 150 150 150;
+  }
+
+  * {
+    border-color: rgb(var(--border));
+  }
+}
+
+/* OPTIONAL: SCROLLBAR */
+@layer utilities {
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: #d1d5db;
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #9ca3af;
+  }
+}
