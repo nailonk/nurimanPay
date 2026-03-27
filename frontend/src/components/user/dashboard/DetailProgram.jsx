@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { getPrograms } from "@/api/program";
+import { transactionApi } from "@/api/transaction";
 
 const formatRupiah = (angka) => {
   return new Intl.NumberFormat("id-ID", {
@@ -19,6 +20,8 @@ const DetailProgram = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
+  const [donatur, setDonatur] = useState([]);
+  const [totalDonatur, setTotalDonatur] = useState(0);
   const [data, setData] = useState(null);
 
   useEffect(() => {
@@ -35,6 +38,20 @@ const DetailProgram = () => {
         );
 
         setData(found);
+
+        // ambil donatur
+        const donaturRes = await transactionApi.getDonaturByProgram(id);
+        console.log("DONATUR RESPONSE:", donaturRes.data); 
+
+        const donaturData = donaturRes?.data?.data || [];
+
+        const validDonatur = donaturData
+          .filter((d) => d.status === "success")
+          .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+        setDonatur(validDonatur.slice(0, 5));
+        setTotalDonatur(validDonatur.length);
+
       } catch (err) {
         console.log(err);
       }
@@ -52,7 +69,7 @@ const DetailProgram = () => {
   }
 
   const progress = Math.round(
-    (data.collected_amount / data.target_amount) * 100
+    (Number(data.collected_amount) / Number(data.target_amount)) * 100
   ) || 0;
 
   return (
@@ -105,7 +122,7 @@ const DetailProgram = () => {
 
               <div className="flex items-center gap-1 text-xs text-gray-400 mt-2">
                 <CircleAlert className="w-3 h-3 text-[#A3C585]" />
-                <span>Saat ini dalam tahap pengecoran.</span>
+                <span>{data.status}</span>
               </div>
 
               <div className="grid grid-cols-3 text-sm mt-4">
@@ -118,12 +135,14 @@ const DetailProgram = () => {
 
                 <div className="text-center">
                   <p className="text-gray-600">Target</p>
-                  <p className="font-bold">Rp 1 M</p>
+                  <p className="font-bold">
+                    {formatRupiah(data.target_amount)}
+                  </p>
                 </div>
 
                 <div className="text-right">
                   <p className="text-gray-600">Donatur</p>
-                  <p className="font-bold">1,240</p>
+                  <p className="font-bold">{totalDonatur}</p>
                 </div>
               </div>
             </Card>
@@ -163,13 +182,12 @@ const DetailProgram = () => {
               <h4 className="font-semibold mb-3">
                 Donatur Terakhir
               </h4>
-
               <div className="space-y-3">
-                {[{ name: "Hamba Allah", amount: 500000 }].map((d, i) => (
+                {donatur.map((d, i) => (
                   <div key={i} className="flex gap-2">
                     <Avatar className="h-8 w-8">
                       <AvatarFallback className="font-bold text-[#A3C585] bg-gray-50">
-                        {d.name[0]}
+                        {d.name?.[0] || "A"}
                       </AvatarFallback>
                     </Avatar>
 
