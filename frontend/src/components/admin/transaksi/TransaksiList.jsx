@@ -4,62 +4,38 @@ import TransaksiFilter from "./TransaksiFilter"
 
 function TransaksiList() {
   const [search, setSearch] = useState("")
+  const [filterProgram, setFilterProgram] = useState("Semua Program") // State baru
   const [transaksi, setTransaksi] = useState([])
 
-  const defaultData = [
-    {
-      id: 1,
-      nama: "H. Muhammad Ridwan",
-      hp: "0812-3456-7890",
-      program: "Wakaf Masjid",
-      nominal: 5000000,
-      metode: "Transfer Mandiri",
-      status: "berhasil",
-      tanggal: "24 Okt 2023, 14:30",
-    },
-    {
-      id: 2,
-      nama: "Siti Aminah",
-      hp: "0856-9988-7766",
-      program: "Santunan Yatim",
-      nominal: 250000,
-      metode: "QRIS / Dana",
-      status: "berhasil",
-      tanggal: "24 Okt 2023, 11:15",
-    },
-  ]
-
   useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem("transaksi"))
-
-    if (saved && saved.length > 0) {
-      setTransaksi(saved)
-    } else {
-      setTransaksi(defaultData)
-      localStorage.setItem("transaksi", JSON.stringify(defaultData))
-    }
+    const saved = JSON.parse(localStorage.getItem("transaksi")) || []
+    setTransaksi(saved)
   }, [])
 
-  const handleDelete = (id) => {
-    const updated = transaksi.filter((item) => item.id !== id)
-    setTransaksi(updated)
-    localStorage.setItem("transaksi", JSON.stringify(updated))
-  }
-
-  const filteredData = transaksi.filter((item) =>
-    item.nama.toLowerCase().includes(search.toLowerCase())
-  )
+  // LOGIKA FILTER GANDA (Nama & Program)
+  const filteredData = transaksi.filter((item) => {
+    const matchesSearch = item.nama.toLowerCase().includes(search.toLowerCase()) || 
+                          item.hp.includes(search)
+    const matchesProgram = filterProgram === "Semua Program" || item.program === filterProgram
+    
+    return matchesSearch && matchesProgram
+  })
 
   return (
-    <div className="space-y-6">
-      <TransaksiFilter search={search} setSearch={setSearch} />
+    <div className="space-y-0">
+      <TransaksiFilter 
+        search={search} 
+        setSearch={setSearch} 
+        filterProgram={filterProgram} 
+        setFilterProgram={setFilterProgram} 
+      />
 
-      <TransaksiTable data={filteredData} onDelete={handleDelete} />
+      <TransaksiTable data={filteredData} />
 
       {filteredData.length === 0 && (
-        <p className="text-center text-gray-500">
-          Data tidak ditemukan 😢
-        </p>
+        <div className="p-10 text-center text-gray-400">
+          Data transaksi tidak ditemukan
+        </div>
       )}
     </div>
   )

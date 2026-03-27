@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom"
 import { Plus } from "lucide-react"
-
 import ProgramList from "@/components/admin/program/ProgramList"
 import { Button } from "@/components/ui/button"
 
@@ -13,21 +12,23 @@ function ProgramPage() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold">Program Donasi</h1>
-          <p className="text-muted-foreground text-sm">
-            Kelola program donasi
+          <p className="text-gray-500 text-sm">
+            Kelola dan pantau seluruh inisiatif penggalang dana.
           </p>
         </div>
 
         <Button
           onClick={() => navigate("/admin/program/create")}
-          className="bg-green-600 hover:bg-green-700 flex gap-2"
+          className="bg-[#A3C585] hover:bg-[#A3C585]/70 flex gap-2 text-white"
         >
           <Plus size={16} />
-          Tambah Program
+          Tambah Program Baru
         </Button>
       </div>
 
-      <ProgramList />
+      <div>
+        <ProgramList />
+      </div>
     </div>
   )
 }

@@ -1,80 +1,50 @@
 import StatusBadge from "./StatusBadge"
+import { MoreVertical } from "lucide-react"
 
-function formatRupiah(angka) {
-  if (!angka) return "Rp 0"
-  return "Rp " + Number(angka).toLocaleString("id-ID")
-}
-
-function TransaksiTable({ data = [], onDelete = () => {} }) {
+function TransaksiTable({ data = [], onDelete }) {
   return (
-    <div className="bg-white rounded-xl border overflow-hidden">
-
-      <table className="w-full text-sm">
-        <thead className="bg-gray-50 text-gray-500">
-          <tr>
-            <th className="p-3 text-left">Donatur</th>
-            <th>Program</th>
-            <th>Nominal</th>
-            <th>Metode</th>
-            <th>Status</th>
-            <th>Tanggal</th>
-            <th>Aksi</th>
+    <div className="overflow-x-auto">
+      <table className="w-full text-left">
+        <thead className="bg-gray-50/50 border-y border-gray-100">
+          <tr className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+            <th className="px-6 py-4">Donatur</th>
+            <th className="px-6 py-4">Program Donasi</th>
+            <th className="px-6 py-4 text-center">Nominal</th>
+            <th className="px-6 py-4">Metode</th>
+            <th className="px-6 py-4">Status</th>
+            <th className="px-6 py-4">Tanggal</th>
+            <th className="px-6 py-4 text-center">Aksi</th>
           </tr>
         </thead>
-
-        <tbody>
-          {Array.isArray(data) && data.length > 0 ? (
-            data.map((item, index) => (
-              <tr key={item?.id || index} className="border-t hover:bg-gray-50">
-
-                <td className="p-3">
-                  <p className="font-medium">{item?.nama || "-"}</p>
-                  <p className="text-xs text-gray-400">{item?.hp || "-"}</p>
-                </td>
-
-                <td>
-                  <span className="bg-green-100 text-green-600 px-2 py-1 rounded-full text-xs">
-                    {item?.program || "-"}
-                  </span>
-                </td>
-
-                <td className="font-semibold">
-                  {formatRupiah(item?.nominal)}
-                </td>
-
-                <td className="text-gray-500">
-                  {item?.metode || "-"}
-                </td>
-
-                <td>
-                  <StatusBadge status={item?.status} />
-                </td>
-
-                <td className="text-gray-500">
-                  {item?.tanggal || "-"}
-                </td>
-
-                <td>
-                  <button
-                    onClick={() => onDelete(item?.id)}
-                    className="text-red-500 text-sm hover:underline"
-                  >
-                    Hapus
-                  </button>
-                </td>
-
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="7" className="text-center py-6 text-gray-400">
-                Tidak ada data transaksi
+        <tbody className="divide-y divide-gray-50">
+          {data.map((item) => (
+            <tr key={item.id} className="hover:bg-gray-50/80 transition-colors group">
+              <td className="px-6 py-4">
+                <div className="font-bold text-gray-700">{item.nama}</div>
+                <div className="text-[11px] text-gray-400">{item.hp}</div>
+              </td>
+              <td className="px-6 py-4">
+                <span className="px-3 py-1 bg-green-50 text-[#A3C585] text-[10px] font-bold rounded-full border border-green-100 uppercase">
+                  {item.program}
+                </span>
+              </td>
+              <td className="px-6 py-4 text-center font-bold text-gray-700">
+                Rp {Number(item.nominal).toLocaleString("id-ID")}
+              </td>
+              <td className="px-6 py-4 text-[12px] text-gray-500">{item.metode}</td>
+              <td className="px-6 py-4">
+                <StatusBadge status={item.status} />
+              </td>
+              <td className="px-6 py-4 text-[12px] text-gray-500">{item.tanggal}</td>
+              <td className="px-6 py-4 text-center">
+                <button className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100">
+                  <MoreVertical size={16} />
+                </button>
               </td>
             </tr>
-          )}
+          ))}
         </tbody>
       </table>
-
     </div>
   )
 }
