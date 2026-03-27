@@ -40,7 +40,7 @@ function ProgramList({ programs = [] }) {
   ];
 
   return (
-    <Card className="rounded-2xl border shadow-sm hover:shadow-md transition-all">
+    <Card className="rounded-2xl border shadow-md hover:shadow-lg transition-all ring-0 focus:ring-0 focus-visible:ring-0 outline-none">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-base sm:text-lg">
           Mendekati Target

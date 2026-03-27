@@ -3,8 +3,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import logo from "@/assets/logo.png"
-import { useNavigate } from "react-router-dom"
-import { useState } from "react"
+import { useNavigate, useLocation } from "react-router-dom"
+import { useState, useEffect } from "react"
+import { transactionApi } from "@/api/transaction"
 
 const nominalList = [10000, 20000, 50000, 100000]
 
@@ -75,9 +76,27 @@ const FormTransaction = () => {
       message,
     }
 
-    console.log("DATA SIAP KIRIM:", payload)
-
-    // nanti tinggal kirim ke API / Supabase di sini
+    try {
+      const response = await transactionApi.create(payload)
+      
+      if (response.data.success) {
+        // Ambil redirect_url dari response backend
+        const redirectUrl = response.data.redirect_url || response.data.data?.redirect_url
+        
+        if (redirectUrl) {
+          window.location.href = redirectUrl 
+        } else {
+          alert("Transaksi berhasil dibuat!")
+          navigate("/") 
+        }
+      }
+    } catch (error) {
+      console.error("Submission Error:", error)
+      const errorMsg = error.response?.data?.error || "Gagal memproses transaksi. Coba lagi nanti."
+      setApiError(errorMsg)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (

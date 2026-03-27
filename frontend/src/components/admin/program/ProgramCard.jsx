@@ -16,7 +16,7 @@ function ProgramCard({ data, onDelete }) {
   }
 
   return (
-    <Card className="rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition">
+    <Card className="rounded-2xl border border-gray-100 shadow-md overflow-hidden hover:shadow-lg transition ring-0 focus:ring-0 focus-visible:ring-0 outline-none">
       
       {/* IMAGE SECTION */}
       <div className="relative h-56 w-full bg-gray-100">
@@ -47,7 +47,7 @@ function ProgramCard({ data, onDelete }) {
             <Pencil
               size={18}
               onClick={() => navigate(`/admin/program/edit/${data.id}`)}
-              className="cursor-pointer hover:text-[#7FAE5A] transition-colors"
+              className="cursor-pointer hover:text-orange-500 transition-colors"
             />
             <Trash2
               size={18}

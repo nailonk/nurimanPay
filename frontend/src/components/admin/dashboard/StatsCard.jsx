@@ -71,7 +71,7 @@ function StatsCard({ programs = [], transactions = [] }) {
       {stats.map((item, i) => {
         const Icon = item.icon
         return (
-          <Card key={i} className="bg-white rounded-xl shadow-sm transition duration-300 hover:shadow-md">
+          <Card key={i} className="bg-white rounded-xl shadow-md transition duration-300 hover:shadow-lg ring-0 focus:ring-0 focus-visible:ring-0 outline-none">
             <CardContent className="p-4 flex flex-col items-start gap-3">
               <div className={`${item.bg} w-10 h-10 flex items-center justify-center rounded-lg`}>
                 <Icon className={`${item.iconColor} w-5 h-5`} />

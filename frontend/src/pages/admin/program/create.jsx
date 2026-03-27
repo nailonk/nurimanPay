@@ -1,23 +1,25 @@
 import { useNavigate } from "react-router-dom";
 import ProgramForm from "@/components/admin/program/ProgramForm";
 import { Info, Eye, CheckCircle2, ArrowLeft } from "lucide-react";
-import axios from "axios"; // 1. Import Axios
+import api from "@/api/axios"; 
 
 function ProgramCreate() {
   const navigate = useNavigate();
 
   const handleCreate = async (data) => {
     try {
-      // Kirim data ke endpoint backend
-      const response = await axios.post("http://localhost:5000/program/create", data);
+
+      const response = await api.post("/program/create", data);
       
-      if (response.status === 201 || response.status === 200) {
+      if (response.data) {
         alert("Program berhasil ditambahkan ke database!");
         navigate("/admin/program");
       }
     } catch (err) {
-      console.error("Gagal menambah program:", err.response?.data || err.message);
-      alert("Gagal menyimpan ke database. Pastikan server backend jalan.");
+      console.error("Gagal menambah program:", err);
+      // 3. Ambil pesan error dari response backend agar lebih informatif
+      const errorMsg = err.response?.data?.error || err.response?.data?.message || "Gagal menyimpan ke database.";
+      alert(errorMsg);
     }
   };
 
@@ -45,7 +47,6 @@ function ProgramCreate() {
 
       {/* 3 INFO CARDS */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
-        {/* Tips Deskripsi */}
         <div className="bg-[#f2f7f0]/50 p-6 rounded-2xl border border-[#e2ece0] transition-all hover:shadow-md hover:shadow-green-50">
           <div className="flex items-center gap-3 mb-3">
             <div className="p-2 bg-white rounded-lg shadow-sm">
@@ -58,7 +59,6 @@ function ProgramCreate() {
           </p>
         </div>
 
-        {/* Visual Terbuka */}
         <div className="bg-[#f2f7f0]/50 p-6 rounded-2xl border border-[#e2ece0] transition-all hover:shadow-md hover:shadow-green-50">
           <div className="flex items-center gap-3 mb-3">
             <div className="p-2 bg-white rounded-lg shadow-sm">
@@ -71,7 +71,6 @@ function ProgramCreate() {
           </p>
         </div>
 
-        {/* Verifikasi */}
         <div className="bg-[#f2f7f0]/50 p-6 rounded-2xl border border-[#e2ece0] transition-all hover:shadow-md hover:shadow-green-50">
           <div className="flex items-center gap-3 mb-3">
             <div className="p-2 bg-white rounded-lg shadow-sm">

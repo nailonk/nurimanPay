@@ -2,7 +2,7 @@ import { TrendingUp } from "lucide-react"
 
 function TransaksiStats() {
   const stats = [
-    { label: "Total Donasi (Bulan Ini)", value: "Rp 45.280.000", color: "text-green-600", bg: "bg-green-50/50", trend: "+12.5% dari bulan lalu" },
+    { label: "Total Donasi (Bulan Ini)", value: "Rp 45.280.000", color: "text-green-600", bg: "bg-white", trend: "+12.5% dari bulan lalu" },
     { label: "Total Transaksi", value: "1,240", color: "text-gray-800", bg: "bg-white", sub: "Semua waktu" },
     { label: "Pending Review", value: "12", color: "text-orange-600", bg: "bg-white", sub: "Butuh konfirmasi manual" },
     { label: "Donatur Aktif", value: "458", color: "text-[#A3C585]", bg: "bg-white", trend: "+8 donatur baru minggu ini" },

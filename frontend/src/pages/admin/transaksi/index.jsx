@@ -1,16 +1,19 @@
 import { FileDown } from "lucide-react";
-import * as XLSX from "xlsx/xlsx.mjs";
+import * as XLSX from "xlsx";
 import TransaksiList from "@/components/admin/transaksi/TransaksiList";
 import TransaksiStats from "@/components/admin/transaksi/TransaksiStats";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
 function TransaksiPage() {
+
+  const [showDialog, setShowDialog] = useState(false);
 
   const handleDownloadExcel = () => {
     const rawData = JSON.parse(localStorage.getItem("transaksi")) || [];
 
     if (rawData.length === 0) {
-      alert("Maaf, tidak ada data transaksi untuk diunduh.");
+      setShowDialog(true);
       return;
     }
 
@@ -36,6 +39,23 @@ function TransaksiPage() {
   return (
     <div className="p-4 md:p-6 space-y-8 bg-[#f9fafb] min-h-screen animate-in fade-in duration-500">
       
+      {/* DIALOG */}
+      {showDialog && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-[999]">
+          <div className="bg-white rounded-2xl shadow-lg p-6 w-[320px] text-center">
+            <p className="text-gray-700 font-medium">
+              Maaf, tidak ada data transaksi untuk diunduh.
+            </p>
+            <Button
+              onClick={() => setShowDialog(false)}
+              className="mt-4 bg-[#A3C585] hover:bg-[#8eb074] text-white w-full"
+            >
+              OK
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* HEADER SECTION */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>

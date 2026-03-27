@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { ArrowLeft } from "lucide-react"
-import axios from "axios"
+import api from "@/api/axios" 
 import ProgramForm from "@/components/admin/program/ProgramForm"
 
 function ProgramEdit() {
@@ -15,13 +15,10 @@ function ProgramEdit() {
     const fetchProgram = async () => {
       try {
         setLoading(true)
-        const response = await axios.get(`http://localhost:5000/program`)
-        
-        const rawData = response.data
-        const allPrograms = Array.isArray(rawData) ? rawData : (rawData.data || [])
 
-        // Cari program yang cocok
-        const program = allPrograms.find(p => String(p.id) === String(id))
+        const response = await api.get(`/program/${id}`)
+
+        const program = response.data?.data || response.data
 
         if (program) {
           setData({
@@ -39,7 +36,7 @@ function ProgramEdit() {
         }
       } catch (err) {
         console.error("Gagal mengambil data:", err)
-        setError("Gagal mengambil data dari server.")
+        setError(err.response?.data?.error || "Gagal mengambil data dari server.")
       } finally {
         setLoading(false)
       }
@@ -50,38 +47,45 @@ function ProgramEdit() {
 
   const handleUpdate = async (formData) => {
     try {
-
       const payload = {
         title: formData.title,
         description: formData.description,
-        target_amount: Number(formData.target_amount), // Pastikan menggunakan target_amount
-        status: formData.status,
-        image: formData.image,
-        collected_amount: formData.collected_amount || 0
-      }
+        target_amount: Number(formData.target_amount),
+        status: formData.status || 'aktif',
+        image: formData.image
+      };
 
-      console.log("Mengirim payload ke backend:", payload)
-
-      await axios.put(`http://localhost:5000/program/${id}`, payload)
+      await api.put(`/program/${id}`, payload);
       
-      alert("Berhasil diperbarui!")
-      navigate("/admin/program")
+      alert("Program berhasil diperbarui!");
+      navigate("/admin/program");
     } catch (err) {
-      console.error("Update Error:", err)
-      // Memberikan pesan error yang lebih spesifik jika ada dari backend
-      const errMsg = err.response?.data?.error || "Gagal menyimpan perubahan."
-      alert(`Error: ${errMsg}`)
+      console.error("Update Error Detail:", err);
+      const serverMessage = err.response?.data?.error || err.response?.data?.message;
+      const errorMessage = serverMessage || "Terjadi kesalahan saat menyimpan perubahan.";
+      
+      alert(`Gagal Update: ${errorMessage}`);
+      throw err; // Lempar balik agar status loading di tombol form berhenti
     }
-  }
+  };
 
-  if (loading) return <div className="p-10 text-center text-gray-500 font-medium">Memuat data program...</div>
+  if (loading) return (
+    <div className="flex flex-col items-center justify-center py-20 text-gray-400 gap-4">
+      <div className="w-10 h-10 border-4 border-[#A3C585] border-t-transparent rounded-full animate-spin"></div>
+      <p className="text-sm font-medium">Memuat data program...</p>
+    </div>
+  )
   
   if (error) return (
-    <div className="p-10 text-center">
-      <p className="text-red-500 font-semibold mb-4">{error}</p>
+    <div className="max-w-md mx-auto mt-20 p-8 text-center bg-white rounded-3xl border border-gray-100 shadow-sm">
+      <div className="w-16 h-16 bg-red-50 text-red-400 rounded-full flex items-center justify-center mx-auto mb-4">
+        <ArrowLeft size={32} />
+      </div>
+      <p className="text-gray-800 font-bold text-lg mb-2">Ups! Ada Masalah</p>
+      <p className="text-gray-500 text-sm mb-6">{error}</p>
       <button 
         onClick={() => navigate("/admin/program")} 
-        className="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+        className="w-full py-3 bg-gray-900 text-white rounded-xl hover:bg-black transition-all font-semibold"
       >
         Kembali ke Daftar
       </button>
@@ -103,10 +107,15 @@ function ProgramEdit() {
         <p className="text-gray-500 text-sm">Perbarui informasi program agar tetap akurat.</p>
       </div>
 
-      <div className="bg-white shadow-sm rounded-[32px] border border-gray-100 overflow-hidden">
-        {/* Pastikan initialData menerima objek data yang lengkap */}
+      <div className="bg-white shadow-sm rounded-[32px] border border-gray-100 overflow-hidden p-2">
         {data && <ProgramForm initialData={data} onSubmit={handleUpdate} />}
       </div>
+      
+      <footer className="mt-16 text-center">
+        <p className="text-[11px] text-gray-400 font-medium tracking-wide">
+          © 2026 NURIMANPAY • SYSTEM MANAGEMENT DONASI
+        </p>
+      </footer>
     </div>
   )
 }

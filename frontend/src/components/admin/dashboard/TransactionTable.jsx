@@ -2,8 +2,10 @@ import {
   Card,
   CardContent,
 } from "@/components/ui/card"
+import { useNavigate } from "react-router-dom";
 
 function TransactionTable({ transactions = [] }) {
+  const navigate = useNavigate();
 
   // Fungsi untuk mendapatkan inisial dari nama donatur
   const getInitials = (name) => {
@@ -129,7 +131,9 @@ function TransactionTable({ transactions = [] }) {
 
         {/* FOOTER */}
         <div className="mt-6 text-center border-t border-gray-50 pt-4">
-          <button className="text-sm font-semibold text-emerald-600 hover:text-emerald-700 transition">
+          <button 
+              onClick={() => navigate("/admin/transaksi")}
+              className="text-sm font-semibold text-emerald-600 hover:text-emerald-700 transition">
             Lihat Semua Riwayat Donasi
           </button>
         </div>

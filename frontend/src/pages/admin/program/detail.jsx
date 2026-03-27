@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import axios from "axios"
+import api from "@/api/axios"
 import { Trash2, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
+
+const PLACEHOLDER = "https://placehold.co/600x400/f3f4f6/a3c585?text=No+Image"
 
 function ProgramDetailAdmin() {
   const { id } = useParams()
@@ -15,51 +17,61 @@ function ProgramDetailAdmin() {
     const fetchProgramDetail = async () => {
       try {
         setLoading(true)
-        const response = await axios.get(`http://localhost:5000/program/${id}`)
-        const data = response.data.data || response.data
+        const response = await api.get(`/program/${id}`)
+
+        }
+
+        const target = Number(data.target_amount) || 0
+        const collected = Number(data.collected_amount) || 0
+        const isImageValid = data.image && data.image !== "null" && String(data.image).length > 50
 
         // Mapping data agar sesuai dengan kebutuhan UI
         const mappedData = {
           ...data,
-          progress: data.target_amount > 0 
-            ? Math.round((data.collected_amount / data.target_amount) * 100) 
-            : 0,
+          progress: target > 0 ? Math.round((collected / target) * 100) : 0,
           formattedCollected: new Intl.NumberFormat("id-ID", { 
             style: "currency", currency: "IDR", maximumFractionDigits: 0 
-          }).format(data.collected_amount || 0),
+          }).format(collected),
           formattedTarget: new Intl.NumberFormat("id-ID", { 
             style: "currency", currency: "IDR", maximumFractionDigits: 0 
-          }).format(data.target_amount || 0),
-          image: data.image || "https://images.unsplash.com/photo-1542621334-a254cf47733d?q=80&w=800",
+          }).format(target),
+          image: isImageValid ? data.image : PLACEHOLDER,
         }
 
         setProgram(mappedData)
       } catch (err) {
         console.error("Gagal memuat detail:", err)
-        alert("Program tidak ditemukan atau server bermasalah.")
+        alert(err.response?.data?.error || "Program tidak ditemukan atau server bermasalah.")
         navigate("/admin/program")
       } finally {
         setLoading(false)
       }
     }
 
-    fetchProgramDetail()
+    if (id) fetchProgramDetail()
   }, [id, navigate])
 
   const handleDelete = async () => {
     if (window.confirm("Apakah Anda yakin ingin menghapus program ini secara permanen?")) {
       try {
-        await axios.delete(`http://localhost:5000/program/${id}`)
+        await api.delete(`/program/${id}`)
         alert("Program berhasil dihapus.")
         navigate("/admin/program")
       } catch (err) {
         console.error("Gagal menghapus:", err)
-        alert("Terjadi kesalahan saat menghapus data.")
+        const msg = err.response?.data?.error || "Terjadi kesalahan saat menghapus data."
+        alert(msg)
       }
     }
   }
 
-  if (loading) return <div className="p-10 text-center">Memuat data program...</div>
+  if (loading) return (
+    <div className="flex flex-col items-center justify-center py-20 text-gray-400 gap-4">
+      <div className="w-10 h-10 border-4 border-[#A3C585] border-t-transparent rounded-full animate-spin"></div>
+      <p className="text-sm">Memuat data program...</p>
+    </div>
+  )
+
   if (!program) return null
 
   return (
@@ -67,94 +79,97 @@ function ProgramDetailAdmin() {
       {/* BACK BUTTON */}
       <button
         onClick={() => navigate("/admin/program")}
-        className="flex items-center gap-2 mb-6 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+        className="flex items-center gap-2 mb-6 text-sm text-gray-600 hover:text-gray-900 transition-colors group"
       >
-        <ArrowLeft size={16} /> Kembali ke Program
+        <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> 
+        Kembali ke Program
       </button>
 
       {/* CARD */}
-      <div className="max-w-4xl mx-auto bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <div className="max-w-4xl mx-auto bg-white rounded-[32px] border border-gray-100 shadow-sm overflow-hidden">
         {/* IMAGE */}
-        <div className="relative h-80">
+        <div className="relative h-96">
           <img
             src={program.image}
             alt={program.title}
             className="w-full h-full object-cover"
           />
           {/* BADGE */}
-          <span className="absolute top-4 left-4 bg-[#A3C585] text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-md">
+          <span className="absolute top-6 left-6 bg-[#A3C585] text-white text-xs font-bold px-5 py-2 rounded-full shadow-lg">
             {program.status?.toUpperCase() || "AKTIF"}
           </span>
         </div>
 
         {/* CONTENT */}
-        <div className="p-8 space-y-6">
-          <div className="flex justify-between items-start gap-4">
-            <div className="flex-1">
-              <h1 className="text-2xl font-bold text-gray-800">
+        <div className="p-10 space-y-8">
+          <div className="flex justify-between items-start gap-6">
+            <div className="flex-1 space-y-4">
+              <h1 className="text-3xl font-extrabold text-gray-800 tracking-tight">
                 {program.title}
               </h1>
-              <p className="text-gray-600 mt-3 leading-relaxed">
+              <p className="text-gray-600 leading-relaxed whitespace-pre-line">
                 {program.description}
               </p>
             </div>
 
             <button 
               onClick={handleDelete}
-              className="p-2 rounded-lg bg-red-50 text-red-400 hover:text-red-600 hover:bg-red-100 transition-all"
+              className="p-3 rounded-2xl bg-red-50 text-red-400 hover:text-red-600 hover:bg-red-100 transition-all shadow-sm"
+              title="Hapus Program"
             >
-              <Trash2 size={22} />
+              <Trash2 size={24} />
             </button>
           </div>
 
-          <hr className="border-gray-100" />
+          <div className="h-px bg-gray-100" />
 
           {/* PROGRESS */}
-          <div className="space-y-3">
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-500 font-medium">Progres Pengumpulan</span>
-              <span className="text-[#7FAE5A] font-bold">
-                {program.progress}%
-              </span>
+          <div className="space-y-4">
+            <div className="flex justify-between items-end">
+              <div>
+                <p className="text-sm text-gray-400 font-medium">Progres Donasi</p>
+                <p className="text-2xl font-black text-[#7FAE5A]">{program.progress}%</p>
+              </div>
+              <span className="text-sm text-gray-400 italic">Target: {program.formattedTarget}</span>
             </div>
 
-            <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+            <div className="h-4 bg-gray-100 rounded-full overflow-hidden">
               <div
-                className="h-full bg-[#A3C585] transition-all duration-500"
-                style={{ width: `${program.progress}%` }}
+                className="h-full bg-[#A3C585] transition-all duration-700 ease-out shadow-[0_0_15px_rgba(163,197,133,0.5)]"
+                style={{ width: `${Math.min(program.progress, 100)}%` }}
               />
             </div>
           </div>
 
           {/* TERKUMPUL & TARGET */}
-          <div className="grid grid-cols-2 gap-4 bg-gray-50 p-4 rounded-xl">
+          <div className="grid grid-cols-2 gap-6 bg-gray-50/50 p-6 rounded-[24px] border border-gray-100">
             <div>
-              <p className="text-gray-500 text-xs uppercase tracking-wider mb-1">Terkumpul</p>
-              <p className="text-xl font-bold text-gray-800">
+              <p className="text-gray-400 text-xs uppercase tracking-widest mb-2">Dana Terkumpul</p>
+              <p className="text-2xl font-bold text-gray-800">
                 {program.formattedCollected}
               </p>
             </div>
 
-            <div className="text-right border-l border-gray-200">
-              <p className="text-gray-500 text-xs uppercase tracking-wider mb-1">Target Dana</p>
-              <p className="text-xl font-semibold text-gray-600">
+            <div className="text-right border-l border-gray-200 pl-6">
+              <p className="text-gray-400 text-xs uppercase tracking-widest mb-2">Target Dibutuhkan</p>
+              <p className="text-2xl font-semibold text-gray-600">
                 {program.formattedTarget}
               </p>
             </div>
           </div>
 
           {/* ACTION */}
-          <div className="pt-4 flex gap-3">
+          <div className="pt-6 flex gap-4">
             <Button
-              className="bg-[#A3C585] hover:bg-[#92b874] text-white px-8 h-11"
+              className="bg-[#A3C585] hover:bg-[#92b874] text-white px-10 h-12 rounded-xl text-md font-bold shadow-md transition-all active:scale-95"
               onClick={() => navigate(`/admin/program/edit/${id}`)}
             >
-              Edit Program
+              Edit Informasi Program
             </Button>
             
             <Button
               variant="outline"
-              className="border-gray-200 text-gray-600 hover:bg-gray-50 px-8 h-11"
+              className="bg-red-600 border-gray-200 text-white px-10 h-12 rounded-xl text-md active:scale-95"
               onClick={() => navigate("/admin/program")}
             >
               Tutup

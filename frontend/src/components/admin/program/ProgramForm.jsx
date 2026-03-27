@@ -179,7 +179,7 @@ function ProgramForm({ onSubmit, initialData = {} }) {
           <button 
             type="button" 
             onClick={() => navigate("/admin/program")}
-            className="px-8 h-12 rounded-xl text-gray-400 font-bold hover:bg-gray-50 transition-all"
+            className="px-8 h-12 rounded-xl bg-red-600 text-white font-bold transition-all"
           >
             Batal
           </button>

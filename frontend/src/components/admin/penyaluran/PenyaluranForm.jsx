@@ -128,7 +128,7 @@ export default function FormPenyaluran({ editData, editIndex, refresh, setOpen }
           <button 
             type="button" 
             onClick={() => setOpen(false)}
-            className="w-full md:w-auto px-10 h-12 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-50 font-bold transition-all order-2 md:order-1"
+            className="w-full md:w-auto px-10 h-12 rounded-xl text-white bg-red-600 font-bold transition-all order-2 md:order-1"
           >
             Batal
           </button>
