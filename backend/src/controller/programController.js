@@ -41,3 +41,31 @@ export const getProgramTransactions = async (req, res) => {
     res.status(500).json({ message: "Gagal mengambil data transaksi" });
   }
 };
+
+export const updateProgram = async (req, res) => {
+  const { id } = req.params;
+  try {
+    // Memanggil service, bukan langsung pool query
+    const updatedProgram = await programService.updateProgramService(id, req.body);
+
+    if (!updatedProgram) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Program tidak ditemukan' 
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Program berhasil diperbarui',
+      data: updatedProgram
+    });
+  } catch (error) {
+    console.error('Controller Error Update Program:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Gagal memperbarui program', 
+      details: error.message 
+    });
+  }
+};

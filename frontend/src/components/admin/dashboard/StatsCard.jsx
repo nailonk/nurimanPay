@@ -1,92 +1,85 @@
 import { Card, CardContent } from "@/components/ui/card"
-import { Megaphone, Wallet, HandCoins, Receipt, TrendingUp } from "lucide-react"
+import { Megaphone, Wallet, HandCoins, Receipt } from "lucide-react"
 
-function StatsCard() {
-  const data = [
+function StatsCard({ programs = [], transactions = [] }) {
+  
+  const safeTransactions = Array.isArray(transactions) ? transactions : [];
+  const safePrograms = Array.isArray(programs) ? programs : [];
+  const activeProgramIds = safePrograms.map(p => String(p.id));
+
+  const totalDonasiValid = safeTransactions
+    .filter(t => {
+
+      const statusLunas = ['success', 'settlement', 'capture'].includes(t.status?.toLowerCase());
+
+      const isProgramValid = !t.program_id || activeProgramIds.includes(String(t.program_id));
+      
+      return statusLunas && isProgramValid;
+    })
+    .reduce((acc, curr) => {
+      const nilai = curr.amount || curr.nominal || curr.gross_amount || curr.total || 0;
+      return acc + Number(nilai);
+    }, 0);
+
+  const totalSemuaTransaksi = safeTransactions.filter(t => 
+    !t.program_id || activeProgramIds.includes(String(t.program_id))
+  ).length;
+
+  const formatIDR = (amount) => {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
+  const stats = [
     {
       title: "Total Program",
-      value: "12",
+      value: safePrograms.length.toString(),
       icon: Megaphone,
-      bg: "bg-green-100",
-      iconColor: "text-green-600",
-      trend: "+2 bulan ini",
+      bg: "bg-green-50",
+      iconColor: "text-green-500",
     },
     {
       title: "Total Donasi Masuk",
-      value: "Rp 150.250k",
+      // Nominal uang hanya dari transaksi Sukses
+      value: formatIDR(totalDonasiValid),
       icon: Wallet,
-      bg: "bg-yellow-100",
-      iconColor: "text-yellow-600",
-      trend: "+12%",
+      bg: "bg-orange-50",
+      iconColor: "text-orange-500",
     },
     {
       title: "Dana Disalurkan",
-      value: "Rp 85.000k",
+      value: "Rp 0", 
       icon: HandCoins,
-      bg: "bg-blue-100",
-      iconColor: "text-blue-600",
-      trend: "+8%",
+      bg: "bg-blue-50",
+      iconColor: "text-blue-500",
     },
     {
       title: "Jumlah Transaksi",
-      value: "1,240",
+      // Menghitung SEMUA (Success + Pending + Cancel, dll)
+      value: totalSemuaTransaksi.toLocaleString(),
       icon: Receipt,
       bg: "bg-gray-100",
-      iconColor: "text-gray-600",
-      trend: "+5%",
+      iconColor: "text-gray-500",
     },
   ]
 
   return (
     <>
-      {data.map((item, i) => {
+      {stats.map((item, i) => {
         const Icon = item.icon
-
         return (
-          <Card
-            key={i}
-            className="
-              group rounded-2xl border border-gray-200 
-              shadow-sm hover:shadow-md 
-              transition-all duration-300
-              hover:-translate-y-1
-            "
-          >
-            <CardContent className="p-4 sm:p-5 flex items-center justify-between">
-
-              {/* LEFT */}
-              <div className="space-y-2">
-
-                <p className="text-xs sm:text-sm text-gray-500">
-                  {item.title}
-                </p>
-
-                <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 tracking-tight">
-                  {item.value}
-                </h3>
-
-                {/* TREND */}
-                <div className="flex items-center gap-1 text-xs text-green-600">
-                  <TrendingUp className="w-3 h-3" />
-                  <span>{item.trend}</span>
-                </div>
-
+          <Card key={i} className="bg-white rounded-xl shadow-sm transition duration-300 hover:shadow-md">
+            <CardContent className="p-4 flex flex-col items-start gap-3">
+              <div className={`${item.bg} w-10 h-10 flex items-center justify-center rounded-lg`}>
+                <Icon className={`${item.iconColor} w-5 h-5`} />
               </div>
-
-              {/* ICON */}
-              <div
-                className={`
-                  ${item.bg} 
-                  p-3 rounded-xl
-                  transition-all duration-300
-                  group-hover:scale-110
-                `}
-              >
-                <Icon
-                  className={`${item.iconColor} w-5 h-5`}
-                />
+              <div className="flex flex-col justify-center">
+                <p className="text-sm text-gray-500 mb-1">{item.title}</p>
+                <h3 className="text-xl font-semibold text-gray-800 leading-tight">{item.value}</h3>
               </div>
-
             </CardContent>
           </Card>
         )

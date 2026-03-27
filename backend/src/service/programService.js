@@ -2,15 +2,17 @@ import pool from '../config/db.js';
 
 // Logika simpan program baru
 export const createProgramService = async (programData) => {
-  const { title, description, target_amount } = programData;
+  // Tambahkan end_date di sini
+  const { title, description, target_amount, end_date } = programData;
 
   const query = `
-    INSERT INTO programs (title, description, target_amount, collected_amount, status)
-    VALUES ($1, $2, $3, 0, 'aktif')
+    INSERT INTO programs (title, description, target_amount, end_date, collected_amount, status)
+    VALUES ($1, $2, $3, $4, 0, 'aktif')
     RETURNING *
   `;
   
-  const values = [title, description, target_amount];
+  // Masukkan end_date ke dalam array values ($4)
+  const values = [title, description, target_amount, end_date];
   const result = await pool.query(query, values);
   return result.rows[0];
 };
@@ -37,4 +39,28 @@ export const getTransactionsByProgramService = async (programId) => {
     console.error("Error fetching transactions:", error);
     throw error;
   }
+};
+
+export const updateProgramService = async (id, data) => {
+    // Pastikan semua field ini dikirim dari Postman
+    const { title, description, target_amount, end_date, status } = data;
+    
+    const result = await pool.query(
+        `UPDATE programs 
+         SET title = $1, description = $2, target_amount = $3, end_date = $4, status = $5, updated_at = NOW()
+         WHERE id = $6
+         RETURNING *`,
+        [title, description, target_amount, end_date, status, id]
+    );
+    return result.rows[0];
+};
+export const addCollectedAmount = async (programId, amount) => {
+  const query = `
+    UPDATE programs 
+    SET collected_amount = collected_amount + $1 
+    WHERE id = $2 
+    RETURNING *
+  `;
+  const result = await pool.query(query, [amount, programId]);
+  return result.rows[0];
 };

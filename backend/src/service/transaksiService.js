@@ -6,10 +6,10 @@ export const createDonationService = async (donationData) => {
 
   const orderId = `DONASI-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
-  // 1. Simpan data awal ke database
+  // Simpan data awal ke database
   const insertQuery = `
-    INSERT INTO transactions (name, phone_number, amount, message, program_id, order_id, status)
-    VALUES ($1, $2, $3, $4, $5, $6, 'pending')
+    INSERT INTO transactions (name, phone_number, amount, message, program_id, order_id, status, created_at)
+    VALUES ($1, $2, $3, $4, $5, $6, 'pending', CURRENT_TIMESTAMP)
     RETURNING id
   `;
   const insertValues = [name, phone_number, amount, message, program_id || null, orderId];
@@ -55,20 +55,38 @@ export const checkMidtransStatusService = async (orderId) => {
   let dbStatus = 'pending';
   const ts = status.transaction_status;
 
+  // Cek apakah status dari Midtrans adalah sukses
   if (ts === 'settlement' || ts === 'capture') {
     dbStatus = 'success';
   } else if (['deny', 'cancel', 'expire'].includes(ts)) {
     dbStatus = 'failed';
   }
 
-  // 1. Update tabel TRANSACTIONS (untuk status utama)
+  // 1. Ambil data transaksi lama buat cek status sebelumnya (PENTING!)
+  // Ini supaya kalau di-refresh, saldo nggak nambah terus-terusan
+  const oldTrans = await pool.query(
+    'SELECT status, amount, program_id FROM transactions WHERE order_id = $1', 
+    [orderId]
+  );
+  const currentDbStatus = oldTrans.rows[0]?.status;
+  const amount = oldTrans.rows[0]?.amount;
+  const programId = oldTrans.rows[0]?.program_id;
+
+  // 2. Update tabel TRANSACTIONS (Status Utama)
   await pool.query(
-    `UPDATE transactions SET status = $1 WHERE order_id = $2`,
+    `UPDATE transactions SET status = $1, updated_at = NOW() WHERE order_id = $2`,
     [dbStatus, orderId]
   );
 
-  // 2. Update tabel MIDTRANS_PAYMENTS (untuk detail pembayaran)
-  // Pastikan kolom-kolom ini ada di tabel midtrans_payments kamu
+  // 3. LOGIKA TAMBAHAN: Kalau status berubah jadi success dan sebelumnya BELUM success
+  if (dbStatus === 'success' && currentDbStatus !== 'success' && programId) {
+    await pool.query(
+      `UPDATE programs SET collected_amount = collected_amount + $1 WHERE id = $2`,
+      [amount, programId]
+    );
+  }
+
+  // 4. Update tabel MIDTRANS_PAYMENTS
   await pool.query(
     `UPDATE midtrans_payments 
      SET transaction_status = $1, payment_type = $2, updated_at = NOW() 

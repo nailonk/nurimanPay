@@ -31,10 +31,10 @@ app.use((req, res, next) => {
 });
 
 // Routes
-app.use('/auth', authRoutes);
-app.use('/transaksi', transaksiRoutes);           
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/transaksi', transaksiRoutes);           
 app.use('/notif', notificationRoutes);   
-app.use('/program', programRoutes);       
+app.use('/api/v1/program', programRoutes);       
 
 // Root endpoint
 app.get('/', (req, res) => {
@@ -45,19 +45,20 @@ app.get('/', (req, res) => {
         timestamp: new Date(),
         endpoints: {
             auth: {
-                login: 'POST /auth/login'
+                login: 'POST api/v1/auth/login'
             },
             transaksi: {
-                create: 'POST /transaksi/create',
-                getAll: 'GET /transaksi'
+                create: 'POST api/v1/transaksi/create',
+                getAll: 'GET api/v1/transaksi'
             },
             program: {
-                create: 'POST /program/create',
-                getAll: 'GET /program'
+                create: 'POST api/v1/program/create',
+                getAll: 'GET api/v1/program',
+                getTransactions: 'GET api/v1/program/:id/transactions'
             },
             midtrans: {
-                notification: 'POST /notif',
-                cekStatus: 'GET /status/:orderId'
+                notification: 'POST api/v1/notif',
+                cekStatus: 'GET api/v1/status/:orderId'
             }
         }
     });

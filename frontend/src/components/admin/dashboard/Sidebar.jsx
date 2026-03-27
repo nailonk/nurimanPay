@@ -4,20 +4,22 @@ import {
   Wallet,
   History,
   LogOut,
-  Menu
+  Menu, // Icon buka
+  X     // Icon tutup
 } from "lucide-react"
-
 import { useNavigate, useLocation } from "react-router-dom"
 import { useState } from "react"
 import logo from "@/assets/logo.png"
 
-function Sidebar({ isMobileOpen, setIsMobileOpen }) {
+function Sidebar() {
   const navigate = useNavigate()
   const location = useLocation()
-
+  
+  // State untuk Desktop (Collapse/Expand)
   const [isOpen, setIsOpen] = useState(true)
+  // State untuk Mobile (Show/Hide)
+  const [isMobileOpen, setIsMobileOpen] = useState(false)
 
-  // ✅ PATH SUDAH DISAMAKAN
   const menus = [
     { name: "Dashboard", icon: LayoutDashboard, path: "/admin/dashboard" },
     { name: "Program Donasi", icon: HandHeart, path: "/admin/program" },
@@ -32,71 +34,62 @@ function Sidebar({ isMobileOpen, setIsMobileOpen }) {
 
   return (
     <>
-      {/* OVERLAY MOBILE */}
+      {/* TOMBOL HAMBURGER */}
+      {!isMobileOpen && (
+        <button 
+          onClick={() => setIsMobileOpen(true)}
+          className="fixed top-4 left-4 z-[40] md:hidden p-2 bg-[#A3C586] text-white rounded-lg shadow-lg"
+        >
+          <Menu size={24} />
+        </button>
+      )}
+
+      {/* OVERLAY */}
       {isMobileOpen && (
         <div
-          className="fixed inset-0 bg-black/40 z-40 md:hidden"
+          className="fixed inset-0 bg-black/50 z-[60] md:hidden"
           onClick={() => setIsMobileOpen(false)}
         />
       )}
 
-      {/* SIDEBAR */}
+      {/* SIDEBAR CORE */}
       <div
         className={`
-          fixed md:relative z-50
-          h-full
-          bg-[#A3C586] text-white
+          fixed md:sticky top-0 left-0 z-[70]
+          h-screen bg-[#A3C586] text-white
           flex flex-col justify-between
-          p-5 transition-all duration-300
-
+          p-5 transition-all duration-300 ease-in-out
+          
+          /* Lebar Sidebar */
           ${isOpen ? "w-64" : "w-20"}
-
-          /* MOBILE SLIDE */
+          
+          /* Logika Sembunyi di Mobile */
           ${isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
         `}
       >
-        {/* TOP */}
         <div>
+          {/* HEADER: Logo & Toggle Button */}
+          <div className="flex items-center justify-between mb-8">
+            {(isOpen || isMobileOpen) && (
+              <div className="flex items-center gap-3">
+                <img src={logo} alt="Logo" className="w-10 h-10 object-contain" />
+                <div className="leading-tight">
+                  <h1 className="text-lg font-bold">Nurul Iman</h1>
+                  <p className="text-[10px] text-green-100 uppercase tracking-widest">Admin Panel</p>
+                </div>
+              </div>
+            )}
 
-          {/* TOGGLE */}
-          <button
-            onClick={() => {
-              if (window.innerWidth < 768) {
-                setIsMobileOpen(false)
-              } else {
-                setIsOpen(!isOpen)
-              }
-            }}
-            className="mb-6 text-white"
-          >
-            <Menu />
-          </button>
+            {/* Tombol Toggle Desktop / Close Mobile */}
+            <button 
+              onClick={() => isMobileOpen ? setIsMobileOpen(false) : setIsOpen(!isOpen)}
+              className="p-1 hover:bg-white/20 rounded-lg"
+            >
+              {isMobileOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
 
-          {/* USER */}
-          {isOpen && (
-            <div className="mb-8 flex items-center gap-3">
-
-  {/* LOGO */}
-  <img
-    src={logo}
-    alt="Logo"
-    className="w-10 h-10 object-contain"
-  />
-
-  {/* TEXT */}
-  <div>
-    <h1 className="text-lg font-semibold leading-tight">
-      Nurul Iman
-    </h1>
-    <p className="text-sm text-green-100">
-      Admin Panel
-    </p>
-  </div>
-
-</div>
-          )} 
-
-          {/* MENU */}
+          {/* MENU NAVIGASI */}
           <ul className="space-y-2">
             {menus.map((menu, i) => {
               const isActive = location.pathname === menu.path
@@ -110,27 +103,12 @@ function Sidebar({ isMobileOpen, setIsMobileOpen }) {
                     setIsMobileOpen(false)
                   }}
                   className={`
-                    relative flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer transition-all
-
-                    ${
-                      isActive
-                        ? "bg-white/30 text-white"
-                        : "text-green-50 hover:bg-white/20"
-                    }
+                    flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all
+                    ${isActive ? "bg-white/30 text-white hover:bg-white/20" : "text-white hover:bg-white/10"}
                   `}
                 >
-                  {/* ACTIVE BAR */}
-                  {isActive && (
-                    <span className="absolute left-0 top-0 h-full w-[4px] bg-white rounded-r" />
-                  )}
-
-                  <Icon size={20} />
-
-                  <span
-                    className={`whitespace-nowrap transition-all duration-300 ${
-                      isOpen ? "opacity-100 ml-1" : "opacity-0 w-0 overflow-hidden"
-                    }`}
-                  >
+                  <Icon size={22} />
+                  <span className={`font-medium transition-all ${isOpen ? "block" : "hidden"}`}>
                     {menu.name}
                   </span>
                 </li>
@@ -142,12 +120,10 @@ function Sidebar({ isMobileOpen, setIsMobileOpen }) {
         {/* LOGOUT */}
         <button
           onClick={logout}
-          className="flex items-center gap-2 text-sm text-green-100 hover:text-red-200 transition"
+          className="flex items-center gap-3 px-4 py-3 text-white/80 hover:text-white hover:bg-red-500/20 rounded-xl transition-all"
         >
-          <LogOut size={18} />
-          <span className={`${isOpen ? "block" : "hidden"}`}>
-            Logout
-          </span>
+          <LogOut size={20} />
+          <span className={`${isOpen ? "block" : "hidden"} font-medium`}>Logout</span>
         </button>
       </div>
     </>

@@ -1,13 +1,10 @@
 import {
   Card,
   CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
 } from "@/components/ui/card"
 
 import {
-  LineChart,
+  AreaChart,
   Line,
   XAxis,
   Tooltip,
@@ -27,51 +24,52 @@ function ChartSection() {
   ]
 
   return (
-    <Card className="rounded-2xl border shadow-sm hover:shadow-md transition-all">
+    <Card className="bg-white rounded-xl shadow-sm transition duration-300 hover:shadow-md">
 
       {/* HEADER */}
-      <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-2">
+      <div className="flex items-center justify-between p-4 pb-0">
 
         <div>
-          <CardTitle className="text-base sm:text-lg">
+          <h3 className="text-base font-semibold text-gray-800">
             Statistik Donasi
-          </CardTitle>
-          <CardDescription>
+          </h3>
+          <p className="text-sm text-gray-500">
             Penerimaan dana 6 bulan terakhir
-          </CardDescription>
+          </p>
         </div>
 
-        {/* FILTER */}
         <select className="
           text-sm bg-gray-100 px-3 py-1.5 rounded-lg
-          outline-none focus:ring-2 focus:ring-green-300
+          outline-none focus:ring-2 focus:ring-[#A3C585]
+          transition
         ">
           <option>2026</option>
           <option>2025</option>
         </select>
 
-      </CardHeader>
+      </div>
 
-      {/* CONTENT */}
-      <CardContent>
-        <div className="h-[250px] sm:h-[300px] w-full">
+      {/* CHART */}
+      <CardContent className="pt-4">
+        <div className="h-[260px] w-full">
 
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data}>
+            <AreaChart data={data}>
 
               {/* GRADIENT */}
               <defs>
-                <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.4} />
-                  <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                <linearGradient id="greenGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#A3C585" stopOpacity={0.6} />
+                  <stop offset="60%" stopColor="#A3C585" stopOpacity={0.25} />
+                  <stop offset="100%" stopColor="#A3C585" stopOpacity={0} />
                 </linearGradient>
               </defs>
 
-              {/* GRID */}
+              {/* GRID (lebih soft) */}
               <CartesianGrid
-                strokeDasharray="3 3"
+                strokeDasharray="4 4"
                 vertical={false}
-                stroke="#e5e7eb"
+                stroke="#f1f5f9"
               />
 
               {/* X AXIS */}
@@ -79,18 +77,21 @@ function ChartSection() {
                 dataKey="name"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: "#6b7280", fontSize: 12 }}
+                tick={{ fill: "#9ca3af", fontSize: 12 }}
               />
 
-              {/* TOOLTIP CUSTOM */}
+              {/* TOOLTIP */}
               <Tooltip
+                cursor={{ stroke: "#e5e7eb", strokeWidth: 1 }}
                 content={({ active, payload }) => {
                   if (active && payload && payload.length) {
                     return (
-                      <div className="bg-white border rounded-lg shadow-sm px-3 py-2 text-xs">
-                        <p className="font-medium">{payload[0].payload.name}</p>
-                        <p className="text-green-600 font-semibold">
-                          {payload[0].value}
+                      <div className="bg-white rounded-lg shadow-sm px-3 py-2 text-xs">
+                        <p className="text-gray-500">
+                          {payload[0].payload.name}
+                        </p>
+                        <p className="text-[#A3C585] font-semibold">
+                          Rp {payload[0].value}
                         </p>
                       </div>
                     )
@@ -101,23 +102,28 @@ function ChartSection() {
 
               {/* AREA */}
               <Area
-                type="monotone"
-                dataKey="value"
-                stroke="none"
-                fill="url(#colorValue)"
-              />
+                  type="monotone"
+                  dataKey="value"
+                  stroke="none"
+                  fill="url(#greenGradient)"
+                  fillOpacity={1}
+                  isAnimationActive={true}
+                  animationDuration={800}
+                />
 
               {/* LINE */}
               <Line
                 type="monotone"
                 dataKey="value"
-                stroke="hsl(var(--primary))"
-                strokeWidth={3}
+                stroke="#22c55e"
+                strokeWidth={2}
                 dot={false}
-                activeDot={{ r: 6 }}
+                activeDot={{ r: 4 }}
+                isAnimationActive={true}
+                animationDuration={800}
               />
 
-            </LineChart>
+            </AreaChart>
           </ResponsiveContainer>
 
         </div>

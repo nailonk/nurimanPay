@@ -1,149 +1,141 @@
 import {
   Card,
   CardContent,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card"
 
-function TransactionTable() {
+function TransactionTable({ transactions = [] }) {
 
-  const data = [
-    {
-      id: "#TX-88210",
-      nama: "H. Ridwan",
-      program: "Sedekah Makan Jumat",
-      nominal: "500.000",
-      tanggal: "21 Jun 2024, 10:30",
-      status: "berhasil",
-      initials: "HR",
-    },
-    {
-      id: "#TX-88209",
-      nama: "Anonim",
-      program: "Beasiswa Santri",
-      nominal: "1.250.000",
-      tanggal: "21 Jun 2024, 09:15",
-      status: "berhasil",
-      initials: "AN",
-    },
-    {
-      id: "#TX-88208",
-      nama: "Siti Mariam",
-      program: "Renovasi Masjid",
-      nominal: "250.000",
-      tanggal: "20 Jun 2024, 21:45",
-      status: "pending",
-      initials: "SM",
-    },
-    {
-      id: "#TX-88207",
-      nama: "Bambang S.",
-      program: "Sedekah Makan Jumat",
-      nominal: "100.000",
-      tanggal: "20 Jun 2024, 18:20",
-      status: "berhasil",
-      initials: "BS",
-    },
-  ]
+  // Fungsi untuk mendapatkan inisial dari nama donatur
+  const getInitials = (name) => {
+    if (!name) return "AN";
+    return name
+      .trim()
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .substring(0, 2);
+  };
+
+  // Format Mata Uang Rupiah
+  const formatIDR = (amount) => {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
+  // Format Tanggal sesuai database (ISO String)
+  const formatDate = (dateString) => {
+    if (!dateString) return "-";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("id-ID", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit"
+    }).replace(/\./g, ':');
+  };
 
   return (
-    <Card>
-
+    <Card className="bg-white rounded-xl shadow-sm border border-gray-100 transition duration-300 hover:shadow-md">
+      
       {/* HEADER */}
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-base">
+      <div className="flex items-center justify-between p-4 border-b border-gray-50">
+        <h3 className="text-base font-bold text-gray-800 tracking-tight">
           Transaksi Terbaru
-        </CardTitle>
+        </h3>
+      </div>
 
-        <button className="text-sm text-primary hover:underline">
-          Lihat Semua
-        </button>
-      </CardHeader>
-
-      {/* CONTENT */}
-      <CardContent>
-
+      {/* TABLE */}
+      <CardContent className="pt-4">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm min-w-[700px]">
-
-            {/* HEADER */}
-            <thead>
-              <tr className="text-left text-xs text-muted-foreground border-b">
-                <th className="py-3">ID</th>
-                <th>Donatur</th>
-                <th>Program</th>
-                <th>Nominal</th>
-                <th>Tanggal</th>
-                <th>Status</th>
+          <table className="w-full text-sm min-w-[750px]">
+            
+            <thead className="bg-gray-50/50">
+              <tr className="text-left text-xs font-bold text-gray-500 uppercase tracking-widest">
+                <th className="py-3 px-4">ID Transaksi</th>
+                <th className="px-4">Donatur</th>
+                <th className="px-4">Nominal</th>
+                <th className="px-4">Tanggal</th>
+                <th className="px-4">Status</th>
               </tr>
             </thead>
 
-            {/* BODY */}
-            <tbody>
-              {data.map((item, i) => (
-                <tr
-                  key={i}
-                  className="border-b last:border-0 hover:bg-muted/50 transition"
-                >
-
-                  {/* ID */}
-                  <td className="py-4 font-medium">
-                    {item.id}
+            <tbody className="divide-y divide-gray-100">
+              {transactions.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="py-10 text-center text-gray-400 italic">
+                    Belum ada data transaksi yang tersinkronisasi.
                   </td>
-
-                  {/* DONATUR */}
-                  <td>
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 flex items-center justify-center rounded-full bg-muted text-xs font-semibold">
-                        {item.initials}
-                      </div>
-                      <span>{item.nama}</span>
-                    </div>
-                  </td>
-
-                  {/* PROGRAM */}
-                  <td className="text-muted-foreground">
-                    {item.program}
-                  </td>
-
-                  {/* NOMINAL */}
-                  <td className="font-semibold">
-                    Rp {item.nominal}
-                  </td>
-
-                  {/* TANGGAL */}
-                  <td className="text-muted-foreground">
-                    {item.tanggal}
-                  </td>
-
-                  {/* STATUS */}
-                  <td>
-                    <span
-                      className={`
-                        px-2.5 py-1 text-xs rounded-full font-medium
-                        ${
-                          item.status === "berhasil"
-                            ? "bg-green-100 text-green-700"
-                            : "bg-yellow-100 text-yellow-700"
-                        }
-                      `}
-                    >
-                      {item.status === "berhasil"
-                        ? "Berhasil"
-                        : "Pending"}
-                    </span>
-                  </td>
-
                 </tr>
-              ))}
-            </tbody>
+              ) : (
+                transactions.slice(0, 10).map((item, i) => (
+                  <tr key={item.id || i} className="hover:bg-gray-50/80 transition-colors">
+                    
+                    {/* ORDER ID */}
+                    <td className="py-4 px-4 font-mono text-xs text-gray-600">
+                      {item.order_id}
+                    </td>
 
+                    {/* DONATUR */}
+                    <td className="px-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 flex items-center justify-center rounded-full bg-emerald-100 text-[10px] font-bold text-emerald-700">
+                          {getInitials(item.name)}
+                        </div>
+                        <span className="text-gray-700 font-medium capitalize">
+                          {item.name || "Hamba Allah"}
+                        </span>
+                      </div>
+                    </td>
+
+                    {/* NOMINAL */}
+                    <td className="px-4 font-semibold text-gray-900">
+                      {formatIDR(item.amount)}
+                    </td>
+
+                    {/* TANGGAL */}
+                    <td className="px-4 text-gray-500 text-xs">
+                      {formatDate(item.created_at)}
+                    </td>
+
+                    {/* STATUS (Success, Pending, Settlement) */}
+                    <td className="px-4">
+                      <span
+                        className={`
+                          px-3 py-1 text-[10px] rounded-full font-bold uppercase tracking-tighter border
+                          ${
+                            item.status === "success" || item.status === "settlement"
+                              ? "bg-emerald-50 text-emerald-600 border-emerald-100"
+                              : item.status === "pending"
+                              ? "bg-amber-50 text-amber-600 border-amber-100"
+                              : "bg-rose-50 text-rose-600 border-rose-100"
+                          }
+                        `}
+                      >
+                        {item.status === "success" || item.status === "settlement" ? "Berhasil" : item.status}
+                      </span>
+                    </td>
+
+                  </tr>
+                ))
+              )}
+            </tbody>
           </table>
         </div>
 
+        {/* FOOTER */}
+        <div className="mt-6 text-center border-t border-gray-50 pt-4">
+          <button className="text-sm font-semibold text-emerald-600 hover:text-emerald-700 transition">
+            Lihat Semua Riwayat Donasi
+          </button>
+        </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
-export default TransactionTable
+export default TransactionTable;

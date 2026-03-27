@@ -1,12 +1,28 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
 import { Heart, ShieldCheck, CircleAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { getPrograms } from "@/api/program";
-import { transactionApi } from "@/api/transaction";
+
+const programs = [
+  {
+    title: "Infaq Pembangunan",
+    desc: "Bantu renovasi lantai dua untuk ruang belajar TPA.",
+    image:
+      "https://awsimages.detik.net.id/visual/2025/11/14/pik-1763121943826_169.jpeg?w=650&q=90",
+    collected: 50000000,
+    progress: 65,
+  },
+  {
+    title: "Sedekah Jumat",
+    desc: "Penyaluran nasi kotak & sembako setiap Jumat.",
+    image:
+      "https://bucket-api.baznas.go.id/bucket-api/file?bucket=bzn-fdr-smb-p5739641&file=attachments/new_artikel/MzU4NTE3NDIzMjQwMjg.jpg",
+    collected: 5000000,
+    progress: 40,
+  },
+];
 
 const formatRupiah = (angka) => {
   return new Intl.NumberFormat("id-ID", {
@@ -20,45 +36,7 @@ const DetailProgram = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [donatur, setDonatur] = useState([]);
-  const [totalDonatur, setTotalDonatur] = useState(0);
-  const [data, setData] = useState(null);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await getPrograms();
-
-        const list = Array.isArray(res.data)
-          ? res.data
-          : res.data?.data || [];
-
-        const found = list.find(
-          (item) => String(item.id) === String(id)
-        );
-
-        setData(found);
-
-        // ambil donatur
-        const donaturRes = await transactionApi.getDonaturByProgram(id);
-        console.log("DONATUR RESPONSE:", donaturRes.data); 
-
-        const donaturData = donaturRes?.data?.data || [];
-
-        const validDonatur = donaturData
-          .filter((d) => d.status === "success")
-          .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-
-        setDonatur(validDonatur.slice(0, 5));
-        setTotalDonatur(validDonatur.length);
-
-      } catch (err) {
-        console.log(err);
-      }
-    };
-
-    fetchData();
-  }, [id]);
+  const data = programs[id];
 
   if (!data) {
     return (
@@ -67,10 +45,6 @@ const DetailProgram = () => {
       </div>
     );
   }
-
-  const progress = Math.round(
-    (Number(data.collected_amount) / Number(data.target_amount)) * 100
-  ) || 0;
 
   return (
     <div className="bg-[#f5f6f7] min-h-screen py-8 px-4 md:px-8">
@@ -101,52 +75,61 @@ const DetailProgram = () => {
           {/* LEFT */}
           <div className="md:col-span-2 space-y-6">
 
-            <Card className="p-5 rounded-xl bg-white shadow-md border-0 hover:shadow-lg transition ring-0 focus-visible:ring-0 focus:outline-none">
+            {/* PROGRESS */}
+            <Card className="p-5 rounded-xl bg-white border-0 shadow-md ring-0 focus-visible:ring-0 focus:outline-none">
               <div className="flex justify-between items-center">
                 <p className="text-sm text-gray-500">
                   Progress Pembangunan
                 </p>
+
+                <div className="text-right">
+                  <p className="text-[10px] text-gray-400">
+                    ESTIMASI SELESAI
+                  </p>
+                  <p className="text-xs font-medium">
+                    Desember 2027
+                  </p>
+                </div>
               </div>
 
               <h2 className="text-lg font-bold text-[#7da85f] mt-1">
-                {progress}%{" "}
+                {data.progress}%{" "}
                 <span className="text-gray-400 font-medium">
                   Tercapai
                 </span>
               </h2>
 
               <Progress
-                value={progress}
+                value={data.progress}
                 className="mt-3 h-2 bg-[#A3C585]/20 [&>div]:bg-[#A3C585]"
               />
 
               <div className="flex items-center gap-1 text-xs text-gray-400 mt-2">
                 <CircleAlert className="w-3 h-3 text-[#A3C585]" />
-                <span>{data.status}</span>
+                <span>Saat ini dalam tahap pengecoran.</span>
               </div>
 
               <div className="grid grid-cols-3 text-sm mt-4">
-                <div>
+                <div className="space-y-1 text-left">
                   <p className="text-gray-600">Terkumpul</p>
                   <p className="font-bold">
-                    {formatRupiah(data.collected_amount)}
+                    {formatRupiah(data.collected)}
                   </p>
                 </div>
 
-                <div className="text-center">
+                <div className="space-y-1 text-center">
                   <p className="text-gray-600">Target</p>
-                  <p className="font-bold">
-                    {formatRupiah(data.target_amount)}
-                  </p>
+                  <p className="font-bold">Rp 1 M</p>
                 </div>
 
-                <div className="text-right">
+                <div className="space-y-1 text-right">
                   <p className="text-gray-600">Donatur</p>
-                  <p className="font-bold">{totalDonatur}</p>
+                  <p className="font-bold">1,240</p>
                 </div>
               </div>
             </Card>
 
+            {/* DESKRIPSI */}
             <div>
               <div className="border-b border-gray-200">
                 <span className="text-[#7da85f] font-semibold text-sm pb-1 border-b-2 border-[#7da85f]">
@@ -155,7 +138,7 @@ const DetailProgram = () => {
               </div>
 
               <p className="text-gray-600 pt-4 text-sm leading-relaxed">
-                {data.description || data.desc}
+                {data.desc}
               </p>
             </div>
           </div>
@@ -165,8 +148,8 @@ const DetailProgram = () => {
 
             <div className="p-5">
               <Button
-                onClick={() => navigate("/form-transaction", { state: { programId: data.id } })} 
-                className="w-full h-12 bg-[#A3C585] text-white shadow-md border-0 hover:shadow-lg transition"
+                onClick={() => navigate("/form-transaction")}
+                className="w-full h-12 bg-[#A3C585] text-white rounded-lg"
               >
                 <Heart size={16} />
                 Donasi Sekarang
@@ -178,16 +161,21 @@ const DetailProgram = () => {
               </div>
             </div>
 
-            <Card className="p-5 rounded-xl bg-white border-0 shadow-md hover:shadow-lg transition ring-0 focus-visible:ring-0 focus:outline-none">
+            {/* DONATUR */}
+            <Card className="p-5 rounded-xl bg-white border-0 shadow-md ring-0 focus-visible:ring-0 focus:outline-none">
               <h4 className="font-semibold mb-3">
                 Donatur Terakhir
               </h4>
+
               <div className="space-y-3">
-                {donatur.map((d, i) => (
+                {[
+                  { name: "Hamba Allah", amount: 500000 },
+                  { name: "Ahmad Basuki", amount: 150000 },
+                ].map((d, i) => (
                   <div key={i} className="flex gap-2">
                     <Avatar className="h-8 w-8">
                       <AvatarFallback className="font-bold text-[#A3C585] bg-gray-50">
-                        {d.name?.[0] || "A"}
+                        {d.name[0]}
                       </AvatarFallback>
                     </Avatar>
 
