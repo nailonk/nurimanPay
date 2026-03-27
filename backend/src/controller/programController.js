@@ -29,3 +29,15 @@ export const getAllPrograms = async (req, res) => {
     res.status(500).json({ error: 'Gagal mengambil data program' });
   }
 };
+export const getProgramTransactions = async (req, res) => {
+  const { id } = req.params; // Mengambil program_id dari URL
+  try {
+    const transactions = await programService.getTransactionsByProgramService(id);
+    res.status(200).json({
+      success: true,
+      data: transactions
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Gagal mengambil data transaksi" });
+  }
+};
