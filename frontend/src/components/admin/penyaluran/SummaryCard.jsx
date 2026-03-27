@@ -67,9 +67,11 @@ export default function SummaryCard() {
       </Card>
 
       {/* Kekurangan Target */}
-      <Card className="border-none shadow-sm bg-white">
       <Card className="border-none shadow-md bg-white  ring-0 focus:ring-0 focus-visible:ring-0 outline-none">
+        <CardContent className="p-5">
+          <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
             Kekurangan Target Donasi
+          </p>
           <h2 className="text-2xl font-bold text-orange-500">
             {formatIDR(Math.max(0, stats.totalTarget - stats.totalCollected))}
           </h2>

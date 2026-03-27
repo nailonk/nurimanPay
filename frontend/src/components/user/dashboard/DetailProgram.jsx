@@ -5,11 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { getPrograms } from "@/api/program";
+import { transactionApi } from "@/api/transaction";
 
-const programs = [
-  {
 const formatRupiah = (angka) => {
   return new Intl.NumberFormat("id-ID", {
+    style: "currency",
     currency: "IDR",
     maximumFractionDigits: 0,
   }).format(angka || 0);

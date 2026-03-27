@@ -77,16 +77,6 @@ function Navbar({ openSidebar, onSearch, initialValue = "", title = "Dashboard A
             </div>
           </div>
 
-            {/* Tombol Clear (X) - Muncul hanya jika ada teks */}
-            {query && (
-              <button 
-                onClick={clearSearch}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-              >
-                <X size={14} />
-              </button>
-            )}
-          </div>
         </div>
       </div>
     </nav>

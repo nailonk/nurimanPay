@@ -19,6 +19,10 @@ function ProgramDetailAdmin() {
         setLoading(true)
         const response = await api.get(`/program/${id}`)
 
+        const data = response.data?.data || response.data
+
+        if (!data) {
+          throw new Error("Data program tidak ditemukan")
         }
 
         const target = Number(data.target_amount) || 0
