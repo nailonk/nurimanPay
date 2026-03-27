@@ -1,5 +1,6 @@
 import { core } from '../config/midtrans.js';
 import pool from '../config/db.js';
+import * as programService from './programService.js';
 
 export const handleNotificationService = async (notification) => {
   // 1. Validasi Notifikasi (Mendapatkan data asli & aman dari Midtrans)
@@ -42,20 +43,36 @@ export const handleNotificationService = async (notification) => {
     orderId
   ]);
 
-  // 4. Update Tabel 'transactions' (Status utama aplikasi)
-  // Perhatikan: Sesuai ERD, kolomnya adalah 'payment_method'
-  const queryTransaction = `
-    UPDATE transactions 
-    SET status = $1, payment_method = $2, updated_at = NOW() 
-    WHERE order_id = $3
-    RETURNING *
-  `;
-  
-  const result = await pool.query(queryTransaction, [dbStatus, paymentType, orderId]);
+ // 4. Update Tabel 'transactions'
+const queryTransaction = `
+  UPDATE transactions 
+  SET status = $1, payment_method = $2, updated_at = NOW() 
+  WHERE order_id = $3
+  RETURNING *
+`;
 
-  return { 
+const result = await pool.query(queryTransaction, [dbStatus, paymentType, orderId]);
+const transaction = result.rows[0]; // Data dari baris tabel 'transactions' yang barusan diupdate
+
+// --- LOGIKA PENAMBAHAN DANA (Berdasarkan ERD-mu) ---
+if (transaction && dbStatus === 'success') {
+    // Sesuai gambarmu: kolomnya namanya 'amount', bukan 'gross_amount'
+    const danaMasuk = Number(transaction.amount); 
+    const idProgram = transaction.program_id;
+
+    console.log(`✅ Sinkronisasi: Program ${idProgram} menerima dana Rp${danaMasuk}`);
+
+    try {
+        // Panggil fungsi untuk update 'collected_amount' di tabel programs
+        await programService.addCollectedAmount(idProgram, danaMasuk);
+    } catch (err) {
+        console.error('❌ Gagal sinkronisasi dana ke tabel programs:', err.message);
+    }
+}
+
+return { 
     dbStatus, 
     orderId, 
-    transaction: result.rows[0] 
-  };
+    transaction 
+};
 };
