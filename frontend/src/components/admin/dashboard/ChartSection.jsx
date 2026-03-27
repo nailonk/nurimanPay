@@ -1,14 +1,11 @@
+import { useMemo } from "react" // Gunakan useMemo untuk efisiensi perhitungan
 import {
   Card,
   CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
 } from "@/components/ui/card"
 
 import {
-  LineChart,
-  Line,
+  AreaChart,
   XAxis,
   Tooltip,
   ResponsiveContainer,
@@ -16,81 +13,106 @@ import {
   CartesianGrid,
 } from "recharts"
 
-function ChartSection() {
-  const data = [
-    { name: "Jan", value: 400 },
-    { name: "Feb", value: 700 },
-    { name: "Mar", value: 300 },
-    { name: "Apr", value: 600 },
-    { name: "Mei", value: 200 },
-    { name: "Jun", value: 800 },
-  ]
+function ChartSection({ transactions = [] }) {
+  // 1. Logika mengolah data transaksi ke format Chart (6 bulan terakhir)
+  const chartData = useMemo(() => {
+    const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agt", "Sep", "Okt", "Nov", "Des"];
+    
+    // Inisialisasi objek untuk menampung total per bulan
+    const monthlyTotals = {};
+    
+    // Ambil 6 bulan terakhir dari sekarang
+    const now = new Date();
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const monthName = months[d.getMonth()];
+      monthlyTotals[monthName] = 0;
+    }
+
+    // Isi data dari transaksi asli (hanya yang statusnya success/settlement)
+    transactions.forEach((t) => {
+      if (t.status === "success" || t.status === "settlement") {
+        const date = new Date(t.created_at);
+        const monthName = months[date.getMonth()];
+        
+        // Cek jika bulan transaksi masuk dalam range 6 bulan yang kita buat
+        if (monthlyTotals.hasOwnProperty(monthName)) {
+          monthlyTotals[monthName] += Number(t.amount);
+        }
+      }
+    });
+
+    // Ubah objek ke array format Recharts
+    return Object.keys(monthlyTotals).map((name) => ({
+      name,
+      value: monthlyTotals[name],
+    }));
+  }, [transactions]);
+
+  // Fungsi format rupiah untuk tooltip
+  const formatIDR = (val) => {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      maximumFractionDigits: 0,
+    }).format(val);
+  };
 
   return (
-    <Card className="rounded-2xl border shadow-sm hover:shadow-md transition-all">
-
+    <Card className="bg-white rounded-xl shadow-md transition duration-300 hover:shadow-md border-0 ring-0 focus:ring-0 focus-visible:ring-0 outline-none">
       {/* HEADER */}
-      <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-2">
-
+      <div className="flex items-center justify-between p-6 pb-0">
         <div>
-          <CardTitle className="text-base sm:text-lg">
+          <h3 className="text-base font-bold text-gray-800 tracking-tight">
             Statistik Donasi
-          </CardTitle>
-          <CardDescription>
-            Penerimaan dana 6 bulan terakhir
-          </CardDescription>
+          </h3>
+          <p className="text-sm text-gray-500">
+            Tren penerimaan dana 6 bulan terakhir
+          </p>
         </div>
 
-        {/* FILTER */}
-        <select className="
-          text-sm bg-gray-100 px-3 py-1.5 rounded-lg
-          outline-none focus:ring-2 focus:ring-green-300
-        ">
-          <option>2026</option>
-          <option>2025</option>
-        </select>
+        <div className="text-xs font-medium text-gray-400 bg-gray-50 px-3 py-1 rounded-full border border-gray-100">
+          Real-time Data
+        </div>
+      </div>
 
-      </CardHeader>
-
-      {/* CONTENT */}
-      <CardContent>
-        <div className="h-[250px] sm:h-[300px] w-full">
-
+      {/* CHART */}
+      <CardContent className="pt-6">
+        <div className="h-[260px] w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data}>
-
-              {/* GRADIENT */}
+            <AreaChart data={chartData}>
               <defs>
-                <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.4} />
-                  <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                <linearGradient id="greenGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#A3C585" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#A3C585" stopOpacity={0} />
                 </linearGradient>
               </defs>
 
-              {/* GRID */}
               <CartesianGrid
                 strokeDasharray="3 3"
                 vertical={false}
-                stroke="#e5e7eb"
+                stroke="#f1f5f9"
               />
 
-              {/* X AXIS */}
               <XAxis
                 dataKey="name"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: "#6b7280", fontSize: 12 }}
+                tick={{ fill: "#9ca3af", fontSize: 12 }}
+                dy={10}
               />
 
-              {/* TOOLTIP CUSTOM */}
               <Tooltip
+                cursor={{ stroke: "#A3C585", strokeWidth: 1, strokeDasharray: "5 5" }}
                 content={({ active, payload }) => {
                   if (active && payload && payload.length) {
                     return (
-                      <div className="bg-white border rounded-lg shadow-sm px-3 py-2 text-xs">
-                        <p className="font-medium">{payload[0].payload.name}</p>
-                        <p className="text-green-600 font-semibold">
-                          {payload[0].value}
+                      <div className="bg-white rounded-xl shadow-xl border border-gray-50 p-3 ring-1 ring-black/5">
+                        <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">
+                          {payload[0].payload.name}
+                        </p>
+                        <p className="text-[#7FAE5A] font-bold text-sm">
+                          {formatIDR(payload[0].value)}
                         </p>
                       </div>
                     )
@@ -99,32 +121,22 @@ function ChartSection() {
                 }}
               />
 
-              {/* AREA */}
               <Area
                 type="monotone"
                 dataKey="value"
-                stroke="none"
-                fill="url(#colorValue)"
-              />
-
-              {/* LINE */}
-              <Line
-                type="monotone"
-                dataKey="value"
-                stroke="hsl(var(--primary))"
+                stroke="#A3C585"
                 strokeWidth={3}
-                dot={false}
-                activeDot={{ r: 6 }}
+                fillOpacity={1}
+                fill="url(#greenGradient)"
+                isAnimationActive={true}
+                animationDuration={1200}
               />
-
-            </LineChart>
+            </AreaChart>
           </ResponsiveContainer>
-
         </div>
       </CardContent>
-
     </Card>
   )
 }
 
-export default ChartSection
+export default ChartSection;
