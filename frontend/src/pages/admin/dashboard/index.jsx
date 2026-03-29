@@ -6,7 +6,7 @@ import ChartSection from "@/components/admin/dashboard/ChartSection";
 import ProgramList from "@/components/admin/dashboard/ProgramList";
 import TransactionTable from "@/components/admin/dashboard/TransactionTable";
 
-function DashboardPage() {
+export default function DashboardPage() {
   const [programs, setPrograms] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
