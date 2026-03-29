@@ -1,72 +1,28 @@
-import React, { useRef } from "react";
+import React, { useRef, useMemo } from "react";
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useNavigate } from "react-router-dom";
 
-const programs = [
-  {
-    title: "Infaq Pembangunan",
-    desc: "Bantu kami menyelesaikan renovasi lantai dua untuk ruang belajar TPA.",
-    image:
-      "https://awsimages.detik.net.id/visual/2025/11/14/pik-1763121943826_169.jpeg?w=650&q=90",
-    collected: 50000000,
-    progress: 65,
-  },
-  {
-    title: "Sedekah Jumat",
-    desc: "Penyaluran nasi kotak dan paket sembako untuk jamaah setiap Jumat.",
-    image:
-      "https://bucket-api.baznas.go.id/bucket-api/file?bucket=bzn-fdr-smb-p5739641&file=attachments/new_artikel/MzU4NTE3NDIzMjQwMjg.jpg",
-    collected: 5000000,
-    progress: 40,
-  },
-  {
-    title: "Bantuan Anak Yatim",
-    desc: "Santunan rutin dan biaya pendidikan untuk 50 anak yatim piatu di lingkungan masjid.",
-    image:
-      "https://i.pinimg.com/564x/fa/a0/68/faa06864fe248f4bd89331542b640206.jpg",
-    collected: 15000000,
-    progress: 80,
-  },
-  {
-    title: "Bantuan Anak Yatim",
-    desc: "Santunan rutin dan biaya pendidikan untuk 50 anak yatim piatu di lingkungan masjid.",
-    image:
-      "https://i.pinimg.com/564x/fa/a0/68/faa06864fe248f4bd89331542b640206.jpg",
-    collected: 15000000,
-    progress: 80,
-  },
-  {
-    title: "Bantuan Anak Yatim",
-    desc: "Santunan rutin dan biaya pendidikan untuk 50 anak yatim piatu di lingkungan masjid.",
-    image:
-      "https://i.pinimg.com/564x/fa/a0/68/faa06864fe248f4bd89331542b640206.jpg",
-    collected: 15000000,
-    progress: 80,
-  },
-  {
-    title: "Bantuan Anak Yatim",
-    desc: "Santunan rutin dan biaya pendidikan untuk 50 anak yatim piatu di lingkungan masjid.",
-    image:
-      "https://i.pinimg.com/564x/fa/a0/68/faa06864fe248f4bd89331542b640206.jpg",
-    collected: 15000000,
-    progress: 80,
-  },
-];
-
 const formatRupiah = (angka) => {
   return new Intl.NumberFormat("id-ID", {
     style: "currency",
     currency: "IDR",
     maximumFractionDigits: 0,
-  }).format(angka);
+  }).format(angka || 0);
 };
 
 const ProgramSection = ({ programs = [], isLoading = false }) => {
   const scrollRef = useRef(null);
   const navigate = useNavigate();
+  const sortedPrograms = useMemo(() => {
+    return [...programs].sort((a, b) => {
+      const progressA = (Number(a.collected_amount || 0) / Number(a.target_amount || 1));
+      const progressB = (Number(b.collected_amount || 0) / Number(b.target_amount || 1));
+      return progressA - progressB; 
+    });
+  }, [programs]);
 
   const scroll = (direction) => {
     scrollRef.current?.scrollBy({
@@ -106,17 +62,17 @@ const ProgramSection = ({ programs = [], isLoading = false }) => {
       {/* CARD LIST */}
       <div
         ref={scrollRef}
-        className="flex gap-6 overflow-x-auto scroll-smooth pb-6 px-6 scrollbar-thin scrollbar-thumb-[#A3C585]/30 scrollbar-track-transparent"
+        className="flex gap-6 overflow-x-auto scroll-smooth pb-6 px-6 scrollbar-none" // scrollbar-none agar lebih bersih di mobile
       >
         {isLoading ? (
           [1, 2, 3].map((n) => (
-            <Card key={n} className="min-w-[280px] h-[420px] animate-pulse bg-gray-100 rounded-2xl border-0 ring-0 focus:ring-0 outline-none" />
+            <Card key={n} className="min-w-[280px] h-[420px] animate-pulse bg-gray-100 rounded-2xl border-0" />
           ))
         ) : (
-          programs.map((item) => {
-            const currentProgress = Math.round(
+          sortedPrograms.map((item) => {
+            const currentProgress = Math.min(100, Math.round(
               (Number(item.collected_amount || 0) / Number(item.target_amount || 1)) * 100
-            ) || 0;
+            )) || 0;
 
             return (
               <Card

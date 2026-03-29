@@ -104,7 +104,7 @@ function TransactionTable({ transactions = [] }) {
                       {formatDate(item.created_at)}
                     </td>
 
-                    {/* STATUS (Success, Pending, Settlement) */}
+                    {/* STATUS */}
                     <td className="px-4">
                       <span
                         className={`

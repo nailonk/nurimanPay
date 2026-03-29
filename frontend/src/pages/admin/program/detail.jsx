@@ -29,7 +29,6 @@ function ProgramDetailAdmin() {
         const collected = Number(data.collected_amount) || 0
         const isImageValid = data.image && data.image !== "null" && String(data.image).length > 50
 
-        // Mapping data agar sesuai dengan kebutuhan UI
         const mappedData = {
           ...data,
           progress: target > 0 ? Math.round((collected / target) * 100) : 0,

@@ -1,10 +1,18 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Heart, ShieldCheck, CircleAlert, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import FormTransaction from "./FormTransaction";
 import { getPrograms } from "@/api/program";
 import { transactionApi } from "@/api/transaction";
 
@@ -18,12 +26,11 @@ const formatRupiah = (angka) => {
 
 const DetailProgram = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
 
   const [donatur, setDonatur] = useState([]);
   const [totalDonatur, setTotalDonatur] = useState(0);
   const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -45,7 +52,7 @@ const DetailProgram = () => {
       } catch (err) {
         console.error(err);
       } finally {
-        setLoading(false); 
+        setLoading(false);
       }
     };
 
@@ -96,7 +103,7 @@ const DetailProgram = () => {
         {/* CONTENT */}
         <div className="grid md:grid-cols-3 gap-6 mt-6">
           <div className="md:col-span-2 space-y-6">
-            <Card className="p-5 rounded-xl bg-white shadow-md border-0 ring-0 focus:ring-0 focus-visible:ring-0 outline-none">
+            <Card className="p-5 rounded-xl bg-white shadow-md border-0 ring-0 outline-none">
               <h2 className="text-lg font-bold text-[#7da85f] mt-1">
                 {progress}% <span className="text-gray-400 font-medium text-sm">Tercapai</span>
               </h2>
@@ -124,30 +131,53 @@ const DetailProgram = () => {
               </div>
             </Card>
 
-              <div className="border-b border-gray-100 pb-2 mb-4">
-                <span className="text-[#A3C585] font-bold text-sm border-b-2 border-[#A3C585] pb-2">
-                  Deskripsi Program
-                </span>
-              </div>
-              <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-line">
-                {data.description}
-              </p>
+            <div className="border-b border-gray-100 pb-2">
+              <span className="text-[#A3C585] font-bold text-sm border-b-2 border-[#A3C585] pb-2">
+                Deskripsi Program
+              </span>
+            </div>
+            <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-line">
+              {data.description}
+            </p>
           </div>
 
+          {/* SIDEBAR RIGHT */}
           <div className="space-y-4">
-              <Button
-                onClick={() => navigate("/form-transaction", { state: { programId: data.id } })}
-                className="w-full h-12 bg-[#A3C585] hover:bg-[#8eb16f] text-white shadow-md border-0 transition flex gap-2"
+            {/* DIALOG MODAL DONASI */}
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button className="w-full h-12 bg-[#A3C585] hover:bg-[#8eb16f] text-white shadow-md border-0 transition flex gap-2">
+                  <Heart size={18} />
+                  Donasi Sekarang
+                </Button>
+              </DialogTrigger>
+              <DialogContent 
+                className="bg-white p-0 
+                          w-full h-full max-h-screen 
+                          sm:max-w-[425px] sm:h-auto sm:max-h-[90vh] 
+                          sm:rounded-xl border-0 
+                          flex flex-col 
+                          outline-none ring-0 focus:ring-0 focus-visible:ring-0"
               >
-                <Heart size={18} />
-                Donasi Sekarang
-              </Button>
-              <div className="mt-3 h-12 flex gap-2 text-[11px] text-gray-500 bg-gray-50 p-3 rounded-lg border border-gray-100">
-                <ShieldCheck size={14} className="text-[#A3C585] shrink-0" />
-                <span>Pembayaran aman diproses melalui sistem enkripsi otomatis.</span>
-              </div>
+                <DialogHeader className="p-4 border-b">
+                  <DialogTitle className="text-center text-sm font-bold">
+                    Form Transaksi Donasi
+                  </DialogTitle>
+                </DialogHeader>
 
-            <Card className="p-5 rounded-xl bg-white border-0 shadow-md ring-0 focus:ring-0 focus-visible:ring-0 outline-none">
+                {/* Area Scrollable */}
+                <div className="flex-1 overflow-y-auto p-4 scrollbar-hide">
+                  <FormTransaction programId={data.id} />
+                </div>
+              </DialogContent>
+            </Dialog>
+
+            <div className="mt-3 flex gap-2 text-[11px] text-gray-500 bg-gray-50 p-3 rounded-lg border border-gray-100">
+              <ShieldCheck size={14} className="text-[#A3C585] shrink-0" />
+              <span>Pembayaran aman diproses melalui sistem enkripsi otomatis.</span>
+            </div>
+
+            <Card className="p-5 rounded-xl bg-white border-0 shadow-md ring-0 outline-none">
               <h4 className="font-bold text-gray-800 mb-4 text-sm">Donatur Terakhir</h4>
               <div className="space-y-4">
                 {donatur.length > 0 ? (

@@ -10,7 +10,6 @@ export default function Penyaluran() {
       <div>
         <TablePenyaluran />
       </div>
-      {/* HAPUS */}
     </div>
   )
 }

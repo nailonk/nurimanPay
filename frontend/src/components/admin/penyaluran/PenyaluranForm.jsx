@@ -117,7 +117,7 @@ export default function FormPenyaluran({ editData, editIndex, refresh, setOpen }
           )}
         </div>
 
-        {/* Buttons - Disesuaikan agar Simpan Laporan menonjol dan pas lebaarnya */}
+        {/* Buttons */}
         <div className="flex flex-col md:flex-row items-center justify-end gap-4 pt-8 border-t border-gray-50">
           <button 
             type="submit" 

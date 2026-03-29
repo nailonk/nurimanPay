@@ -4,7 +4,7 @@ import TransaksiFilter from "./TransaksiFilter"
 
 function TransaksiList() {
   const [search, setSearch] = useState("")
-  const [filterProgram, setFilterProgram] = useState("Semua Program") // State baru
+  const [filterProgram, setFilterProgram] = useState("Semua Program") 
   const [transaksi, setTransaksi] = useState([])
 
   useEffect(() => {
@@ -12,7 +12,6 @@ function TransaksiList() {
     setTransaksi(saved)
   }, [])
 
-  // LOGIKA FILTER GANDA (Nama & Program)
   const filteredData = transaksi.filter((item) => {
     const matchesSearch = item.nama.toLowerCase().includes(search.toLowerCase()) || 
                           item.hp.includes(search)

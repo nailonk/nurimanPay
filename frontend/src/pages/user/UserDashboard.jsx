@@ -36,7 +36,7 @@ return (
       <HeroSection />
 
       {/* PROGRAM SECTION */}
-      <section id="program-section" className="bg-gray-50/80 py-12 scroll-mt-10 outline-none"> {/* Tambah outline-none di sini */}
+      <section id="program-section" className="bg-gray-50/80 py-12 scroll-mt-10 outline-none"> 
         <div className="w-full px-4 md:max-w-7xl md:mx-auto md:px-6">
           <ProgramSection programs={programs} isLoading={isLoading} />
         </div>

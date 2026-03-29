@@ -14,8 +14,8 @@ export default function Header({ setOpen, setEditData }) {
 
           <Button 
             onClick={() => {
-              setEditData(null); // Reset data edit jika ada
-              setOpen(true);     // Munculkan form
+              setEditData(null); 
+              setOpen(true);    
             }}
             className="bg-[#A3C585] hover:bg-[#A3C585]/70 flex gap-2 text-white"
           >

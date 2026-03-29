@@ -5,7 +5,7 @@ import { getPrograms } from "@/api/program"
 export default function SummaryCard() {
   const [stats, setStats] = useState({
     totalCollected: 0,
-    activeProgramsCount: 0, // Menggunakan penamaan yang lebih jelas
+    activeProgramsCount: 0, 
     totalTarget: 0
   })
   const [loading, setLoading] = useState(true)
@@ -15,17 +15,16 @@ export default function SummaryCard() {
       try {
         const response = await getPrograms()
         const rawData = response.data
-        // Pastikan kita mengakses array data dengan benar
         const programs = Array.isArray(rawData) ? rawData : (rawData.data || [])
 
-        // HITUNG SEMUA DATA DALAM SATU PROSES
+        // HITUNG SEMUA DATA 
         const total = programs.reduce((acc, curr) => acc + (Number(curr.collected_amount) || 0), 0)
         const target = programs.reduce((acc, curr) => acc + (Number(curr.target_amount) || 0), 0)
         const activeCount = programs.filter(p => p.status === 'aktif').length
 
         setStats({
           totalCollected: total,
-          activeProgramsCount: activeCount, // Menggunakan hasil filter 'aktif'
+          activeProgramsCount: activeCount, 
           totalTarget: target
         })
       } catch (error) {
