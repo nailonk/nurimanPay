@@ -8,6 +8,7 @@ import authRoutes from './src/routes/authRoutes.js';
 import transaksiRoutes from './src/routes/transaksiRoutes.js';
 import notificationRoutes from './src/routes/notificationRoutes.js';
 import programRoutes from './src/routes/programRoutes.js';
+import penyaluranRoutes from './src/routes/penyaluranRoutes.js';
 
 const app = express();
 
@@ -34,8 +35,9 @@ app.use((req, res, next) => {
 // Routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/transaksi', transaksiRoutes);           
-app.use('/notif', notificationRoutes);   
-app.use('/api/v1/program', programRoutes);       
+app.use('/api/v1/notif', notificationRoutes);   
+app.use('/api/v1/program', programRoutes);  
+app.use('/api/v1/penyaluran', penyaluranRoutes);
 
 // Root endpoint
 app.get('/', (req, res) => {
@@ -60,6 +62,15 @@ app.get('/', (req, res) => {
             midtrans: {
                 notification: 'POST api/v1/notif',
                 cekStatus: 'GET api/v1/status/:orderId'
+            },
+            penyaluran: {
+            getAll: 'GET /api/v1/penyaluran',
+            getDetail: 'GET /api/v1/penyaluran/:id',
+            getByProgram: 'GET /api/v1/penyaluran/program/:programId',
+            getSummary: 'GET /api/v1/penyaluran/summary/:programId',
+            create: 'POST /api/v1/penyaluran',
+            update: 'PUT /api/v1/penyaluran/:id',
+            delete: 'DELETE /api/v1/penyaluran/:id'
             }
         }
     });
