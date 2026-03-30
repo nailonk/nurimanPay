@@ -76,14 +76,10 @@ export default function AboutSection() {
                   </p>
                 </div>
               </div>
-
             </div>
-
           </div>
         </div>
-
       </div>
-
     </section>
   )
 }

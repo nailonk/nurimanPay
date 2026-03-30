@@ -21,11 +21,10 @@ function Navbar({ openSidebar, onSearch, initialValue = "", title = "Dashboard A
 
   return (
     <nav className="w-full border-b bg-white/80 backdrop-blur-md sticky top-0 z-30">
-      {/* Menggunakan max-w-full dan px-4-8 untuk memastikan menyentuh ujung layar dengan padding cantik */}
       <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20 gap-4">
           
-          {/* LEFT: Menu & Dynamic Title */}
+          {/* LEFT */}
           <div className="flex items-center gap-4 flex-shrink-0">
             <button
               onClick={openSidebar}
@@ -40,7 +39,7 @@ function Navbar({ openSidebar, onSearch, initialValue = "", title = "Dashboard A
             </h1>
           </div>
 
-          {/* RIGHT: Dynamic Search Area */}
+          {/* RIGHT */}
           <div className="flex-1 flex justify-end items-center max-w-md">
             <div className="relative w-full group">
               <Search

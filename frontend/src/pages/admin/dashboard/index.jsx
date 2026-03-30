@@ -6,11 +6,12 @@ import ChartSection from "@/components/admin/dashboard/ChartSection";
 import ProgramList from "@/components/admin/dashboard/ProgramList";
 import TransactionTable from "@/components/admin/dashboard/TransactionTable";
 
-export default function DashboardPage() {
+function DashboardPage() {
   const [programs, setPrograms] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -51,7 +52,6 @@ export default function DashboardPage() {
 
   if (loading) return (
     <div className="flex flex-col items-center justify-center py-20 text-gray-400 gap-4">
-      {/* Spinner konsisten dengan halaman detail dan edit */}
       <div className="w-10 h-10 border-4 border-[#A3C585] border-t-transparent rounded-full animate-spin"></div>
       <p className="text-sm font-medium animate-pulse">Memuat data dashboard...</p>
     </div>
@@ -82,8 +82,6 @@ export default function DashboardPage() {
       </header>
 
       <div className="px-4 sm:px-6 lg:px-8 space-y-6 pb-10">
-        
-        {/* StatsCard tetap menggunakan data asli agar angka total tidak berubah saat filter */}
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6">
           <StatsCard programs={programs} transactions={transactions} />
         </div>
@@ -113,3 +111,4 @@ export default function DashboardPage() {
   );
 }
 
+export default DashboardPage;

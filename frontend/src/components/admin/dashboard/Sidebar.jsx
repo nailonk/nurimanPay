@@ -10,7 +10,7 @@ import {
 } from "lucide-react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { useState } from "react"
-import { useAuth } from "@/hooks/useAuth" // Integrasi AuthContext
+import { useAuth } from "@/hooks/useAuth" 
 import { Button } from "@/components/ui/button"
 import logo from "@/assets/logo.png"
 
@@ -31,12 +31,8 @@ function Sidebar() {
     { name: "Riwayat Transaksi", icon: History, path: "/admin/transaksi" },
   ]
 
-  /**
-   * Final Logout Handler
-   * Resets global auth state and redirects to landing page
-   */
   const handleFinalLogout = () => {
-    authLogout() // Clears state + localStorage
+    authLogout() 
     setShowLogoutConfirm(false)
     navigate("/", { replace: true })
   }
@@ -73,7 +69,7 @@ function Sidebar() {
         `}
       >
         <div>
-          {/* HEADER: Logo & Toggle */}
+          {/* HEADER */}
           <div className="flex items-center justify-between mb-8">
             {(isOpen || isMobileOpen) && (
               <div className="flex items-center gap-3 overflow-hidden">
@@ -136,7 +132,6 @@ function Sidebar() {
       {/* LOGOUT CONFIRMATION DIALOG (MODAL) */}
       {showLogoutConfirm && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          {/* Backdrop */}
           <div 
             className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
             onClick={() => setShowLogoutConfirm(false)}

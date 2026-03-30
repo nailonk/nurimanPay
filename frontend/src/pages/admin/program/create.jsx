@@ -17,7 +17,6 @@ function ProgramCreate() {
       }
     } catch (err) {
       console.error("Gagal menambah program:", err);
-      // 3. Ambil pesan error dari response backend agar lebih informatif
       const errorMsg = err.response?.data?.error || err.response?.data?.message || "Gagal menyimpan ke database.";
       alert(errorMsg);
     }
@@ -45,7 +44,7 @@ function ProgramCreate() {
         <ProgramForm onSubmit={handleCreate} />
       </div>
 
-      {/* 3 INFO CARDS */}
+      {/* INFO CARDS */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
         <div className="bg-[#f2f7f0]/50 p-6 rounded-2xl border border-[#e2ece0] transition-all hover:shadow-md hover:shadow-green-50">
           <div className="flex items-center gap-3 mb-3">

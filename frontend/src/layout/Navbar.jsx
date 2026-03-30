@@ -1,17 +1,14 @@
 import React from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { User, LogOut } from "lucide-react"
-import { useAuth } from "@/hooks/useAuth" // Import hook auth
+import { useAuth } from "@/hooks/useAuth"
 import logo from "@/assets/logo.png"
 
 function Navbar() {
   const navigate = useNavigate()
   const location = useLocation()
-  const { admin, logout } = useAuth() // Ambil state admin dan fungsi logout
+  const { admin, logout } = useAuth() 
 
-  /**
-   * Section scroll handler
-   */
   const handleScroll = (sectionId) => {
     if (location.pathname !== "/") {
       navigate("/")
@@ -29,21 +26,14 @@ function Navbar() {
     }
   }
 
-  /**
-   * Secure Logout Handler
-   * Triggers global state reset and redirects to login
-   */
   const handleLogout = () => {
     const confirmLogout = window.confirm("Apakah anda yakin ingin keluar dari sistem?")
     if (confirmLogout) {
-      logout() // Ini akan menghapus localStorage DAN setAdmin(null)
+      logout() 
       navigate("/login", { replace: true })
     }
   }
 
-  /**
-   * Navigation Guard for User Icon
-   */
   const handleUserClick = () => {
     if (admin) {
       navigate("/admin/dashboard")
@@ -66,34 +56,31 @@ function Navbar() {
         </h1>
       </div>
 
-      {/* Navigation & Actions */}
       <div className="flex items-center gap-6">
         
         {/* Navigation Links */}
         <div className="hidden sm:flex items-center gap-6 text-sm font-semibold text-gray-800">
           <button 
-            onClick={() => navigate("/program-section")}
-            className="hover:text-green-600"
+            onClick={() => handleScroll("program-section")}
+            className="hover:text-green-600 transition-colors"
           >
             Program
           </button>
           <button 
-            onClick={() => navigate("/about")}
-            className="hover:text-green-600"
+            onClick={() => handleScroll("about-section")}
+            className="hover:text-green-600 transition-colors"
           >
             Tentang Kami
           </button>
           <button 
-            onClick={() => navigate("/contact")}
-            className="hover:text-green-600"
+            onClick={() => handleScroll("contact-section")}
+            className="hover:text-green-600 transition-colors"
           >
             Kontak
           </button>
         </div>
 
-        {/* User Session Controls */}
         <div className="flex items-center gap-2">
-          {/* Dashboard/Login Link */}
           <button
             onClick={handleUserClick}
             className="w-9 h-9 flex items-center justify-center rounded-full bg-green-100 hover:bg-green-200 transition"
@@ -102,7 +89,6 @@ function Navbar() {
             <User size={18} className="text-[#A3C585]/80" />
           </button>
 
-          {/* Conditional Logout Button: Only shown if admin is logged in */}
           {admin && (
             <button
               onClick={handleLogout}
