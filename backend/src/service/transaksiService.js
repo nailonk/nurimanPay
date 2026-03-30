@@ -6,7 +6,7 @@ export const createDonationService = async (donationData) => {
 
   const orderId = `DONASI-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
-  // Simpan data awal ke database
+  // 1. Simpan data awal ke database
   const insertQuery = `
     INSERT INTO transactions (name, phone_number, amount, message, program_id, order_id, status, created_at)
     VALUES ($1, $2, $3, $4, $5, $6, 'pending', CURRENT_TIMESTAMP)
@@ -18,9 +18,27 @@ export const createDonationService = async (donationData) => {
 
   // 2. Buat transaksi di Midtrans
   const parameter = {
-    transaction_details: { order_id: orderId, gross_amount: amount },
-    customer_details: { first_name: name, phone: phone_number },
-    item_details: [{ id: 'donasi-1', price: amount, quantity: 1, name: 'Donasi Nurul Iman' }],
+    transaction_details: { 
+      order_id: orderId, 
+      gross_amount: amount 
+    },
+    customer_details: { 
+      first_name: name, 
+      phone: phone_number 
+    },
+    item_details: [{ 
+      id: 'donasi-1', 
+      price: amount, 
+      quantity: 1, 
+      name: 'Donasi Nurul Iman' 
+    }],
+    // Tambahkan callbacks sesuai struktur routing frontend temanmu
+    // Tapi tetap menggunakan variabel program_id dari kode kamu
+    callbacks: {
+      finish: `http://localhost:5173/detail-program/${program_id}`,
+      error: `http://localhost:5173/detail-program/${program_id}`,
+      pending: `http://localhost:5173/detail-program/${program_id}`
+    },
     custom_field1: donasiId.toString()
   };
 

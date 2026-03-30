@@ -66,7 +66,17 @@ const ProgramSection = ({ programs = [], isLoading = false }) => {
       >
         {isLoading ? (
           [1, 2, 3].map((n) => (
-            <Card key={n} className="min-w-[280px] h-[420px] animate-pulse bg-gray-100 rounded-2xl border-0" />
+            <Card 
+              key={n} 
+              className="min-w-[280px] h-[420px] animate-pulse bg-gray-50 rounded-2xl border-0 flex items-center justify-center ring-0 focus:ring-0 focus-visible:ring-0 outline-none"
+            >
+              <div className="flex flex-col items-center gap-2">
+                <Loader2 className="w-8 h-8 animate-spin text-[#A3C585]/50" />
+                <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">
+                  Memuat...
+                </p>
+              </div>
+            </Card>
           ))
         ) : (
           sortedPrograms.map((item) => {

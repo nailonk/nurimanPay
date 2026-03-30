@@ -1,6 +1,7 @@
 import { core } from '../config/midtrans.js';
 import pool from '../config/db.js';
 import * as programService from './programService.js';
+import whatsappClient from '../config/wa.js';
 
 export const handleNotificationService = async (notification) => {
   // 1. Validasi Notifikasi (Mendapatkan data asli & aman dari Midtrans)
@@ -54,25 +55,45 @@ const queryTransaction = `
 const result = await pool.query(queryTransaction, [dbStatus, paymentType, orderId]);
 const transaction = result.rows[0]; // Data dari baris tabel 'transactions' yang barusan diupdate
 
-// --- LOGIKA PENAMBAHAN DANA (Berdasarkan ERD-mu) ---
 if (transaction && dbStatus === 'success') {
-    // Sesuai gambarmu: kolomnya namanya 'amount', bukan 'gross_amount'
     const danaMasuk = Number(transaction.amount); 
     const idProgram = transaction.program_id;
 
     console.log(`✅ Sinkronisasi: Program ${idProgram} menerima dana Rp${danaMasuk}`);
 
     try {
-        // Panggil fungsi untuk update 'collected_amount' di tabel programs
         await programService.addCollectedAmount(idProgram, danaMasuk);
-    } catch (err) {
-        console.error('❌ Gagal sinkronisasi dana ke tabel programs:', err.message);
-    }
-}
 
-return { 
-    dbStatus, 
-    orderId, 
-    transaction 
+        // 2. PANGGIL FUNGSI KIRIM WA DI SINI (HANYA JIKA SUCCESS)
+        await sendDonationStatus(
+            transaction.phone_number, // Pastikan nama kolom di DB-mu benar
+            transaction.name,   // Pastikan nama kolom di DB-mu benar
+            danaMasuk, 
+            'BERHASIL'
+        );
+
+    } catch (err) {
+        console.error('❌ Gagal sinkronisasi atau kirim WA:', err.message);
+    }
+  }
+
+  return { dbStatus, orderId, transaction };
 };
+
+// --- 3. FUNGSI KIRIM WA-NYA TETAP DI BAWAH ---
+export const sendDonationStatus = async (nomorHp, namaDonatur, nominal, status) => {
+    try {
+        let cleanNumber = nomorHp.replace(/\D/g, ''); 
+        let formattedNumber = cleanNumber.startsWith('0') ? '62' + cleanNumber.slice(1) : cleanNumber;
+        const chatId = `${formattedNumber}@c.us`;
+
+        const pesan = `Halo *${namaDonatur}*,\n\nDonasi sebesar *Rp ${Number(nominal).toLocaleString('id-ID')}* telah kami terima dengan status: *${status}*.\n\nTerima kasih atas kebaikan Anda. 🙏\n-- *NurimanPay* --`;
+
+        await whatsappClient.sendMessage(chatId, pesan);
+        console.log(`📩 Notifikasi WA terkirim ke: ${namaDonatur}`);
+        return { success: true };
+    } catch (error) {
+        console.error('❌ Gagal kirim notifikasi WA:', error);
+        return { success: false, error };
+    }
 };

@@ -38,21 +38,35 @@ const FormTransaction = ({ programId }) => {
   const [showErrorAlert, setShowErrorAlert] = useState(false)
   const [apiError, setApiError] = useState("")
 
-  // --- 1. LOGIC DETEKSI STATUS DARI MIDTRANS (URL) ---
+  // LOGIC DETEKSI STATUS DARI MIDTRANS (URL) 
   useEffect(() => {
-    const status = searchParams.get("transaction_status")
+    const status = searchParams.get("transaction_status");
+    const orderId = searchParams.get("order_id"); 
 
-    if (status === "settlement" || status === "capture") {
-      setShowSuccessAlert(true)
-      setSearchParams({}) // Bersihkan URL
-    } else if (status === "deny" || status === "cancel" || status === "expire") {
-      setApiError("Maaf, transaksi Anda tidak dapat diproses atau telah kedaluwarsa.")
-      setShowErrorAlert(true)
-      setSearchParams({})
+    if (orderId && status) {
+      const syncStatus = async () => {
+        setLoading(true);
+        try {
+          await transactionApi.checkStatus(orderId); 
+          
+          if (status === "settlement" || status === "capture") {
+            setShowSuccessAlert(true);
+          } else if (["deny", "cancel", "expire"].includes(status)) {
+            setApiError("Transaksi gagal atau kedaluwarsa.");
+            setShowErrorAlert(true);
+          }
+        } catch (err) {
+          console.error("Gagal sinkronisasi status:", err);
+        } finally {
+          setLoading(false);
+          setSearchParams({}); 
+        }
+      };
+
+      syncStatus();
     }
-  }, [searchParams, setSearchParams])
+  }, [searchParams, setSearchParams]);
 
-  // --- 2. LOGIC HELPER ---
   const handleNominalChange = (e) => {
     let value = e.target.value.replace(/\D/g, "")
     if (value) {
@@ -80,7 +94,7 @@ const FormTransaction = ({ programId }) => {
     return Object.keys(newErrors).length === 0
   }
 
-  // --- 3. PROSES KIRIM DATA & REDIRECT ---
+  // PROSES KIRIM DATA & REDIRECT
   const handleSubmit = async () => {
     if (!validate()) return
     setLoading(true)
@@ -96,22 +110,36 @@ const FormTransaction = ({ programId }) => {
 
     try {
       const response = await transactionApi.create(payload)
-      if (response.data.success) {
+      const snapToken = response.data.snap_token || response.data.data?.token;
+      if (snapToken && window.snap) {
+        window.snap.pay(snapToken, {
+          onSuccess: function () {
+            setShowSuccessAlert(true);
+            setLoading(false);
+          },
+          onPending: function (result) {
+            console.log("Pending:", result);
+            setLoading(false);
+          },
+          onError: function () {
+            setApiError("Pembayaran gagal diproses.");
+            setShowErrorAlert(true);
+            setLoading(false);
+          },
+          onClose: function () {
+            setLoading(false);
+          }
+        });
+      } else {
         const url = response.data.redirect_url || response.data.data?.redirect_url
-        if (url) {
-          // Langsung lempar ke Midtrans
-          window.location.href = url 
-        }
+        if (url) window.location.href = url 
       }
     } catch (error) {
-      const errorMsg = error.response?.data?.error || "Gagal menghubungi server pembayaran."
-      setApiError(errorMsg)
+      setApiError(error.response?.data?.error || "Gagal menghubungi server.")
       setShowErrorAlert(true)
-    } finally {
       setLoading(false)
     }
   }
-
   return (
     <div className="w-full max-w-sm mx-auto bg-white p-2">
       {/* HEADER */}
