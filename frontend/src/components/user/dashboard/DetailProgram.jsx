@@ -1,10 +1,27 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Heart, ShieldCheck, CircleAlert, Loader2 } from "lucide-react";
+import { Heart, ShieldCheck, CircleAlert, Loader2, CheckCircle2, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
+import FormTransaction from "./FormTransaction";
 import { getPrograms } from "@/api/program";
 import { transactionApi } from "@/api/transaction";
 
@@ -18,12 +35,27 @@ const formatRupiah = (angka) => {
 
 const DetailProgram = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [donatur, setDonatur] = useState([]);
   const [totalDonatur, setTotalDonatur] = useState(0);
   const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
+
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [showErrorAlert, setShowErrorAlert] = useState(false);
+  
+  useEffect(() => {
+    const status = searchParams.get("transaction_status");
+    if (status) {
+      if (status === "settlement" || status === "capture") {
+        setShowSuccessAlert(true);
+      } else if (["deny", "cancel", "expire"].includes(status)) {
+        setShowErrorAlert(true);
+      }
+      setSearchParams({}); // Bersihkan URL setelah alert dipicu
+    }
+  }, [searchParams, setSearchParams]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -45,7 +77,7 @@ const DetailProgram = () => {
       } catch (err) {
         console.error(err);
       } finally {
-        setLoading(false); 
+        setLoading(false);
       }
     };
 
@@ -95,59 +127,94 @@ const DetailProgram = () => {
 
         {/* CONTENT */}
         <div className="grid md:grid-cols-3 gap-6 mt-6">
-          <div className="md:col-span-2 space-y-6">
-            <Card className="p-5 rounded-xl bg-white shadow-md border-0 ring-0 focus:ring-0 focus-visible:ring-0 outline-none">
-              <h2 className="text-lg font-bold text-[#7da85f] mt-1">
-                {progress}% <span className="text-gray-400 font-medium text-sm">Tercapai</span>
-              </h2>
+  <div className="md:col-span-2 space-y-6">
+    <Card className="p-5 rounded-xl bg-white shadow-md border-0 ring-0 outline-0">
+      <div className="flex items-baseline gap-2">
+        <h2 className="text-xl font-bold text-[#7da85f]">
+          {progress}%
+        </h2>
+        <span className="text-gray-400 font-medium text-sm">Tercapai</span>
+      </div>
 
-              <Progress value={progress} className="mt-3 h-2 bg-[#A3C585]/20 [&>div]:bg-[#A3C585]" />
+      <Progress value={progress} className="mt-3 h-2 bg-[#A3C585]/20 [&>div]:bg-[#A3C585]" />
 
-              <div className="flex items-center gap-1 text-xs text-gray-400 mt-3">
-                <CircleAlert className="w-3 h-3 text-[#A3C585]" />
-                <span className="capitalize">{data.status || "Aktif"}</span>
-              </div>
+      <div className="flex items-center gap-1 text-xs text-gray-400 mt-3">
+        <CircleAlert className="w-3 h-3 text-[#A3C585]" />
+        <span className="capitalize">{data.status || "Aktif"}</span>
+      </div>
 
-              <div className="grid grid-cols-3 text-sm mt-6 pt-4 border-t border-gray-50">
-                <div>
-                  <p className="text-gray-500 text-xs uppercase tracking-tight">Terkumpul</p>
-                  <p className="font-bold text-[#A3C585]">{formatRupiah(data.collected_amount)}</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-gray-500 text-xs uppercase tracking-tight">Target</p>
-                  <p className="font-bold">{formatRupiah(data.target_amount)}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-gray-500 text-xs uppercase tracking-tight">Donatur</p>
-                  <p className="font-bold">{totalDonatur}</p>
-                </div>
-              </div>
-            </Card>
+      {/* Grid yang diperbaiki: Stack di mobile, Baris di desktop */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6 pt-4 border-t border-gray-50">
+        <div className="flex flex-col">
+          <p className="text-gray-500 text-[10px] uppercase tracking-wider">Terkumpul</p>
+          <p className="font-bold text-[#A3C585] text-base truncate">
+            {formatRupiah(data.collected_amount)}
+          </p>
+        </div>
+        <div className="flex flex-col sm:items-center">
+          <p className="text-gray-500 text-[10px] uppercase tracking-wider">Target</p>
+          <p className="font-bold text-gray-700 text-base truncate">
+            {formatRupiah(data.target_amount)}
+          </p>
+        </div>
+        <div className="flex flex-col sm:items-end">
+          <p className="text-gray-500 text-[10px] uppercase tracking-wider">Donatur</p>
+          <p className="font-bold text-gray-700 text-base">
+            {totalDonatur} <span className="text-xs font-normal text-gray-400">Orang</span>
+          </p>
+        </div>
+      </div>
+    </Card>
 
-              <div className="border-b border-gray-100 pb-2 mb-4">
-                <span className="text-[#A3C585] font-bold text-sm border-b-2 border-[#A3C585] pb-2">
-                  Deskripsi Program
-                </span>
-              </div>
-              <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-line">
-                {data.description}
-              </p>
-          </div>
-
-          <div className="space-y-4">
-              <Button
-                onClick={() => navigate("/form-transaction", { state: { programId: data.id } })}
-                className="w-full h-12 bg-[#A3C585] hover:bg-[#8eb16f] text-white shadow-md border-0 transition flex gap-2"
+    {/* Deskripsi */}
+    <div className="space-y-4">
+       <div className="inline-block border-b-2 border-[#A3C585] pb-1">
+         <span className="text-[#A3C585] font-bold text-sm uppercase tracking-wide">
+           Deskripsi Program
+         </span>
+       </div>
+       <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-line">
+         {data.description}
+       </p>
+    </div>
+  </div>
+          {/* SIDEBAR RIGHT */}
+<div className="space-y-4 pb-10 md:pb-0">
+            {/* DIALOG MODAL DONASI */}
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button className="w-full h-12 bg-[#A3C585] hover:bg-[#8eb16f] text-white shadow-md border-0 transition flex gap-2">
+                  <Heart size={18} />
+                  Donasi Sekarang
+                </Button>
+              </DialogTrigger>
+              <DialogContent 
+                className="bg-white p-0 
+                          w-full h-full max-h-screen 
+                          sm:max-w-[425px] sm:h-auto sm:max-h-[90vh] 
+                          sm:rounded-xl border-0 
+                          flex flex-col 
+                          outline-none ring-0 focus:ring-0 focus-visible:ring-0"
               >
-                <Heart size={18} />
-                Donasi Sekarang
-              </Button>
-              <div className="mt-3 h-12 flex gap-2 text-[11px] text-gray-500 bg-gray-50 p-3 rounded-lg border border-gray-100">
-                <ShieldCheck size={14} className="text-[#A3C585] shrink-0" />
-                <span>Pembayaran aman diproses melalui sistem enkripsi otomatis.</span>
-              </div>
+                <DialogHeader className="p-4 border-b">
+                  <DialogTitle className="text-center text-sm font-bold">
+                    Form Transaksi Donasi
+                  </DialogTitle>
+                </DialogHeader>
 
-            <Card className="p-5 rounded-xl bg-white border-0 shadow-md ring-0 focus:ring-0 focus-visible:ring-0 outline-none">
+                {/* Area Scrollable */}
+                <div className="flex-1 overflow-y-auto p-4 scrollbar-hide">
+                  <FormTransaction programId={data.id} />
+                </div>
+              </DialogContent>
+            </Dialog>
+
+            <div className="mt-3 flex gap-2 text-[11px] text-gray-500 bg-gray-50 p-3 rounded-lg border border-gray-100">
+              <ShieldCheck size={14} className="text-[#A3C585] shrink-0" />
+              <span>Pembayaran aman diproses melalui sistem enkripsi otomatis.</span>
+            </div>
+
+            <Card className="p-5 rounded-xl bg-white border-0 shadow-md ring-0 outline-none">
               <h4 className="font-bold text-gray-800 mb-4 text-sm">Donatur Terakhir</h4>
               <div className="space-y-4">
                 {donatur.length > 0 ? (
@@ -172,6 +239,56 @@ const DetailProgram = () => {
           </div>
         </div>
       </div>
+
+{/* Alert Sukses */}
+      <AlertDialog open={showSuccessAlert} onOpenChange={setShowSuccessAlert}>
+        <AlertDialogContent className="max-w-[320px] bg-white rounded-2xl border-0 shadow-2xl ring-0 outline-none">
+          <AlertDialogHeader className="flex flex-col items-center justify-center">
+            <div className="flex flex-col items-center justify-center w-full">
+              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                <CheckCircle2 className="w-8 h-8 text-green-600" />
+              </div>
+              <AlertDialogTitle className="text-center font-bold text-lg w-full">
+                Terima Kasih!
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-center text-xs mt-2 w-full">
+                Donasi Anda telah kami terima. Semoga menjadi amal jariyah yang berkah.
+              </AlertDialogDescription>
+            </div>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction 
+              onClick={() => setShowSuccessAlert(false)}
+              className="w-full bg-[#A3C585] hover:bg-[#92b874] border-0"
+            >
+              Tutup
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Alert Gagal */}
+      <AlertDialog open={showErrorAlert} onOpenChange={setShowErrorAlert}>
+        <AlertDialogContent className="max-w-[320px] bg-white rounded-2xl border-0 outline-none shadow-2xl">
+          <AlertDialogHeader>
+            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-2 mx-auto">
+              <XCircle className="w-8 h-8 text-red-600" />
+            </div>
+            <AlertDialogTitle className="text-center text-red-600">Transaksi Bermasalah</AlertDialogTitle>
+            <AlertDialogDescription className="text-center text-xs">
+              Maaf, transaksi Anda tidak dapat diproses atau telah kedaluwarsa.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction 
+              onClick={() => setShowErrorAlert(false)}
+              className="w-full bg-gray-800 hover:bg-gray-700 border-0"
+            >
+              Mengerti
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

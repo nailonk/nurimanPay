@@ -89,7 +89,7 @@ function ChartSection({ transactions = [] }) {
               </defs>
 
               <CartesianGrid
-                strokeDasharray="4 4"
+                strokeDasharray="3 3"
                 vertical={false}
                 stroke="#f1f5f9"
               />

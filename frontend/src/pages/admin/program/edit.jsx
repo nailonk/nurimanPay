@@ -65,7 +65,7 @@ function ProgramEdit() {
       const errorMessage = serverMessage || "Terjadi kesalahan saat menyimpan perubahan.";
       
       alert(`Gagal Update: ${errorMessage}`);
-      throw err; // Lempar balik agar status loading di tombol form berhenti
+      throw err; 
     }
   };
 

@@ -65,7 +65,7 @@ function TransaksiPage() {
           </p>
         </div>
 
-        {/* TOMBOL DOWNLOAD */}
+        {/* TOMBOL DOWNLOAD EXCEL */}
         <Button 
           onClick={handleDownloadExcel}
           className="bg-[#A3C585] hover:bg-[#8eb074] text-white rounded-xl px-6 h-11 flex items-center gap-2 shadow-sm transition-all active:scale-95"

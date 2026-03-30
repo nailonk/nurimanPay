@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button"
 import { Trash2 } from "lucide-react"
 import { useEffect, useState } from "react"
 
-/* Badge sesuai desain foto (hijau sangat muda, teks hijau brand) */
 const Badge = ({ children }) => (
   <span className="px-3 py-1 text-[10px] font-bold rounded-full bg-[#f2f7f0] text-[#A3C585] uppercase tracking-wide">
     {children}
@@ -42,7 +41,7 @@ export default function TablePenyaluran() {
       <Table>
         <TableHeader className="bg-gray-50/50">
           <TableRow className="border-none">
-            {/* Header Kolom Sesuai Urutan di Foto */}
+            {/* Header Kolom */}
             <TableHead className="text-[11px] font-bold uppercase text-gray-400 tracking-wider pl-6">Tanggal</TableHead>
             <TableHead className="text-[11px] font-bold uppercase text-gray-400 tracking-wider">Program</TableHead>
             <TableHead className="text-[11px] font-bold uppercase text-gray-400 tracking-wider">Tujuan</TableHead>
@@ -80,7 +79,7 @@ export default function TablePenyaluran() {
                   </div>
                 </TableCell>
 
-                {/* NOMINAL (Warna Hijau & Rata Kanan Sedikit/Bold) */}
+                {/* NOMINAL */}
                 <TableCell>
                   <div className="text-right pr-10">
                      <p className="text-[10px] text-gray-400 font-bold uppercase">Rp</p>
@@ -95,7 +94,7 @@ export default function TablePenyaluran() {
                   </p>
                 </TableCell>
 
-                {/* BUKTI (Foto Kecil Rounded) */}
+                {/* BUKTI */}
                 <TableCell>
                   <div className="w-10 h-10 rounded-xl overflow-hidden border border-gray-100 shadow-sm">
                     <img
@@ -106,7 +105,7 @@ export default function TablePenyaluran() {
                   </div>
                 </TableCell>
 
-                {/* AKSI (Hanya Trash icon sesuai foto) */}
+                {/* AKSI */}
                 <TableCell className="pr-6">
                   <div className="flex justify-center">
                     <Button
@@ -125,7 +124,7 @@ export default function TablePenyaluran() {
         </TableBody>
       </Table>
 
-      {/* FOOTER TABEL (Pagination Sederhana Sesuai Foto) */}
+      {/* FOOTER TABEL */}
       <div className="px-6 py-4 flex items-center justify-between border-t border-gray-50">
         <p className="text-[11px] text-gray-400 font-medium">
           Menampilkan {data.length} data

@@ -29,7 +29,7 @@ function ProgramCard({ data, onDelete }) {
           className="w-full h-full object-cover"
         />
 
-        {/* BADGE (Status Aktif) */}
+        {/* BADGE */}
         {data.badge && (
           <span className="absolute top-3 left-3 bg-[#1b602f] text-white text-[10px] font-bold tracking-wider px-3 py-1 rounded-full shadow-sm">
             {data.badge}

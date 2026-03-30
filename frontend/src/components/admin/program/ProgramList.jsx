@@ -3,7 +3,6 @@ import { getPrograms, deleteProgram } from "@/api/program";
 import ProgramCard from "./ProgramCard";
 import ProgramFilter from "./ProgramFilter";
 
-// Definisikan placeholder di luar agar bisa diakses oleh semua fungsi
 const PLACEHOLDER = "https://placehold.co/600x400/f3f4f6/a3c585?text=No+Image";
 
 function ProgramList() {
@@ -12,13 +11,13 @@ function ProgramList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fungsi untuk mengambil data menggunakan API Service
+  // Mengambil data menggunakan API 
   const fetchPrograms = async () => {
     try {
       setLoading(true);
       const response = await getPrograms();
 
-      // Ambil data dari response axios
+      // Ambil data 
       const rawData = response.data?.data || response.data || [];
 
       const mappedData = rawData.map((p) => {
@@ -62,12 +61,11 @@ function ProgramList() {
     }
   };
 
-  // Fungsi hapus menggunakan API Service
+  // Fungsi hapus menggunakan API 
   const handleDelete = async (id) => {
     if (window.confirm("Apakah Anda yakin ingin menghapus program ini?")) {
       try {
         await deleteProgram(id);
-        // Update state lokal
         setPrograms((prev) => prev.filter((item) => item.id !== id));
         alert("Program berhasil dihapus.");
       } catch (err) {
