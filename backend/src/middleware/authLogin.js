@@ -11,8 +11,7 @@ export const isAdminOnly = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, jwtConfig.secret);
-    
-    // Cek apakah role-nya benar 'admin'
+
     if (decoded.role !== 'admin') {
       return res.status(403).json({ error: 'Akses ditolak: Anda bukan Admin' });
     }

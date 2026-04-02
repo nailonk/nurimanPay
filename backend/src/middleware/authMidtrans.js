@@ -4,7 +4,6 @@ const authMidtrans = (req, res, next) => {
   const { order_id, status_code, gross_amount, signature_key } = req.body;
   const serverKey = process.env.MIDTRANS_SERVER_KEY;
 
-  // Verifikasi keaslian data dari Midtrans
   const hash = crypto
     .createHash('sha512')
     .update(order_id + status_code + gross_amount + serverKey)

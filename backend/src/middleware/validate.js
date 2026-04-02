@@ -9,8 +9,6 @@ export const validate = (schema) => {
       const errorMessage = error.details.map((detail) => detail.message).join(', ');
       return res.status(400).json({ error: errorMessage });
     }
-
-    // Ganti req.body dengan hasil yang sudah bersih (sanitasi)
     req.body = value;
     next();
   };
