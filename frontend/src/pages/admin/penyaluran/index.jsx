@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { ArrowLeft } from "lucide-react"
 import Header from "@/components/admin/penyaluran/Header"
-import SummaryCard from "@/components/admin/penyaluran/SummaryCard"
+import StatCard from "@/components/admin/penyaluran/StatCard"
 import TablePenyaluran from "@/components/admin/penyaluran/Table"
 import FormPenyaluran from "@/components/admin/penyaluran/PenyaluranForm"
 
@@ -47,7 +47,7 @@ export default function Penyaluran() {
         
         <>
           <Header setOpen={setOpen} setEditData={setEditData} />
-          <SummaryCard />
+          <StatCard />
           <div className="bg-white rounded-[24px] shadow-sm border border-gray-100 overflow-hidden">
             <TablePenyaluran
               setOpen={setOpen}

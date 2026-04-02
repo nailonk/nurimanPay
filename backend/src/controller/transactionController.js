@@ -1,4 +1,4 @@
-import * as transactionService from '../service/transaksiService.js';
+import * as transactionService from '../service/transactionService.js';
 
 // 1. Membuat Transaksi (Donasi)
 export const createTransaction = async (req, res) => {

@@ -1,18 +1,14 @@
-import './src/config/wa.js';
 import express from 'express';
 import cors from 'cors';
 import 'dotenv/config';
 import pool from './src/config/db.js';
 import authRoutes from './src/routes/authRoutes.js';
-// IMPORT ROUTES BARU
-import transaksiRoutes from './src/routes/transaksiRoutes.js';
+import transactionRoutes from './src/routes/transactionRoutes.js';
 import notificationRoutes from './src/routes/notificationRoutes.js';
 import programRoutes from './src/routes/programRoutes.js';
-import penyaluranRoutes from './src/routes/penyaluranRoutes.js';
+import distributionRoutes from './src/routes/distributionRoutes.js';
 
 const app = express();
-
-// Test koneksi DB
 pool.connect((err, client, release) => {
     if (err) {
         return console.error('Error acquiring client', err.stack);
@@ -22,7 +18,10 @@ pool.connect((err, client, release) => {
 });
 
 // Middleware
-app.use(cors());
+app.use(cors({
+    origin: process.env.VITE_API_URL,
+    credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -33,11 +32,11 @@ app.use((req, res, next) => {
 });
 
 // Routes
-app.use('/api/v1/auth', authRoutes);
-app.use('/api/v1/transaksi', transaksiRoutes);           
-app.use('/api/v1/notif', notificationRoutes);   
-app.use('/api/v1/program', programRoutes);  
-app.use('/api/v1/penyaluran', penyaluranRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/transaction', transactionRoutes);           
+app.use('/api/notif', notificationRoutes);   
+app.use('/api/program', programRoutes);  
+app.use('/api/distribution', distributionRoutes);
 
 // Root endpoint
 app.get('/', (req, res) => {

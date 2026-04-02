@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useNavigate } from "react-router-dom";
+import noImage from "@/assets/noImage.png"
 
 const formatRupiah = (angka) => {
   return new Intl.NumberFormat("id-ID", {
@@ -91,11 +92,15 @@ const ProgramSection = ({ programs = [], isLoading = false }) => {
               >
                 <div className="h-40 w-full bg-gray-100 shrink-0 overflow-hidden rounded-t-2xl">
                   <img
-                    src={item.image || "https://via.placeholder.com/400x200?text=No+Image"}
+                    // Jika item.image tidak ada, pakai gambar lokal noImage
+                    src={item.image || noImage} 
                     alt={item.title}
                     className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
                     onError={(e) => {
-                      e.target.src = "https://via.placeholder.com/400x200?text=No+Image";
+                      // Stop loop jika gambar cadangan pun bermasalah
+                      e.target.onerror = null; 
+                      // Pakai gambar lokal noImage sebagai cadangan terakhir
+                      e.target.src = noImage; 
                     }}
                   />
                 </div>

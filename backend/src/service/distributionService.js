@@ -1,8 +1,42 @@
 import pool from '../config/db.js';
 
-// ========== PUBLIC SERVICES ==========
+export const createDistributionService = async ({ program_id, amount, description, proof_attachment, distributed_at, created_by }) => {
+    const programCheck = await pool.query(
+        'SELECT collected_amount FROM programs WHERE id = $1',
+        [program_id]
+    );
+    if (programCheck.rows.length === 0) return { error: 'PROGRAM_NOT_FOUND' };
 
-export const getAllDistributions = async () => {
+    const collectedAmount = parseFloat(programCheck.rows[0].collected_amount);
+
+    const totalDistributedResult = await pool.query(
+        'SELECT COALESCE(SUM(amount), 0) as total FROM distributions WHERE program_id = $1',
+        [program_id]
+    );
+    const totalDistributed = parseFloat(totalDistributedResult.rows[0].total);
+    const sisaDana = collectedAmount - totalDistributed;
+
+    if (amount > sisaDana) return { error: 'INSUFFICIENT_FUNDS', sisaDana };
+
+    const insertQuery = `
+        INSERT INTO distributions 
+            (program_id, amount, description, proof_attachment, distributed_at, created_by)
+        VALUES ($1, $2, $3, $4, $5, $6)
+        RETURNING *
+    `;
+    const values = [
+        program_id,
+        amount,
+        description || null,
+        proof_attachment || null,
+        distributed_at || new Date().toISOString().split('T')[0],
+        created_by || null
+    ];
+    const result = await pool.query(insertQuery, values);
+    return { data: result.rows[0] };
+};
+
+export const getAllDistributionsService = async () => {
     const query = `
         SELECT 
             d.*,
@@ -17,7 +51,7 @@ export const getAllDistributions = async () => {
     return result.rows;
 };
 
-export const getDistributionById = async (id) => {
+export const getDistributionByIdService = async (id) => {
     const query = `
         SELECT 
             d.*,
@@ -34,7 +68,7 @@ export const getDistributionById = async (id) => {
     return result.rows[0] || null;
 };
 
-export const getDistributionsByProgram = async (programId) => {
+export const getDistributionsByProgramService = async (programId) => {
     const query = `
         SELECT 
             d.*,
@@ -50,7 +84,7 @@ export const getDistributionsByProgram = async (programId) => {
     return result.rows;
 };
 
-export const getProgramSummary = async (programId) => {
+export const getProgramSummaryService = async (programId) => {
     const programQuery = `
         SELECT title, target_amount, collected_amount
         FROM programs 
@@ -84,47 +118,7 @@ export const getProgramSummary = async (programId) => {
     };
 };
 
-// ========== ADMIN SERVICES ==========
-
-export const createDistribution = async ({ program_id, amount, description, proof_attachment, distributed_at, created_by }) => {
-    // Cek program ada
-    const programCheck = await pool.query(
-        'SELECT collected_amount FROM programs WHERE id = $1',
-        [program_id]
-    );
-    if (programCheck.rows.length === 0) return { error: 'PROGRAM_NOT_FOUND' };
-
-    const collectedAmount = parseFloat(programCheck.rows[0].collected_amount);
-
-    // Cek sisa dana
-    const totalDistributedResult = await pool.query(
-        'SELECT COALESCE(SUM(amount), 0) as total FROM distributions WHERE program_id = $1',
-        [program_id]
-    );
-    const totalDistributed = parseFloat(totalDistributedResult.rows[0].total);
-    const sisaDana = collectedAmount - totalDistributed;
-
-    if (amount > sisaDana) return { error: 'INSUFFICIENT_FUNDS', sisaDana };
-
-    const insertQuery = `
-        INSERT INTO distributions 
-            (program_id, amount, description, proof_attachment, distributed_at, created_by)
-        VALUES ($1, $2, $3, $4, $5, $6)
-        RETURNING *
-    `;
-    const values = [
-        program_id,
-        amount,
-        description || null,
-        proof_attachment || null,
-        distributed_at || new Date().toISOString().split('T')[0],
-        created_by || null
-    ];
-    const result = await pool.query(insertQuery, values);
-    return { data: result.rows[0] };
-};
-
-export const updateDistribution = async (id, { program_id, amount, description, proof_attachment, distributed_at }) => {
+export const updateDistributionService = async (id, { program_id, amount, description, proof_attachment, distributed_at }) => {
     const updateQuery = `
         UPDATE distributions 
         SET 
@@ -142,10 +136,11 @@ export const updateDistribution = async (id, { program_id, amount, description, 
     return result.rows[0] || null;
 };
 
-export const deleteDistribution = async (id) => {
+export const deleteDistributionService = async (id) => {
     const result = await pool.query(
         'DELETE FROM distributions WHERE id = $1 RETURNING *',
         [id]
     );
     return result.rows[0] || null;
 };
+

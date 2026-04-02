@@ -1,7 +1,7 @@
 import pool from '../config/db.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { jwtConfig } from '../config/jwt.js'; // Import config yang sudah kamu buat
+import { jwtConfig } from '../config/jwt.js';
 
 export const loginService = async (email, password) => {
   const userResult = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
@@ -16,7 +16,6 @@ export const loginService = async (email, password) => {
     throw new Error('Email atau password salah');
   }
 
-  // PAKAI CONFIG DI SINI
   const token = jwt.sign(
     { id: user.id, role: user.role },
     jwtConfig.secret, // Lebih rapi

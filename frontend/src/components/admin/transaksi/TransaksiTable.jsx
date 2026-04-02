@@ -1,7 +1,7 @@
 import StatusBadge from "./StatusBadge"
 import { MoreVertical } from "lucide-react"
 
-function TransaksiTable({ data = [], onDelete }) {
+function TransaksiTable({ data = [] }) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-left">

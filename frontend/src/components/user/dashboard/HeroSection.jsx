@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import GambarMasjidHero from "@/assets/GambarMasjidHero.png"
 
 const HeroSection = () => {
   const navigate = useNavigate();
@@ -21,7 +22,7 @@ const HeroSection = () => {
     <section className="relative w-full h-[400px] md:h-[500px] overflow-hidden">
       {/* Background Image */}
       <img
-        src="https://tiperumah.id/blog/wp-content/uploads/2022/05/Gambar-masjid.png"
+        src={GambarMasjidHero}
         alt="Masjid"
         className="absolute inset-0 w-full h-full object-cover"
       />

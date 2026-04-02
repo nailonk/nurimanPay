@@ -1,8 +1,6 @@
 import pool from '../config/db.js';
 
-// Logika simpan program baru
 export const createProgramService = async (programData) => {
-  // Tambahkan end_date di sini
   const { title, description, target_amount, end_date } = programData;
 
   const query = `
@@ -11,17 +9,16 @@ export const createProgramService = async (programData) => {
     RETURNING *
   `;
   
-  // Masukkan end_date ke dalam array values ($4)
   const values = [title, description, target_amount, end_date];
   const result = await pool.query(query, values);
   return result.rows[0];
 };
 
-// Logika ambil semua program
 export const getAllProgramsService = async () => {
   const result = await pool.query('SELECT * FROM programs ORDER BY created_at DESC');
   return result.rows;
 };
+
 export const getTransactionsByProgramService = async (programId) => {
   try {
     const query = `
@@ -29,12 +26,10 @@ export const getTransactionsByProgramService = async (programId) => {
       WHERE program_id = $1 
       ORDER BY created_at DESC
     `; 
-    // Catatan: Di screenshot tidak terlihat kolom transaction_date, 
-    // biasanya defaultnya created_at. Sesuaikan dengan kolom aslimu ya.
-
+  
     const result = await pool.query(query, [programId]);
     
-    return result.rows; // Mengembalikan array (bisa kosong [] jika tidak ada transaksi)
+    return result.rows; 
   } catch (error) {
     console.error("Error fetching transactions:", error);
     throw error;
@@ -42,7 +37,6 @@ export const getTransactionsByProgramService = async (programId) => {
 };
 
 export const updateProgramService = async (id, data) => {
-    // Pastikan semua field ini dikirim dari Postman
     const { title, description, target_amount, end_date, status } = data;
     
     const result = await pool.query(
@@ -54,13 +48,8 @@ export const updateProgramService = async (id, data) => {
     );
     return result.rows[0];
 };
-export const addCollectedAmount = async (programId, amount) => {
-  const query = `
-    UPDATE programs 
-    SET collected_amount = collected_amount + $1 
-    WHERE id = $2 
-    RETURNING *
-  `;
-  const result = await pool.query(query, [amount, programId]);
-  return result.rows[0];
-};
+
+export const deleteProgramService = async (id) => {
+    const result = await pool.query('DELETE FROM programs WHERE id = $1 RETURNING *', [id]);
+    return result.rows[0];
+}

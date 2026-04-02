@@ -1,16 +1,16 @@
 import express from 'express';
-import { updateProgram, getProgramTransactions, getAllPrograms, createProgram } from '../controller/programController.js';
+import * as programController from '../controller/programController.js';
 import { validate } from '../middleware/validate.js'; 
 import { createProgramSchema } from '../validator/programValidator.js'; 
-import { isAdminOnly } from '../middleware/authLogin.js'; // <--- Import ini
+import { isAdminOnly } from '../middleware/authLogin.js'; 
 
 const router = express.Router();
 
-// Siapa pun boleh lihat daftar program (Public)
-router.get('/', getAllPrograms);
-router.get('/:id', getProgramTransactions);
+router.get('/', programController.getAllPrograms);
+router.get('/:id', programController.getProgramTransactions);
+router.get('/:id/transactions', programController.getProgramTransactions);
 
-// HANYA ADMIN yang bisa buat program
-router.post('/create', isAdminOnly, validate(createProgramSchema),createProgram);
-router.put('/:id', isAdminOnly, validate(createProgramSchema), updateProgram);
+router.post('/create', isAdminOnly, validate(createProgramSchema),programController.createProgram);
+router.put('/:id', isAdminOnly, validate(createProgramSchema), programController.updateProgram);
+
 export default router;

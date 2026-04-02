@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Pencil, Trash2 } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
-const IMAGE_PLACEHOLDER = "/images/gradient-default.png";
+const IMAGE_PLACEHOLDER = "@/assets/gradient-default.png";
 
 function ProgramCard({ data, onDelete }) {
   const navigate = useNavigate()

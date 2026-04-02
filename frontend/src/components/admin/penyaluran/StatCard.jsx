@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { useState, useEffect } from "react"
 import { getPrograms } from "@/api/program"
 
-export default function SummaryCard() {
+export default function StatCard() {
   const [stats, setStats] = useState({
     totalCollected: 0,
     activeProgramsCount: 0, 

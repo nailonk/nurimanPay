@@ -1,10 +1,8 @@
-import * as penyaluranService from '../services/penyaluranService.js';
-
-// ========== PUBLIC CONTROLLERS ==========
+import * as distributionService from '../service/distributionService.js';
 
 export const getAllDistributions = async (req, res) => {
     try {
-        const data = await penyaluranService.getAllDistributions();
+        const data = await distributionService.getAllDistributionsService();
         res.json({ success: true, data });
     } catch (error) {
         console.error('Error:', error);
@@ -15,7 +13,7 @@ export const getAllDistributions = async (req, res) => {
 export const getDistributionById = async (req, res) => {
     try {
         const { id } = req.params;
-        const data = await penyaluranService.getDistributionById(id);
+        const data = await distributionService.getDistributionByIdService(id);
 
         if (!data) {
             return res.status(404).json({ success: false, error: 'Distribusi tidak ditemukan' });
@@ -30,7 +28,7 @@ export const getDistributionById = async (req, res) => {
 export const getDistributionsByProgram = async (req, res) => {
     try {
         const { programId } = req.params;
-        const data = await penyaluranService.getDistributionsByProgram(programId);
+        const data = await distributionService.getDistributionsByProgramService(programId);
         res.json({ success: true, data });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -40,7 +38,7 @@ export const getDistributionsByProgram = async (req, res) => {
 export const getProgramSummary = async (req, res) => {
     try {
         const { programId } = req.params;
-        const data = await penyaluranService.getProgramSummary(programId);
+        const data = await distributionService.getProgramSummaryService(programId);
 
         if (!data) {
             return res.status(404).json({ success: false, error: 'Program tidak ditemukan' });
@@ -52,7 +50,6 @@ export const getProgramSummary = async (req, res) => {
     }
 };
 
-// ========== ADMIN CONTROLLERS ==========
 
 export const createDistribution = async (req, res) => {
     try {
@@ -65,7 +62,7 @@ export const createDistribution = async (req, res) => {
             });
         }
 
-        const result = await penyaluranService.createDistribution({
+        const result = await distributionService.createDistributionService({
             program_id, amount, description, proof_attachment, distributed_at, created_by
         });
 
@@ -96,7 +93,7 @@ export const updateDistribution = async (req, res) => {
         const { id } = req.params;
         const { program_id, amount, description, proof_attachment, distributed_at } = req.body;
 
-        const data = await penyaluranService.updateDistribution(id, {
+        const data = await distributionService.updateDistributionService(id, {
             program_id, amount, description, proof_attachment, distributed_at
         });
 
@@ -113,7 +110,7 @@ export const updateDistribution = async (req, res) => {
 export const deleteDistribution = async (req, res) => {
     try {
         const { id } = req.params;
-        const data = await penyaluranService.deleteDistribution(id);
+        const data = await distributionService.deleteDistributionService(id);
 
         if (!data) {
             return res.status(404).json({ success: false, error: 'Distribusi tidak ditemukan' });

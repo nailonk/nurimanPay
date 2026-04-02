@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Heart, ShieldCheck, CircleAlert, Loader2, CheckCircle2, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -57,32 +57,34 @@ const DetailProgram = () => {
     }
   }, [searchParams, setSearchParams]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const res = await getPrograms();
-        const list = Array.isArray(res.data) ? res.data : res.data?.data || [];
-        const found = list.find((item) => String(item.id) === String(id));
-        setData(found);
-
-        const donaturRes = await transactionApi.getDonaturByProgram(id);
-        const donaturData = donaturRes?.data?.data || [];
-        const validDonatur = donaturData
-          .filter((d) => d.status === "success")
-          .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-
-        setDonatur(validDonatur.slice(0, 5));
-        setTotalDonatur(validDonatur.length);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      // 1. Ambil data program (untuk angka terkumpul)
+      const res = await getPrograms();
+      const list = Array.isArray(res.data) ? res.data : res.data?.data || [];
+      const found = list.find((item) => String(item.id) === String(id));
+      
+      if (found) {
+        setData(found); // Ambil angka terkumpul asli dari BE
       }
-    };
 
-    fetchData();
-  }, [id]);
+      // 2. Ambil data donatur
+      const donaturRes = await transactionApi.getDonaturByProgram(id);
+      const donaturData = donaturRes?.data?.data || [];
+      const validDonatur = donaturData.filter((d) => d.status === "success");
+
+      setDonatur(validDonatur.slice(0, 5));
+      setTotalDonatur(validDonatur.length);
+    } catch (err) {
+      console.error("Fetch error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (id) fetchData();
+}, [id]);
 
   if (loading) {
     return (
@@ -204,7 +206,14 @@ const DetailProgram = () => {
 
                 {/* Area Scrollable */}
                 <div className="flex-1 overflow-y-auto p-4 scrollbar-hide">
-                  <FormTransaction programId={data.id} />
+                  {/* Berikan pengaman: Hanya render form jika data.id sudah ada */}
+                  {data && data.id ? (
+                    <FormTransaction programId={data.id} />
+                  ) : (
+                    <div className="flex justify-center p-4">
+                      <Loader2 className="animate-spin text-[#A3C585]" />
+                    </div>
+                  )}
                 </div>
               </DialogContent>
             </Dialog>

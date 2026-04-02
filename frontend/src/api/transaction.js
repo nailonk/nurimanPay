@@ -1,0 +1,6 @@
+import api from "./axios"
+
+export const transactionApi = {
+  create: (data) => api.post("/transaksi/create", data),
+  getDonaturByProgram: (id) => api.get(`/program/${id}`)
+}
