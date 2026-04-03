@@ -38,9 +38,9 @@ export const createDonationService = async (donationData) => {
     ],
     // callback frontend
     callbacks: {
-      finish: `-program/${program_id}`,
+      finish: `https://nuriman-fe.vercel.app/detail-program/${program_id}`,
       error: `https://nuriman-fe.vercel.app/detail-program/${program_id}`,
-      pending: `https://nuriman-fe.vercel.app//detail-program/${program_id}`,
+      pending: `https://nuriman-fe.vercel.app/detail-program/${program_id}`,
     },
     custom_field1: donasiId.toString(),
   };
