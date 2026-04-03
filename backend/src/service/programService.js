@@ -38,6 +38,15 @@ export const getTransactionsByProgramService = async (programId) => {
   }
 };
 
+export const addCollectedAmount = async (programId, amount) => {
+  const query = `
+    UPDATE programs 
+    SET collected_amount = collected_amount + $1 
+    WHERE id = $2
+  `;
+  await pool.query(query, [amount, programId]);
+};
+
 export const updateProgramService = async (id, data) => {
   const { title, description, target_amount, end_date, status } = data;
 
