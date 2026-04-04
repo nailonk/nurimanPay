@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { useState, useEffect } from "react"
 import { getPrograms } from "@/api/program"
 
-export default function StatCard() {
+export default function StatsCard() {
   const [stats, setStats] = useState({
     totalCollected: 0,
     activeProgramsCount: 0, 
@@ -16,8 +16,6 @@ export default function StatCard() {
         const response = await getPrograms()
         const rawData = response.data
         const programs = Array.isArray(rawData) ? rawData : (rawData.data || [])
-
-        // HITUNG SEMUA DATA 
         const total = programs.reduce((acc, curr) => acc + (Number(curr.collected_amount) || 0), 0)
         const target = programs.reduce((acc, curr) => acc + (Number(curr.target_amount) || 0), 0)
         const activeCount = programs.filter(p => p.status === 'aktif').length

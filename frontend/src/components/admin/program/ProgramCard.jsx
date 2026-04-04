@@ -1,29 +1,33 @@
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Pencil, Trash2 } from "lucide-react"
-import { useNavigate } from "react-router-dom"
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Pencil, Trash2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const IMAGE_PLACEHOLDER = "@/assets/gradient-default.png";
 
 function ProgramCard({ data, onDelete }) {
-  const navigate = useNavigate()
-  const progress = data.progress
-
-  const handleDelete = () => {
-    const confirmDelete = confirm(`Yakin hapus "${data.title}"?`)
-    if (!confirmDelete) return
-    onDelete(data.id)
-  }
+  const navigate = useNavigate();
+  const progress = data.progress;
 
   return (
     <Card className="rounded-2xl border border-gray-100 shadow-md overflow-hidden hover:shadow-lg transition ring-0 focus:ring-0 focus-visible:ring-0 outline-none">
-      
       {/* IMAGE SECTION */}
       <div className="relative h-56 w-full bg-gray-100">
         <img
-          src={data.image ? data.image : IMAGE_PLACEHOLDER} 
+          src={data.image ? data.image : IMAGE_PLACEHOLDER}
           onError={(e) => {
-            e.target.src = IMAGE_PLACEHOLDER 
+            e.target.src = IMAGE_PLACEHOLDER;
           }}
           alt={data.title}
           className="w-full h-full object-cover"
@@ -49,11 +53,35 @@ function ProgramCard({ data, onDelete }) {
               onClick={() => navigate(`/admin/program/edit/${data.id}`)}
               className="cursor-pointer hover:text-orange-500 transition-colors"
             />
-            <Trash2
-              size={18}
-              onClick={handleDelete}
-              className="cursor-pointer hover:text-red-500 transition-colors"
-            />
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Trash2
+                  size={18}
+                  className="cursor-pointer hover:text-red-500 transition-colors"
+                />
+              </AlertDialogTrigger>
+              <AlertDialogContent className="rounded-2xl bg-white ring-0 outline-none">
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Hapus Program?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    {" "}
+                    <strong>{data.title}</strong> akan dihapus permanen dari
+                    sistem.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel className="rounded-xl">
+                    Batal
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => onDelete(data.id)}
+                    className="bg-red-500 hover:bg-red-600 rounded-xl"
+                  >
+                    Ya, Hapus
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </div>
 
@@ -79,11 +107,15 @@ function ProgramCard({ data, onDelete }) {
         {/* DONATION DETAILS */}
         <div className="flex justify-between items-end pt-1">
           <div className="space-y-0.5">
-            <p className="text-gray-400 text-[10px] uppercase font-bold tracking-tight">Terkumpul</p>
+            <p className="text-gray-400 text-[10px] uppercase font-bold tracking-tight">
+              Terkumpul
+            </p>
             <p className="font-bold text-gray-800 text-sm">{data.collected}</p>
           </div>
           <div className="text-right space-y-0.5">
-            <p className="text-gray-400 text-[10px] uppercase font-bold tracking-tight">Target</p>
+            <p className="text-gray-400 text-[10px] uppercase font-bold tracking-tight">
+              Target
+            </p>
             <p className="text-gray-600 text-sm font-medium">{data.target}</p>
           </div>
         </div>
@@ -94,14 +126,14 @@ function ProgramCard({ data, onDelete }) {
             variant="ghost"
             size="sm"
             className="text-[#7FAE5A] hover:text-[#1b602f] hover:bg-[#A3C585]/10 font-semibold p-0 h-auto"
-            onClick={() => navigate(`/admin/program/${data.id}`)}
+            onClick={() => navigate(`/admin/program/detail/${data.id}`)}
           >
             Detail Program →
           </Button>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
-export default ProgramCard
+export default ProgramCard;

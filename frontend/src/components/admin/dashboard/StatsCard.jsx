@@ -43,7 +43,6 @@ function StatsCard({ programs = [], transactions = [] }) {
     },
     {
       title: "Total Donasi Masuk",
-      // Nominal uang hanya dari transaksi Sukses
       value: formatIDR(totalDonasiValid),
       icon: Wallet,
       bg: "bg-orange-50",
@@ -58,7 +57,6 @@ function StatsCard({ programs = [], transactions = [] }) {
     },
     {
       title: "Jumlah Transaksi",
-      // Menghitung SEMUA (Success + Pending + Cancel, dll)
       value: totalSemuaTransaksi.toLocaleString(),
       icon: Receipt,
       bg: "bg-gray-100",

@@ -46,14 +46,14 @@ const ProgramSection = ({ programs = [], isLoading = false }) => {
         <div className="flex gap-2">
           <Button
             onClick={() => scroll("left")}
-            className="w-8 h-8 rounded-full border border-[#A3C585]/80 bg-white hover:bg-gray-100 focus-visible:ring-0" // Tambah ring-0
+            className="w-8 h-8 rounded-full border border-[#A3C585]/80 bg-white hover:bg-gray-100 focus-visible:ring-0" 
           >
             <ChevronLeft className="text-[#A3C585]" />
           </Button>
 
           <Button
             onClick={() => scroll("right")}
-            className="w-8 h-8 rounded-full border border-[#A3C585]/80 bg-white hover:bg-gray-100 focus-visible:ring-0" // Tambah ring-0
+            className="w-8 h-8 rounded-full border border-[#A3C585]/80 bg-white hover:bg-gray-100 focus-visible:ring-0" 
           >
             <ChevronRight className="text-[#A3C585]" />
           </Button>
@@ -63,7 +63,7 @@ const ProgramSection = ({ programs = [], isLoading = false }) => {
       {/* CARD LIST */}
       <div
         ref={scrollRef}
-        className="flex gap-6 overflow-x-auto scroll-smooth pb-6 px-6 scrollbar-none" // scrollbar-none agar lebih bersih di mobile
+        className="flex gap-6 overflow-x-auto scroll-smooth pb-6 px-6 scrollbar-none" 
       >
         {isLoading ? (
           [1, 2, 3].map((n) => (
@@ -92,14 +92,11 @@ const ProgramSection = ({ programs = [], isLoading = false }) => {
               >
                 <div className="h-40 w-full bg-gray-100 shrink-0 overflow-hidden rounded-t-2xl">
                   <img
-                    // Jika item.image tidak ada, pakai gambar lokal noImage
                     src={item.image || noImage} 
                     alt={item.title}
                     className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
                     onError={(e) => {
-                      // Stop loop jika gambar cadangan pun bermasalah
-                      e.target.onerror = null; 
-                      // Pakai gambar lokal noImage sebagai cadangan terakhir
+                      e.target.onerror = null;
                       e.target.src = noImage; 
                     }}
                   />

@@ -22,15 +22,13 @@ function ProgramList({ programs = [] }) {
     return Math.min(Math.round(percentage), 100);
   };
 
-  // LOGIKA FILTER & SORTING
   const topPrograms = [...programs]
     .map(p => ({
       ...p,
       currentProgress: calculateProgress(p.collected_amount, p.target_amount)
     }))
-    // Urutkan dari yang progresnya paling besar (hampir 100%)
+
     .sort((a, b) => b.currentProgress - a.currentProgress)
-    // Ambil hanya 3 teratas
     .slice(0, 3);
 
   const iconConfig = [
@@ -40,7 +38,7 @@ function ProgramList({ programs = [] }) {
   ];
 
   return (
-    <Card className="rounded-2xl border shadow-md hover:shadow-lg transition-all ring-0 focus:ring-0 focus-visible:ring-0 outline-none">
+    <Card className="rounded-2xl bg-white border shadow-md hover:shadow-lg transition-all ring-0 focus:ring-0 focus-visible:ring-0 outline-none">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-base sm:text-lg">
           Mendekati Target

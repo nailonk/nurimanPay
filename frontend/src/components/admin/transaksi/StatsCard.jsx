@@ -48,7 +48,7 @@ function TransaksiStats() {
             {item.value}
           </p>
           
-          {/* Bagian Trend */}
+          {/* Trend */}
           {item.trend && (
             <div className="flex items-center gap-1 text-[10px] text-green-500 font-medium">
               <TrendingUp size={12} /> 
@@ -56,7 +56,7 @@ function TransaksiStats() {
             </div>
           )}
           
-          {/* Bagian Sub-keterangan */}
+          {/* Sub-keterangan */}
           {item.sub && (
             <p className="text-[10px] text-gray-400 font-medium">
               {item.sub}
