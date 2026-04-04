@@ -1,5 +1,5 @@
-import Navbar from "./Navbar"
-import Footer from "./Footer"
+import Navbar from "@/layout/user/Navbar"
+import Footer from "@/layout/user/Footer"
 import { Outlet } from "react-router-dom"
 
 export default function UserLayout() {

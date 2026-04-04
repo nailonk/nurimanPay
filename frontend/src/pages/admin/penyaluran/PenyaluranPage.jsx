@@ -1,22 +1,22 @@
 import { useState } from "react"
-import { ArrowLeft } from "lucide-react"
-import Header from "@/components/admin/penyaluran/Header"
-import StatCard from "@/components/admin/penyaluran/StatCard"
-import TablePenyaluran from "@/components/admin/penyaluran/Table"
+import { ArrowLeft, Plus } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import StatsCard from "@/components/admin/penyaluran/StatsCard"
+import PenyaluranTable from "@/components/admin/penyaluran/PenyaluranTable"
 import FormPenyaluran from "@/components/admin/penyaluran/PenyaluranForm"
 
-export default function Penyaluran() {
+export default function PenyaluranPage() {
   const [open, setOpen] = useState(false)
   const [editData, setEditData] = useState(null)
   const [editIndex, setEditIndex] = useState(null)
 
   return (
     <div className="p-4 md:p-6 space-y-6 bg-[#f9fafb] min-h-screen">
-
+      
       {open ? (
+        /* TAMPILAN FORM (TAMBAH/EDIT) */
         <div className="max-w-4xl mx-auto py-4 mb-20 px-6 animate-in fade-in zoom-in duration-300">
           
-          {/* TOMBOL KEMBALI */}
           <button
             onClick={() => setOpen(false)}
             className="flex items-center gap-2 text-sm text-gray-400 hover:text-gray-600 mb-8 transition-colors font-medium group"
@@ -25,7 +25,7 @@ export default function Penyaluran() {
             Kembali ke Daftar Penyaluran
           </button>
 
-          <div className="space-y-2">
+          <div className="space-y-2 mb-6">
             <h1 className="text-2xl font-bold text-gray-800">
               {editData ? "Edit Laporan Penyaluran" : "Tambah Laporan Penyaluran Dana"}
             </h1>
@@ -44,12 +44,33 @@ export default function Penyaluran() {
           </div>
         </div>
       ) : (
-        
+        /* TAMPILAN DASHBOARD UTAMA */
         <>
-          <Header setOpen={setOpen} setEditData={setEditData} />
-          <StatCard />
+          {/* HEADER SECTION */}
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-2xl font-bold">Penyaluran Dana</h1>
+              <p className="text-sm text-gray-500">
+                Kelola data penyaluran dana operasional dan sosial masjid secara transparan.
+              </p>
+            </div>
+
+            <Button 
+              onClick={() => {
+                setEditData(null); 
+                setOpen(true);    
+              }}
+              className="bg-[#A3C585] hover:bg-[#A3C585]/70 flex gap-2 text-white"
+            >
+              <Plus size={16} />
+              Tambah Laporan Penyaluran
+            </Button>
+          </div>
+
+          <StatsCard />
+
           <div className="bg-white rounded-[24px] shadow-sm border border-gray-100 overflow-hidden">
-            <TablePenyaluran
+            <PenyaluranTable
               setOpen={setOpen}
               setEditData={setEditData}
               setEditIndex={setEditIndex}

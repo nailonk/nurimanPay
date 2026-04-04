@@ -1,13 +1,11 @@
 import React from "react"
 import { useNavigate, useLocation } from "react-router-dom"
-import { User, LogOut } from "lucide-react"
-import { useAuth } from "@/hooks/useAuth"
+import { User } from "lucide-react"
 import logo from "@/assets/logo.png"
 
 function Navbar() {
   const navigate = useNavigate()
   const location = useLocation()
-  const { admin, logout } = useAuth() 
 
   const handleScroll = (sectionId) => {
     if (location.pathname !== "/") {
@@ -26,20 +24,8 @@ function Navbar() {
     }
   }
 
-  const handleLogout = () => {
-    const confirmLogout = window.confirm("Apakah anda yakin ingin keluar dari sistem?")
-    if (confirmLogout) {
-      logout() 
-      navigate("/login", { replace: true })
-    }
-  }
-
-  const handleUserClick = () => {
-    if (admin) {
-      navigate("/admin/dashboard")
-    } else {
-      navigate("/login")
-    }
+const handleUserClick = () => {
+    navigate("/login")
   }
 
   return (
@@ -84,20 +70,10 @@ function Navbar() {
           <button
             onClick={handleUserClick}
             className="w-9 h-9 flex items-center justify-center rounded-full bg-green-100 hover:bg-green-200 transition"
-            title={admin ? "Go to Dashboard" : "Login"}
+            title="Login"
           >
             <User size={18} className="text-[#A3C585]/80" />
           </button>
-
-          {admin && (
-            <button
-              onClick={handleLogout}
-              className="w-9 h-9 flex items-center justify-center rounded-full bg-red-50 hover:bg-red-100 transition text-red-500"
-              title="Logout"
-            >
-              <LogOut size={18} />
-            </button>
-          )}
         </div>
 
       </div>

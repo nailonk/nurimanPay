@@ -7,7 +7,6 @@ import { useNavigate } from "react-router-dom";
 function TransactionTable({ transactions = [] }) {
   const navigate = useNavigate();
 
-  // Fungsi untuk mendapatkan inisial dari nama donatur
   const getInitials = (name) => {
     if (!name) return "AN";
     return name
@@ -19,7 +18,6 @@ function TransactionTable({ transactions = [] }) {
       .substring(0, 2);
   };
 
-  // Format Mata Uang Rupiah
   const formatIDR = (amount) => {
     return new Intl.NumberFormat("id-ID", {
       style: "currency",
@@ -28,7 +26,6 @@ function TransactionTable({ transactions = [] }) {
     }).format(amount);
   };
 
-  // Format Tanggal sesuai database (ISO String)
   const formatDate = (dateString) => {
     if (!dateString) return "-";
     const date = new Date(dateString);

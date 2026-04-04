@@ -20,7 +20,7 @@ const HeroSection = () => {
 
   return (
     <section className="relative w-full h-[400px] md:h-[500px] overflow-hidden">
-      {/* Background Image */}
+      {/* BACKGROUND IMAGE */}
       <img
         src={GambarMasjidHero}
         alt="Masjid"

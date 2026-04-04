@@ -1,7 +1,7 @@
 import { FileDown } from "lucide-react";
 import * as XLSX from "xlsx";
-import TransaksiList from "@/components/admin/transaksi/TransaksiList";
-import TransaksiStats from "@/components/admin/transaksi/TransaksiStats";
+import TransaksiStats from "@/components/admin/transaksi/StatsCard";
+import TransaksiTable from "@/components/admin/transaksi/TransaksiTable";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
@@ -80,7 +80,7 @@ function TransaksiPage() {
       
       {/* TABLE SECTION */}
       <div className="bg-white rounded-[24px] shadow-sm border border-gray-100 overflow-hidden">
-        <TransaksiList />
+        <TransaksiTable />
       </div>
     </div>
   );

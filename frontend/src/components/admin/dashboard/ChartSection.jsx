@@ -1,4 +1,4 @@
-import { useMemo } from "react" // Gunakan useMemo untuk efisiensi perhitungan
+import { useMemo } from "react"
 import {
   Card,
   CardContent,
@@ -14,14 +14,11 @@ import {
 } from "recharts"
 
 function ChartSection({ transactions = [] }) {
-  // 1. Logika mengolah data transaksi ke format Chart (6 bulan terakhir)
   const chartData = useMemo(() => {
     const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agt", "Sep", "Okt", "Nov", "Des"];
     
-    // Inisialisasi objek untuk menampung total per bulan
     const monthlyTotals = {};
-    
-    // Ambil 6 bulan terakhir dari sekarang
+
     const now = new Date();
     for (let i = 5; i >= 0; i--) {
       const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
@@ -29,27 +26,22 @@ function ChartSection({ transactions = [] }) {
       monthlyTotals[monthName] = 0;
     }
 
-    // Isi data dari transaksi asli (hanya yang statusnya success/settlement)
     transactions.forEach((t) => {
       if (t.status === "success" || t.status === "settlement") {
         const date = new Date(t.created_at);
         const monthName = months[date.getMonth()];
-        
-        // Cek jika bulan transaksi masuk dalam range 6 bulan yang kita buat
-        if (monthlyTotals.hasOwnProperty(monthName)) {
+        if (monthName in monthlyTotals) {
           monthlyTotals[monthName] += Number(t.amount);
         }
       }
     });
 
-    // Ubah objek ke array format Recharts
     return Object.keys(monthlyTotals).map((name) => ({
       name,
       value: monthlyTotals[name],
     }));
   }, [transactions]);
 
-  // Fungsi format rupiah untuk tooltip
   const formatIDR = (val) => {
     return new Intl.NumberFormat("id-ID", {
       style: "currency",

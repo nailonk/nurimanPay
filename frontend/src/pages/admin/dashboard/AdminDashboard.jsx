@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import api from "@/api/axios"; 
-import Navbar from "@/components/admin/dashboard/Navbar";
+import Navbar from "@/layout/admin/Navbar";
 import StatsCard from "@/components/admin/dashboard/StatsCard";
 import ChartSection from "@/components/admin/dashboard/ChartSection";
 import ProgramList from "@/components/admin/dashboard/ProgramList";
 import TransactionTable from "@/components/admin/dashboard/TransactionTable";
 
-function DashboardPage() {
+function AdminDashboard() {
   const [programs, setPrograms] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -21,7 +21,7 @@ function DashboardPage() {
 
         const [resPrograms, resTransactions] = await Promise.all([
           api.get("/program"),
-          api.get("/transaksi")
+          api.get("/transaction")
         ]);
 
         const dataPrograms = resPrograms.data?.data || resPrograms.data || [];
@@ -50,65 +50,61 @@ function DashboardPage() {
     return nameMatch || idMatch;
   });
 
-  if (loading) return (
-    <div className="flex flex-col items-center justify-center py-20 text-gray-400 gap-4">
-      <div className="w-10 h-10 border-4 border-[#A3C585] border-t-transparent rounded-full animate-spin"></div>
-      <p className="text-sm font-medium animate-pulse">Memuat data dashboard...</p>
-    </div>
-  );
+return (
+  <div className="min-h-screen">
 
-  if (error) {
-    return (
+    {/* Navbar selalu tampil */}
+    <Navbar onSearch={(val) => setSearchTerm(val)} />
+
+    {loading ? (
+      <div className="flex flex-col items-center justify-center py-20 text-gray-400 gap-4">
+        <div className="w-10 h-10 border-4 border-[#A3C585] border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-sm font-medium animate-pulse">
+          Memuat data dashboard...
+        </p>
+      </div>
+    ) : error ? (
       <div className="max-w-md mx-auto mt-20 p-8 text-center bg-white rounded-3xl border border-red-100 shadow-sm">
         <div className="w-16 h-16 bg-red-50 text-red-400 rounded-full flex items-center justify-center mx-auto mb-4">
           <span className="text-2xl">!</span>
         </div>
         <p className="text-gray-800 font-bold text-lg mb-2">Terjadi Kesalahan</p>
         <p className="text-gray-500 text-sm mb-6">{error}</p>
-        <button 
-          onClick={() => window.location.reload()} 
-          className="w-full py-3 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-all font-semibold"
-        >
-          Coba Lagi
-        </button>
       </div>
-    );
-  }
+    ) : (
+      <>
+        <div className="px-4 sm:px-6 lg:px-8 space-y-6 pb-10">
 
-  return (
-    <div className="space-y-6">
-      <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b">
-        <Navbar onSearch={(val) => setSearchTerm(val)} />
-      </header>
-
-      <div className="px-4 sm:px-6 lg:px-8 space-y-6 pb-10">
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6">
-          <StatsCard programs={programs} transactions={transactions} />
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
-            <ChartSection transactions={transactions} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6 mt-4">
+            <StatsCard programs={programs} transactions={transactions} />
           </div>
 
-          <div>
-            <ProgramList programs={filteredPrograms} />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <ChartSection transactions={transactions} />
+            </div>
+
+            <div>
+              <ProgramList programs={filteredPrograms} />
+            </div>
           </div>
+
+          <div className="bg-white rounded-[32px] border border-gray-100 shadow-sm overflow-hidden">
+            <TransactionTable transactions={filteredTransactions} />
+          </div>
+
         </div>
 
-        <div className="bg-white rounded-[32px] border border-gray-100 shadow-sm overflow-hidden">
-          <TransactionTable transactions={filteredTransactions} />
-        </div>
+        <footer className="text-center py-6">
+          <p className="text-[11px] text-gray-400 font-medium tracking-wide">
+            © 2026 NURIMANPAY • SYSTEM MANAGEMENT DASHBOARD
+          </p>
+        </footer>
+      </>
+    )}
 
-      </div>
-
-      <footer className="text-center py-6">
-        <p className="text-[11px] text-gray-400 font-medium tracking-wide">
-          © 2026 NURIMANPAY • SYSTEM MANAGEMENT DASHBOARD
-        </p>
-      </footer>
-    </div>
-  );
+  </div>
+);
 }
 
-export default DashboardPage;
+export default AdminDashboard;

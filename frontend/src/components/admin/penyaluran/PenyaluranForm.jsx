@@ -1,16 +1,17 @@
-import { useNavigate } from "react-router-dom"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Calendar, LayoutGrid, User, Receipt, FileText, UploadCloud, X, Save } from "lucide-react"
-
 export default function FormPenyaluran({ editData, editIndex, refresh, setOpen }) {
-  const navigate = useNavigate();
-  const [form, setForm] = useState({
-    tanggal: "", program: "", tujuan: "", nominal: "", keterangan: "", bukti: "",
+  const [form, setForm] = useState(() => {
+    if (editData) return { ...editData }
+    return {
+      tanggal: "", 
+      program: "", 
+      tujuan: "", 
+      nominal: "", 
+      keterangan: "", 
+      bukti: "",
+    }
   })
-
-  useEffect(() => {
-    if (editData) setForm(editData)
-  }, [editData])
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value })
   
@@ -31,13 +32,16 @@ export default function FormPenyaluran({ editData, editIndex, refresh, setOpen }
     e.preventDefault()
     const data = JSON.parse(localStorage.getItem("penyaluran") || "[]")
     
-    if (editData) data[editIndex] = form
-    else data.push(form)
+    if (editData && editIndex !== undefined) {
+      data[editIndex] = form
+    } else {
+      data.push(form)
+    }
     
     localStorage.setItem("penyaluran", JSON.stringify(data))
 
-    setOpen(false) 
-    if (refresh) refresh();
+    if (setOpen) setOpen(false) 
+    if (refresh) refresh()
   }
 
   return (
@@ -49,7 +53,7 @@ export default function FormPenyaluran({ editData, editIndex, refresh, setOpen }
             <label className="flex items-center gap-2 text-[#A3C585] font-bold text-[11px] uppercase tracking-wider">
               <Calendar size={16} strokeWidth={2.5} /> <span className="text-gray-700">Tanggal Penyaluran</span>
             </label>
-            <input type="date" name="tanggal" value={form.tanggal} onChange={handleChange}
+            <input type="date" name="tanggal" value={form.tanggal} onChange={handleChange} required
               className="w-full bg-gray-50/50 border border-gray-100 rounded-xl px-4 h-12 text-sm focus:border-[#A3C585] outline-none transition-all" />
           </div>
 
@@ -58,7 +62,7 @@ export default function FormPenyaluran({ editData, editIndex, refresh, setOpen }
             <label className="flex items-center gap-2 text-[#A3C585] font-bold text-[11px] uppercase tracking-wider">
               <LayoutGrid size={16} strokeWidth={2.5} /> <span className="text-gray-700">Nama Program Donasi</span>
             </label>
-            <select name="program" value={form.program} onChange={handleChange}
+            <select name="program" value={form.program} onChange={handleChange} required
               className="w-full bg-gray-50/50 border border-gray-100 rounded-xl px-4 h-12 text-sm text-gray-500 focus:border-[#A3C585] outline-none transition-all">
               <option value="">Pilih Program Donasi</option>
               <option value="Santunan">Santunan</option>
@@ -71,7 +75,7 @@ export default function FormPenyaluran({ editData, editIndex, refresh, setOpen }
             <label className="flex items-center gap-2 text-[#A3C585] font-bold text-[11px] uppercase tracking-wider">
               <User size={16} strokeWidth={2.5} /> <span className="text-gray-700">Tujuan Penyaluran</span>
             </label>
-            <input type="text" name="tujuan" placeholder="Nama penerima atau lembaga" value={form.tujuan} onChange={handleChange}
+            <input type="text" name="tujuan" placeholder="Nama penerima atau lembaga" value={form.tujuan} onChange={handleChange} required
               className="w-full bg-gray-50/50 border border-gray-100 rounded-xl px-4 h-12 text-sm focus:border-[#A3C585] outline-none transition-all" />
           </div>
 
@@ -82,7 +86,7 @@ export default function FormPenyaluran({ editData, editIndex, refresh, setOpen }
             </label>
             <div className="relative">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold">Rp</span>
-              <input type="text" placeholder="0" value={form.nominal} onChange={handleNominal}
+              <input type="text" placeholder="0" value={form.nominal} onChange={handleNominal} required
                 className="w-full bg-gray-50/50 border border-gray-100 rounded-xl pl-10 pr-4 h-12 text-sm font-bold text-[#A3C585] focus:border-[#A3C585] outline-none transition-all" />
             </div>
           </div>
@@ -111,7 +115,7 @@ export default function FormPenyaluran({ editData, editIndex, refresh, setOpen }
           </label>
           {form.bukti && (
             <div className="relative w-32 h-32 mt-4 rounded-xl overflow-hidden border-2 border-[#A3C585]">
-              <img src={form.bukti} className="w-full h-full object-cover" />
+              <img src={form.bukti} className="w-full h-full object-cover" alt="preview" />
               <button type="button" onClick={() => setForm({...form, bukti: ""})} className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"><X size={12}/></button>
             </div>
           )}
@@ -120,17 +124,17 @@ export default function FormPenyaluran({ editData, editIndex, refresh, setOpen }
         {/* Buttons */}
         <div className="flex flex-col md:flex-row items-center justify-end gap-4 pt-8 border-t border-gray-50">
           <button 
-            type="submit" 
-            className="w-full md:w-[240px] justify-center bg-[#A3C585] hover:bg-[#8eb074] text-white h-12 px-8 rounded-xl font-bold shadow-lg shadow-green-100 transition-all flex items-center gap-2 order-1 md:order-2"
-          >
-            <Save size={18} /> Simpan Laporan
-          </button>
-          <button 
             type="button" 
             onClick={() => setOpen(false)}
             className="w-full md:w-auto px-10 h-12 rounded-xl text-white bg-red-600 font-bold transition-all order-2 md:order-1"
           >
             Batal
+          </button>
+          <button 
+            type="submit" 
+            className="w-full md:w-[240px] justify-center bg-[#A3C585] hover:bg-[#8eb074] text-white h-12 px-8 rounded-xl font-bold shadow-lg shadow-green-100 transition-all flex items-center gap-2 order-1 md:order-2"
+          >
+            <Save size={18} /> Simpan Laporan
           </button>
         </div>
       </form>
