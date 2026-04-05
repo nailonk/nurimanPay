@@ -2,7 +2,6 @@ import * as programService from '../service/programService.js';
 
 export const createProgram = async (req, res) => {
   try {
-    // Data di req.body sudah divalidasi dan disanitasi oleh Joi
     const newProgram = await programService.createProgramService(req.body);
 
     res.status(201).json({
@@ -30,7 +29,7 @@ export const getAllPrograms = async (req, res) => {
   }
 };
 export const getProgramTransactions = async (req, res) => {
-  const { id } = req.params; // Mengambil program_id dari URL
+  const { id } = req.params; 
   try {
     const transactions = await programService.getTransactionsByProgramService(id);
     res.status(200).json({
@@ -45,7 +44,6 @@ export const getProgramTransactions = async (req, res) => {
 export const updateProgram = async (req, res) => {
   const { id } = req.params;
   try {
-    // Memanggil service, bukan langsung pool query
     const updatedProgram = await programService.updateProgramService(id, req.body);
 
     if (!updatedProgram) {

@@ -1,15 +1,15 @@
 import pool from "../config/db.js";
 
 export const createProgramService = async (programData) => {
-  const { title, description, target_amount, end_date } = programData;
+  const { title, description, target_amount, end_date, image } = programData;
 
   const query = `
-    INSERT INTO programs (title, description, target_amount, end_date, collected_amount, status)
-    VALUES ($1, $2, $3, $4, 0, 'aktif')
+    INSERT INTO programs (title, description, target_amount, end_date, image, collected_amount, status)
+    VALUES ($1, $2, $3, $4, $5, 0, 'aktif')
     RETURNING *
   `;
 
-  const values = [title, description, target_amount, end_date];
+  const values = [title, description, target_amount, end_date, image];
   const result = await pool.query(query, values);
   return result.rows[0];
 };
@@ -48,14 +48,14 @@ export const addCollectedAmount = async (programId, amount) => {
 };
 
 export const updateProgramService = async (id, data) => {
-  const { title, description, target_amount, end_date, status } = data;
+  const { title, description, target_amount, end_date, status, image } = data;
 
   const result = await pool.query(
     `UPDATE programs 
-         SET title = $1, description = $2, target_amount = $3, end_date = $4, status = $5, updated_at = NOW()
-         WHERE id = $6
+         SET title = $1, description = $2, target_amount = $3, end_date = $4, status = $5, image = $6, updated_at = NOW()
+         WHERE id = $7
          RETURNING *`,
-    [title, description, target_amount, end_date, status, id],
+    [title, description, target_amount, end_date, status, image, id],
   );
   return result.rows[0];
 };
