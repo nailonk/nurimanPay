@@ -2,16 +2,55 @@ import * as programService from '../service/programService.js';
 
 export const createProgram = async (req, res) => {
   try {
-    const newProgram = await programService.createProgramService(req.body);
+    // Ambil data dari body request
+    const { title, description, target_amount, end_date, image } = req.body;
+
+    // Validasi sederhana di controller
+    if (!title || !target_amount) {
+      return res.status(400).json({ message: "Judul dan Target Donasi wajib diisi" });
+    }
+
+    const newProgram = await programService.createProgramService({
+      title,
+      description,
+      target_amount,
+      end_date,
+      image
+    });
 
     res.status(201).json({
       success: true,
-      message: 'Program berhasil ditambahkan',
+      message: 'Program baru berhasil dibuat',
       data: newProgram
     });
   } catch (error) {
     console.error('Controller Error Create Program:', error);
-    res.status(500).json({ error: 'Gagal menambah program', details: error.message });
+    res.status(500).json({ 
+      success: false, 
+      error: 'Gagal menambah program', 
+      details: error.message 
+    });
+  }
+};
+
+export const getProgramById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const program = await programService.getProgramByIdService(id);
+
+    if (!program) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "Program tidak ditemukan" 
+      });
+    }
+
+    res.status(200).json({ 
+      success: true, 
+      data: program 
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
   }
 };
 
@@ -31,7 +70,7 @@ export const getAllPrograms = async (req, res) => {
 export const getProgramTransactions = async (req, res) => {
   const { id } = req.params; 
   try {
-    const transactions = await programService.getTransactionsByProgramService(id);
+    const transactions = await programService.getProgramTransactionsService(id);
     res.status(200).json({
       success: true,
       data: transactions
@@ -63,6 +102,35 @@ export const updateProgram = async (req, res) => {
     res.status(500).json({ 
       success: false, 
       error: 'Gagal memperbarui program', 
+      details: error.message 
+    });
+  }
+};
+
+export const deleteProgram = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Panggil service deleteProgramService
+    const deletedProgram = await programService.deleteProgramService(id);
+
+    if (!deletedProgram) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Program tidak ditemukan atau sudah dihapus' 
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Program berhasil dihapus secara permanen',
+      data: deletedProgram
+    });
+  } catch (error) {
+    console.error('Controller Error Delete Program:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Gagal menghapus program', 
       details: error.message 
     });
   }

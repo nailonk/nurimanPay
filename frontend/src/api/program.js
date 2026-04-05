@@ -6,6 +6,9 @@ export const getPrograms = () => api.get("/program");
 // Mengambil detail program berdasarkan ID
 export const getProgramById = (id) => api.get(`/program/${id}`);
 
+// Mengambil transaksi yang terkait dengan program tertentu
+export const getProgramTransactions = (id) => api.get(`/program/${id}/transactions`);
+
 // Membuat program baru
 export const createProgram = (data) => api.post("/program", data);
 

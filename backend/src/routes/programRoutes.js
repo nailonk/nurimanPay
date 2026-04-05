@@ -7,10 +7,11 @@ import { isAdminOnly } from '../middleware/authLogin.js';
 const router = express.Router();
 
 router.get('/', programController.getAllPrograms);
-router.get('/:id', programController.getProgramTransactions);
+router.get('/:id', programController.getProgramById);
 router.get('/:id/transactions', programController.getProgramTransactions);
 
 router.post('/create', isAdminOnly, validate(createProgramSchema),programController.createProgram);
 router.put('/:id', isAdminOnly, validate(createProgramSchema), programController.updateProgram);
+router.delete('/:id', isAdminOnly, programController.deleteProgram);
 
 export default router;

@@ -14,6 +14,18 @@ export const createProgramService = async (programData) => {
   return result.rows[0];
 };
 
+export const getProgramByIdService = async (id) => {
+  try {
+    const query = "SELECT * FROM programs WHERE id = $1";
+    const result = await pool.query(query, [id]);
+
+    return result.rows.length > 0 ? result.rows[0] : null;
+  } catch (error) {
+    console.error("Error di getProgramByIdService:", error);
+    throw error;
+  }
+};
+
 export const getAllProgramsService = async () => {
   const result = await pool.query(
     "SELECT * FROM programs ORDER BY created_at DESC",
@@ -21,7 +33,7 @@ export const getAllProgramsService = async () => {
   return result.rows;
 };
 
-export const getTransactionsByProgramService = async (programId) => {
+export const getProgramTransactionsService = async (programId) => {
   try {
     const query = `
       SELECT * FROM transactions 
@@ -52,14 +64,19 @@ export const updateProgramService = async (id, data) => {
 
   const result = await pool.query(
     `UPDATE programs 
-         SET title = $1, description = $2, target_amount = $3, end_date = $4, status = $5, image = $6, updated_at = NOW()
-         WHERE id = $7
-         RETURNING *`,
+     SET title = $1, 
+         description = $2, 
+         target_amount = $3, 
+         end_date = $4, 
+         status = $5, 
+         image = COALESCE($6, image),
+         updated_at = NOW()
+     WHERE id = $7
+     RETURNING *`,
     [title, description, target_amount, end_date, status, image, id],
   );
   return result.rows[0];
 };
-
 export const deleteProgramService = async (id) => {
   const result = await pool.query(
     "DELETE FROM programs WHERE id = $1 RETURNING *",

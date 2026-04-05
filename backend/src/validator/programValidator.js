@@ -10,5 +10,12 @@ export const createProgramSchema = Joi.object({
   }),
   target_amount: Joi.number().integer().min(100000).required().messages({
     'any.required': 'Target nominal wajib diisi'
-  })
+  }),
+  end_date: Joi.date().iso().allow(null, '').messages({
+    'date.format': 'Format tanggal tidak valid'
+  }),
+  image: Joi.string().allow(null, '').messages({
+    'string.base': 'Format gambar harus berupa string/base64'
+  }),
+  status: Joi.string().valid('aktif', 'selesai', 'draft').optional()
 });

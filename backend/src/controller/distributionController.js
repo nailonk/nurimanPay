@@ -1,5 +1,42 @@
 import * as distributionService from '../service/distributionService.js';
 
+export const createDistribution = async (req, res) => {
+    try {
+        const { program_id, purpose, amount, description, image, distributed_at} = req.body;
+
+        if (!program_id || !amount || amount <= 0) {
+            return res.status(400).json({
+                success: false,
+                error: 'Program ID dan nominal wajib diisi, nominal harus lebih dari 0'
+            });
+        }
+        
+        const result = await distributionService.createDistributionService({
+            program_id, purpose, amount, description, image, distributed_at
+        });
+
+        if (result.error === 'PROGRAM_NOT_FOUND') {
+            return res.status(404).json({ success: false, error: 'Program tidak ditemukan' });
+        }
+
+        if (result.error === 'INSUFFICIENT_FUNDS') {
+            return res.status(400).json({
+                success: false,
+                error: `Dana tidak mencukupi. Sisa dana: Rp ${result.sisaDana.toLocaleString()}`
+            });
+        }
+
+        res.status(201).json({
+            success: true,
+            message: 'Laporan penyaluran berhasil ditambahkan',
+            data: result.data
+        });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+};
+
 export const getAllDistributions = async (req, res) => {
     try {
         const data = await distributionService.getAllDistributionsService();
@@ -51,59 +88,29 @@ export const getProgramSummary = async (req, res) => {
 };
 
 
-export const createDistribution = async (req, res) => {
+export const updateDistribution = async (req, res) => {
     try {
-        const { program_id, amount, description, proof_attachment, distributed_at, created_by } = req.body;
+        const { id } = req.params;
+        const { program_id, purpose, amount, description, image, distributed_at } = req.body;
 
-        if (!program_id || !amount || amount <= 0) {
-            return res.status(400).json({
-                success: false,
-                error: 'Program ID dan nominal wajib diisi, nominal harus lebih dari 0'
-            });
-        }
-
-        const result = await distributionService.createDistributionService({
-            program_id, amount, description, proof_attachment, distributed_at, created_by
+        const result = await distributionService.updateDistributionService(id, {
+            program_id, purpose, amount, description, image, distributed_at
         });
 
-        if (result.error === 'PROGRAM_NOT_FOUND') {
-            return res.status(404).json({ success: false, error: 'Program tidak ditemukan' });
+        if (!result) {
+            return res.status(404).json({ success: false, error: 'Distribusi tidak ditemukan' });
         }
 
         if (result.error === 'INSUFFICIENT_FUNDS') {
             return res.status(400).json({
                 success: false,
-                error: `Dana tidak mencukupi. Sisa dana: Rp ${result.sisaDana.toLocaleString()}`
+                error: `Dana tidak mencukupi. Sisa dana: Rp ${result.sisaDana.toLocaleString('id-ID')}`
             });
         }
 
-        res.status(201).json({
-            success: true,
-            message: 'Laporan penyaluran berhasil ditambahkan',
-            data: result.data
-        });
+        res.json({ success: true, message: 'Laporan berhasil diupdate', data: result });
     } catch (error) {
-        console.error('Error:', error);
         res.status(500).json({ success: false, error: error.message });
-    }
-};
-
-export const updateDistribution = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { program_id, amount, description, proof_attachment, distributed_at } = req.body;
-
-        const data = await distributionService.updateDistributionService(id, {
-            program_id, amount, description, proof_attachment, distributed_at
-        });
-
-        if (!data) {
-            return res.status(404).json({ success: false, error: 'Distribusi tidak ditemukan' });
-        }
-
-        res.json({ success: true, message: 'Laporan berhasil diupdate', data });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
     }
 };
 

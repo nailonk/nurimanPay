@@ -2,11 +2,11 @@ import pool from "../config/db.js";
 
 export const createDistributionService = async ({
   program_id,
+  purpose,
   amount,
   description,
-  proof_attachment,
+  image,
   distributed_at,
-  created_by,
 }) => {
   const programCheck = await pool.query(
     "SELECT collected_amount FROM programs WHERE id = $1",
@@ -27,31 +27,30 @@ export const createDistributionService = async ({
 
   const insertQuery = `
         INSERT INTO distributions 
-            (program_id, amount, description, proof_attachment, distributed_at, created_by)
+            (program_id, purpose, amount, description, image, distributed_at)
         VALUES ($1, $2, $3, $4, $5, $6)
         RETURNING *
     `;
   const values = [
     program_id,
+    purpose,
     amount,
     description || null,
-    proof_attachment || null,
+    image || null,
     distributed_at || new Date().toISOString().split("T")[0],
-    created_by || null,
   ];
   const result = await pool.query(insertQuery, values);
   return { data: result.rows[0] };
 };
 
+
 export const getAllDistributionsService = async () => {
   const query = `
         SELECT 
             d.*,
-            p.title as program_title,
-            u.name as created_by_name
+            p.title as program_title
         FROM distributions d
         LEFT JOIN programs p ON d.program_id = p.id
-        LEFT JOIN users u ON d.created_by = u.id
         ORDER BY d.distributed_at DESC
     `;
   const result = await pool.query(query);
@@ -64,11 +63,9 @@ export const getDistributionByIdService = async (id) => {
             d.*,
             p.title as program_title,
             p.target_amount,
-            p.collected_amount,
-            u.name as created_by_name
+            p.collected_amount
         FROM distributions d
         LEFT JOIN programs p ON d.program_id = p.id
-        LEFT JOIN users u ON d.created_by = u.id
         WHERE d.id = $1
     `;
   const result = await pool.query(query, [id]);
@@ -79,11 +76,9 @@ export const getDistributionsByProgramService = async (programId) => {
   const query = `
         SELECT 
             d.*,
-            p.title as program_title,
-            u.name as created_by_name
+            p.title as program_title
         FROM distributions d
         LEFT JOIN programs p ON d.program_id = p.id
-        LEFT JOIN users u ON d.created_by = u.id
         WHERE d.program_id = $1
         ORDER BY d.distributed_at DESC
     `;
@@ -130,25 +125,52 @@ export const getProgramSummaryService = async (programId) => {
 
 export const updateDistributionService = async (
   id,
-  { program_id, amount, description, proof_attachment, distributed_at },
+  { program_id, purpose, amount, description, image, distributed_at },
 ) => {
+  const oldData = await pool.query("SELECT program_id, amount FROM distributions WHERE id = $1", [id]);
+  if (oldData.rows.length === 0) return null;
+
+  const targetProgramId = program_id || oldData.rows[0].program_id;
+
+  if (amount || program_id) {
+    const programCheck = await pool.query(
+      "SELECT collected_amount FROM programs WHERE id = $1",
+      [targetProgramId]
+    );
+    const collectedAmount = parseFloat(programCheck.rows[0].collected_amount);
+
+    const totalDistResult = await pool.query(
+      "SELECT COALESCE(SUM(amount), 0) as total FROM distributions WHERE program_id = $1 AND id != $2",
+      [targetProgramId, id] 
+    );
+    
+    const totalLainnya = parseFloat(totalDistResult.rows[0].total);
+    const sisaDana = collectedAmount - totalLainnya;
+    const newAmount = amount ? parseFloat(amount) : parseFloat(oldData.rows[0].amount);
+
+    if (newAmount > sisaDana) {
+      return { error: "INSUFFICIENT_FUNDS", sisaDana };
+    }
+  }
   const updateQuery = `
         UPDATE distributions 
         SET 
             program_id = COALESCE($1, program_id),
-            amount = COALESCE($2, amount),
-            description = COALESCE($3, description),
-            proof_attachment = COALESCE($4, proof_attachment),
-            distributed_at = COALESCE($5, distributed_at),
+            purpose = COALESCE($2, purpose),
+            amount = COALESCE($3, amount),
+            description = COALESCE($4, description),
+            image = COALESCE($5, image),
+            distributed_at = COALESCE($6, distributed_at),
             updated_at = NOW()
-        WHERE id = $6
+        WHERE id = $7
         RETURNING *
     `;
   const values = [
     program_id,
+    purpose,
     amount,
     description,
-    proof_attachment,
+    image,
     distributed_at,
     id,
   ];

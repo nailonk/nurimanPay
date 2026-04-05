@@ -17,13 +17,12 @@ export default function FormPenyaluran({ editData, refresh, setOpen }) {
   const [programs, setPrograms] = useState([])
   const [loading, setLoading] = useState(false)
 
-  // 🔥 INIT EDIT (MENAMPILKAN DATA LAMA)
   useEffect(() => {
     if (editData) {
       setForm({
         tanggal: editData.distributed_at || "",
         program: editData.program_id ? String(editData.program_id) : "",
-        tujuan: editData.tujuan || "",
+        tujuan: editData.purpose || "",
         nominal: editData.amount
           ? new Intl.NumberFormat("id-ID").format(editData.amount)
           : "",
@@ -35,7 +34,6 @@ export default function FormPenyaluran({ editData, refresh, setOpen }) {
     fetchPrograms()
   }, [editData])
 
-  // 🔥 FETCH PROGRAM (HANYA 100%)
   const fetchPrograms = async () => {
     try {
       const res = await fetch("http://localhost:5000/api/program")
@@ -54,7 +52,6 @@ export default function FormPenyaluran({ editData, refresh, setOpen }) {
     }
   }
 
-  // 🔥 HANDLE CHANGE (ANTI BUG)
   const handleChange = (e) => {
     const { name, value } = e.target
     setForm(prev => ({
@@ -82,7 +79,7 @@ export default function FormPenyaluran({ editData, refresh, setOpen }) {
     reader.readAsDataURL(file)
   }
 
-  // 🔥 HITUNG SALDO
+  // menghitung sisa saldo program (target - collected - distribusi lain)
   const getSaldo = () => {
     const selected = programs.find(p => String(p.id) === String(form.program))
     if (!selected) return 0
@@ -96,7 +93,7 @@ export default function FormPenyaluran({ editData, refresh, setOpen }) {
     return saldo
   }
 
-  // 🔥 SUBMIT
+  // validasi dan submit form
   const handleSubmit = async (e) => {
     e.preventDefault()
 
@@ -126,7 +123,7 @@ export default function FormPenyaluran({ editData, refresh, setOpen }) {
 
     const payload = {
       program_id: form.program,
-      tujuan: form.tujuan, // 🔥 FIX UTAMA
+      purpose: form.tujuan, 
       amount: amount,
       description: form.keterangan,
       distributed_at: form.tanggal,
