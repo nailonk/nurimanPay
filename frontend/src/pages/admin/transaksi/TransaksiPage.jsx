@@ -58,14 +58,27 @@ function TransaksiPage() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Riwayat Transaksi</h1>
-          <p className="text-sm text-gray-500">Data real-time dari database & Midtrans</p>
+          <p className="text-sm text-gray-500">Kelola dan pantau semua data donasi masuk secara real-time.</p>
         </div>
         <Button 
           onClick={handleDownloadExcel} 
           disabled={loading || transactions.length === 0}
-          className="bg-[#A3C585] hover:bg-[#8eb074] flex gap-2"
+          className="
+            bg-[#A3C585] hover:bg-[#8eb074] 
+            text-white font-semibold px-6 py-5 
+            rounded-xl shadow-sm hover:shadow-md
+            transition-all duration-200 ease-in-out
+            active:scale-95 disabled:opacity-50 
+            disabled:cursor-not-allowed disabled:hover:bg-[#A3C585]
+            flex items-center gap-2
+          "
         >
-          <FileDown size={18} /> Excel
+          {loading ? (
+            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+          ) : (
+            <FileDown size={18} className="group-hover:translate-y-0.5 transition-transform" />
+          )}
+          <span>Download Excel</span>
         </Button>
       </div>
 
@@ -77,6 +90,11 @@ function TransaksiPage() {
           <TransaksiTable data={transactions} />
         </>
       )}
+      <footer className="text-center py-6">
+        <p className="text-[11px] text-gray-400 font-medium tracking-wide">
+          © 2026 NurimanPay • Seluruh Hak Cipta Dilindungi
+        </p>
+      </footer>
     </div>
   );
 }
