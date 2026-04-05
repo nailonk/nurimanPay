@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useNavigate, Outlet, useLocation } from "react-router-dom"
 import { Plus, Search, Loader2 } from "lucide-react"
 import { getPrograms, deleteProgram } from "@/api/program"
@@ -18,11 +18,24 @@ function ProgramPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  // Cek apakah kita di halaman utama list atau sedang di child route (detail/form)
+  // Perbaikan deteksi halaman utama agar lebih fleksibel
   const isMainPage = location.pathname === "/admin/program" || location.pathname === "/admin/program/"
 
+  const handleDelete = async (id) => {
+    if (window.confirm("Apakah Anda yakin ingin menghapus program ini?")) {
+      try {
+        await deleteProgram(id)
+        setPrograms((prev) => prev.filter((item) => item.id !== id))
+        alert("Program berhasil dihapus.")
+      } catch (error) { // Mengganti 'err' menjadi 'error' untuk menghindari konflik
+        console.error("Gagal menghapus:", error)
+        alert("Gagal menghapus program.")
+      }
+    }
+  }
+
   // --- FETCH DATA ---
-  const fetchPrograms = async () => {
+  const fetchPrograms = useCallback(async () => {
     try {
       setLoading(true)
       const response = await getPrograms()
@@ -50,30 +63,21 @@ function ProgramPage() {
       })
       setPrograms(mappedData)
       setError(null)
-    } catch {
-      setError("Gagal memuat data program. Pastikan server berjalan.")
+    } catch (error) { // Konsistensi menggunakan nama 'error'
+      console.error("Fetch error:", error)
+      setError("Gagal memuat data program.")
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
-  // --- DELETE LOGIC ---
-  const handleDelete = async (id) => {
-    if (window.confirm("Apakah Anda yakin ingin menghapus program ini?")) {
-      try {
-        await deleteProgram(id)
-        setPrograms((prev) => prev.filter((item) => item.id !== id))
-        alert("Program berhasil dihapus.")
-      } catch {
-        alert("Gagal menghapus program.")
-      }
-    }
-  }
-
-  // Fetch data hanya jika sedang berada di halaman utama list
+  // Effect untuk fetch data: Berjalan saat pertama kali mount 
+  // dan saat user kembali ke halaman utama dari halaman detail/edit
   useEffect(() => {
-    if (isMainPage) fetchPrograms()
-  }, [isMainPage])
+    if (isMainPage) {
+      fetchPrograms()
+    }
+  }, [isMainPage, fetchPrograms])
 
   // --- FILTERING ---
   const filteredPrograms = programs.filter((p) =>
@@ -118,7 +122,7 @@ function ProgramPage() {
                 placeholder:text-gray-400
                 focus:outline-none focus:ring-2 focus:ring-[#A3C585]/20 focus:bg-white
                 border border-transparent focus:border-[#A3C585]"
-              />
+            />
           </div>
 
           {/* LIST SECTION */}
@@ -150,7 +154,9 @@ function ProgramPage() {
           )}
         </>
       ) : (
-        /* Tempat munculnya DetailProgram.jsx atau ProgramForm.jsx */
+        /* PENTING: Gunakan context jika ingin melempar data/fungsi refresh ke child 
+          Contoh: <Outlet context={{ onRefresh: fetchPrograms }} />
+        */
         <Outlet />
       )}
     </div>
