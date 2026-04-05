@@ -5,6 +5,7 @@ import { getPrograms } from "@/api/program"
 export default function StatsCard() {
   const [stats, setStats] = useState({
     totalCollected: 0,
+    totalDistributed: 0, // 🔥 baru
     activeProgramsCount: 0, 
     totalTarget: 0
   })
@@ -13,18 +14,48 @@ export default function StatsCard() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
+        // 🔥 PROGRAM
         const response = await getPrograms()
         const rawData = response.data
         const programs = Array.isArray(rawData) ? rawData : (rawData.data || [])
-        const total = programs.reduce((acc, curr) => acc + (Number(curr.collected_amount) || 0), 0)
-        const target = programs.reduce((acc, curr) => acc + (Number(curr.target_amount) || 0), 0)
-        const activeCount = programs.filter(p => p.status === 'aktif').length
+
+        // 🔥 FILTER 100%
+        const completedPrograms = programs.filter(p => {
+          const target = Number(p.target_amount) || 0
+          const collected = Number(p.collected_amount) || 0
+          if (target === 0) return false
+          return (collected / target) * 100 >= 100
+        })
+
+        const totalCollected = completedPrograms.reduce(
+          (acc, curr) => acc + (Number(curr.collected_amount) || 0),
+          0
+        )
+
+        const totalTarget = completedPrograms.reduce(
+          (acc, curr) => acc + (Number(curr.target_amount) || 0),
+          0
+        )
+
+        const activeCount = completedPrograms.filter(p => p.status === 'aktif').length
+
+        // 🔥 DISTRIBUTION (DANA TERSALURKAN)
+        const distRes = await fetch("http://localhost:5000/api/distribution")
+        const distJson = await distRes.json()
+        const distributions = distJson.data || []
+
+        const totalDistributed = distributions.reduce(
+          (acc, curr) => acc + (Number(curr.amount) || 0),
+          0
+        )
 
         setStats({
-          totalCollected: total,
-          activeProgramsCount: activeCount, 
-          totalTarget: target
+          totalCollected,
+          totalDistributed,
+          activeProgramsCount: activeCount,
+          totalTarget
         })
+
       } catch (error) {
         console.error("Gagal memuat statistik:", error)
       } finally {
@@ -45,16 +76,19 @@ export default function StatsCard() {
 
   if (loading) return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-pulse">
-      {[1, 2, 3].map(i => <div key={i} className="h-24 bg-gray-100 rounded-xl"></div>)}
+      {[1, 2, 3].map(i => (
+        <div key={i} className="h-24 bg-gray-100 rounded-xl"></div>
+      ))}
     </div>
   )
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      {/* Total Donasi Terkumpul */}
-      <Card className="border-none shadow-md bg-white ring-0 focus:ring-0 focus-visible:ring-0 outline-none">
+      
+      {/* Total Donasi */}
+      <Card className="border-none shadow-md bg-white ring-0 outline-none">
         <CardContent className="p-5">
-          <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
+          <p className="text-[11px] font-bold text-gray-400 uppercase mb-2">
             Total Donasi Terkumpul
           </p>
           <h2 className="text-2xl font-bold text-[#A3C585]">
@@ -63,22 +97,22 @@ export default function StatsCard() {
         </CardContent>
       </Card>
 
-      {/* Kekurangan Target */}
-      <Card className="border-none shadow-md bg-white  ring-0 focus:ring-0 focus-visible:ring-0 outline-none">
+      {/* 🔥 DIGANTI: Dana Tersalurkan */}
+      <Card className="border-none shadow-md bg-white ring-0 outline-none">
         <CardContent className="p-5">
-          <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
-            Kekurangan Target Donasi
+          <p className="text-[11px] font-bold text-gray-400 uppercase mb-2">
+            Dana Tersalurkan
           </p>
           <h2 className="text-2xl font-bold text-orange-500">
-            {formatIDR(Math.max(0, stats.totalTarget - stats.totalCollected))}
+            {formatIDR(stats.totalDistributed)}
           </h2>
         </CardContent>
       </Card>
 
       {/* Program Aktif */}
-      <Card className="border-none shadow-md bg-white  ring-0 focus:ring-0 focus-visible:ring-0 outline-none">
+      <Card className="border-none shadow-md bg-white ring-0 outline-none">
         <CardContent className="p-5">
-          <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
+          <p className="text-[11px] font-bold text-gray-400 uppercase mb-2">
             Program Sedang Berjalan
           </p>
           <h2 className="text-2xl font-bold text-gray-800">
@@ -86,6 +120,7 @@ export default function StatsCard() {
           </h2>
         </CardContent>
       </Card>
+
     </div>
   )
 }
