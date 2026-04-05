@@ -28,25 +28,34 @@ function ProgramForm() {
 
   useEffect(() => {
     if (isEdit) {
-      const fetchProgram = async () => {
-        try {
-          const response = await api.get(`/program/${id}`);
-          const data = response.data?.data || response.data;
+    const fetchProgram = async () => {
+      try {
+        console.log("Mencari ID:", id); // Cek apakah ID ini sama persis dengan di Supabase
+        const response = await api.get(`/program/${id}`);
+        
+        // DEBUG: Cek apakah data benar-benar array kosong
+        if (response.data.data.length === 0) {
+          console.error("Backend mengirim array kosong untuk ID ini!");
+        }
+
+        const data = Array.isArray(response.data.data) ? response.data.data[0] : response.data.data;
+
+        if (data) {
           setForm({
             title: data.title || "",
             description: data.description || "",
-            target_amount: data.target_amount || "",
+            target_amount: data.target_amount ? String(data.target_amount) : "", 
             image: data.image || "",
             status: data.status || "aktif",
             collected_amount: data.collected_amount || 0
           });
-        } catch {
-          alert("Gagal mengambil data program.");
-          navigate("/admin/program");
-        } finally {
-          setIsLoadingData(false);
         }
-      };
+      } catch (err) {
+        console.error("Gagal fetch:", err);
+      } finally {
+        setIsLoadingData(false);
+      }
+    };
       fetchProgram();
     }
   }, [id, isEdit, navigate]);
