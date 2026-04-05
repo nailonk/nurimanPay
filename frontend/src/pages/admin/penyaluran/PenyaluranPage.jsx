@@ -76,6 +76,11 @@ export default function PenyaluranPage() {
               setEditIndex={setEditIndex}
             />
           </div>
+        <footer className="text-center py-6">
+          <p className="text-[11px] text-gray-400 font-medium tracking-wide">
+            © 2026 NurimanPay • Seluruh Hak Cipta Dilindungi
+          </p>
+        </footer>
         </>
       )}
     </div>

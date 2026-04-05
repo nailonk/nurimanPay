@@ -97,7 +97,7 @@ return (
 
         <footer className="text-center py-6">
           <p className="text-[11px] text-gray-400 font-medium tracking-wide">
-            © 2026 NURIMANPAY • SYSTEM MANAGEMENT DASHBOARD
+            © 2026 NurimanPay • Seluruh Hak Cipta Dilindungi
           </p>
         </footer>
       </>

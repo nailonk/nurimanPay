@@ -93,7 +93,7 @@ function ProgramPage() {
             <div>
               <h1 className="text-2xl font-bold text-gray-800">Program Donasi</h1>
               <p className="text-gray-500 text-sm">
-                Kelola dan pantau seluruh inisiatif penggalang dana.
+                Kelola dan pantau seluruh inisiatif penggalangan dana.
               </p>
             </div>
 
@@ -150,13 +150,15 @@ function ProgramPage() {
                   <p className="text-gray-400 font-medium">Data program tidak ditemukan.</p>
                 </div>
               )}
+              <footer className="text-center py-6">
+                <p className="text-[11px] text-gray-400 font-medium tracking-wide">
+                  © 2026 NurimanPay • Seluruh Hak Cipta Dilindungi
+                </p>
+              </footer>
             </div>
           )}
         </>
       ) : (
-        /* PENTING: Gunakan context jika ingin melempar data/fungsi refresh ke child 
-          Contoh: <Outlet context={{ onRefresh: fetchPrograms }} />
-        */
         <Outlet />
       )}
     </div>

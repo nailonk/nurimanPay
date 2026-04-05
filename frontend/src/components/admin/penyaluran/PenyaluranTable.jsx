@@ -6,12 +6,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-
 import { Button } from "@/components/ui/button"
-import { Trash2, ChevronLeft, ChevronRight, Pencil, Image } from "lucide-react"
-import { useEffect, useState } from "react"
-
-// 🔥 MODAL IMAGE
+import { Trash2, ChevronLeft, ChevronRight, Image } from "lucide-react"
+import { useCallback, useEffect, useState } from "react"
 import {
   Dialog,
   DialogContent,
@@ -25,89 +22,63 @@ const Badge = ({ children }) => (
   </span>
 )
 
-export default function PenyaluranTable({ setOpen, setEditData }) {
-
+export default function PenyaluranTable() {
   const [data, setData] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
-  const [previewImage, setPreviewImage] = useState(null) // 🔥 modal state
-
+  const [previewImage, setPreviewImage] = useState(null)
   const itemsPerPage = 5
 
-  // 🔥 FETCH DATA
-  const loadData = async () => {
+  // 1. Definisikan loadData terlebih dahulu
+  const loadData = useCallback(async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/distribution")
-      const result = await res.json()
-
+      const res = await fetch("http://localhost:5000/api/distribution");
+      const result = await res.json();
+      
       if (result.success) {
         const mapped = result.data.map((item) => ({
           id: item.id,
           tanggal: item.distributed_at?.split("T")[0] || "-",
           program: item.program_title || "-",
-          tujuan: item.description || "-",
+          tujuan: item.purpose || "-",
           nominal: new Intl.NumberFormat("id-ID").format(Number(item.amount) || 0),
           keterangan: item.description || "-",
-          bukti: item.proof_attachment || "",
-        }))
-
-        setData(mapped)
+          bukti: item.image || item.proof_attachment || "", 
+        }));
+        setData(mapped);
       }
-
     } catch (err) {
-      console.error("Gagal ambil data:", err)
+      console.error("Gagal ambil data:", err);
     }
-  }
+  }, []);
 
   useEffect(() => {
-    loadData()
-  }, [])
+    loadData();
+  }, [loadData]);
 
-  // 🔥 DELETE (TETAP)
   const handleDelete = async (id) => {
-    const confirmDelete = confirm("Yakin hapus data ini?")
+    const confirmDelete = window.confirm("Yakin hapus data ini?")
     if (!confirmDelete) return
 
     try {
       const token = localStorage.getItem("token")
-
       const res = await fetch(`http://localhost:5000/api/distribution/${id}`, {
         method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       })
-
+      
       const result = await res.json()
-
-      if (result.success) {
-        alert("Berhasil dihapus ✅")
-        loadData()
+      if (res.ok && result.success) {
+        alert("Berhasil dihapus")
+        await loadData()
       } else {
-        alert("Gagal hapus ❌")
+        alert("Gagal hapus: " + (result.message || "Izin ditolak"))
       }
-
     } catch (err) {
       console.error(err)
-      alert("Server error ❌")
+      alert("Server error")
     }
   }
 
-  // 🔥 EDIT
-  const handleEdit = (item) => {
-    setEditData({
-      id: item.id,
-      tanggal: item.tanggal,
-      program: item.program,
-      tujuan: item.tujuan,
-      nominal: item.nominal,
-      keterangan: item.keterangan,
-      bukti: item.bukti,
-    })
-
-    setOpen(true)
-  }
-
-  // 🔥 PAGINATION
   const indexOfLast = currentPage * itemsPerPage
   const indexOfFirst = indexOfLast - itemsPerPage
   const currentItems = data.slice(indexOfFirst, indexOfLast)
@@ -115,7 +86,6 @@ export default function PenyaluranTable({ setOpen, setEditData }) {
 
   return (
     <div className="bg-white">
-
       <Table>
         <TableHeader className="bg-gray-50/50">
           <TableRow className="border-none">
@@ -138,129 +108,108 @@ export default function PenyaluranTable({ setOpen, setEditData }) {
             </TableRow>
           ) : (
             currentItems.map((item) => (
-              <TableRow key={item.id}>
+              <TableRow key={item.id} className="hover:bg-gray-50/50 transition-colors">
+                {/* Tanggal */}
+                <TableCell className="pl-6 align-top py-4 text-gray-600 font-medium">
+                  {item.tanggal}
+                </TableCell>
 
-                <TableCell className="pl-6">{item.tanggal}</TableCell>
-
-                <TableCell>
+                {/* Program */}
+                <TableCell className="align-top py-4">
                   <Badge>{item.program}</Badge>
                 </TableCell>
 
-                <TableCell>{item.tujuan}</TableCell>
-
-                <TableCell>
-                  <div className="text-right pr-6">
-                    <p className="text-xs text-gray-400">Rp</p>
-                    <p className="font-bold text-[#A3C585]">{item.nominal}</p>
+                {/* Tujuan - Diarahkan ke bawah jika tidak muat */}
+                <TableCell className="align-top py-4 max-w-[180px]">
+                  <div className="text-sm text-gray-700 font-semibold break-words leading-relaxed">
+                    {item.tujuan}
                   </div>
                 </TableCell>
 
-                <TableCell className="max-w-[200px]">
-                  <p className="text-xs line-clamp-2">{item.keterangan}</p>
+                {/* Nominal */}
+                <TableCell className="align-top py-4">
+                  <div className="text-right pr-4">
+                    <p className="text-[10px] text-gray-400 uppercase font-extrabold">Rp</p>
+                    <p className="font-bold text-[#A3C585] text-sm">{item.nominal}</p>
+                  </div>
                 </TableCell>
 
-                {/* 🔥 ICON IMAGE */}
-                <TableCell>
+                {/* Keterangan - Diarahkan ke bawah jika tidak muat */}
+                <TableCell className="align-top py-4 max-w-[250px]">
+                  <div className="text-xs text-gray-500 whitespace-pre-wrap break-words leading-relaxed">
+                    {item.keterangan}
+                  </div>
+                </TableCell>
+
+                {/* Foto */}
+                <TableCell className="align-top py-4">
                   <div
                     onClick={() => setPreviewImage(item.bukti)}
-                    className="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-100 cursor-pointer hover:bg-gray-200 transition"
-                    title="Klik untuk lihat"
+                    className="w-12 h-12 rounded-xl overflow-hidden bg-gray-100 cursor-pointer hover:ring-2 hover:ring-[#A3C585] transition-all active:scale-90 flex items-center justify-center border border-gray-100"
                   >
-                    <Image size={18} className="text-gray-600" />
+                    {item.bukti ? (
+                      <img 
+                        src={item.bukti} 
+                        alt="Bukti" 
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.target.onerror = null; 
+                          e.target.src = "https://placehold.co/100x100?text=Error";
+                        }}
+                      />
+                    ) : (
+                      <Image size={18} className="text-gray-400" />
+                    )}
                   </div>
                 </TableCell>
 
-                {/* 🔥 AKSI */}
-                <TableCell className="pr-6">
-                  <div className="flex justify-center gap-2">
-
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      onClick={() => handleEdit(item)}
-                      className="hover:bg-blue-50 hover:text-blue-500"
-                    >
-                      <Pencil size={16} />
-                    </Button>
-
+                {/* Aksi */}
+                <TableCell className="pr-6 align-top py-4">
+                  <div className="flex justify-center">
                     <Button
                       size="icon"
                       variant="ghost"
                       onClick={() => handleDelete(item.id)}
-                      className="hover:bg-red-50 hover:text-red-500"
+                      className="h-9 w-9 hover:bg-red-50 hover:text-red-500 rounded-full transition-colors"
                     >
                       <Trash2 size={16} />
                     </Button>
-
                   </div>
                 </TableCell>
-
               </TableRow>
             ))
           )}
         </TableBody>
       </Table>
 
-      {/* 🔥 PAGINATION */}
+      {/* Pagination */}
       <div className="px-6 py-4 flex justify-between items-center border-t">
-
-        <p className="text-xs text-gray-400">
-          Halaman {currentPage} dari {totalPages}
-        </p>
-
+        <p className="text-xs text-gray-400">Halaman {currentPage} dari {totalPages}</p>
         <div className="flex items-center gap-2">
-
-          <button
-            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-          >
+          <button onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1}>
             <ChevronLeft size={16} />
           </button>
-
           {[...Array(totalPages)].map((_, i) => (
             <button
               key={i}
               onClick={() => setCurrentPage(i + 1)}
-              className={`px-2 text-sm ${
-                currentPage === i + 1 ? "font-bold text-[#A3C585]" : "text-gray-400"
-              }`}
+              className={`px-2 text-sm ${currentPage === i + 1 ? "font-bold text-[#A3C585]" : "text-gray-400"}`}
             >
               {i + 1}
             </button>
           ))}
-
-          <button
-            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
-          >
+          <button onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages}>
             <ChevronRight size={16} />
           </button>
-
         </div>
       </div>
 
-      {/* 🔥 MODAL IMAGE (DETAIL PENYALURAN) */}
       <Dialog open={!!previewImage} onOpenChange={() => setPreviewImage(null)}>
         <DialogContent className="max-w-md rounded-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-sm text-gray-600">
-              Detail Bukti Penyaluran
-            </DialogTitle>
-          </DialogHeader>
-
-          {previewImage ? (
-            <img
-              src={previewImage}
-              className="w-full h-auto rounded-xl object-cover"
-            />
-          ) : (
-            <div className="text-center text-gray-400 py-10">
-              Tidak ada gambar
-            </div>
-          )}
+          <DialogHeader><DialogTitle className="text-sm text-gray-600">Detail Bukti Penyaluran</DialogTitle></DialogHeader>
+          {previewImage && <img src={previewImage} className="w-full h-auto rounded-xl object-cover" />}
         </DialogContent>
       </Dialog>
-
     </div>
   )
 }

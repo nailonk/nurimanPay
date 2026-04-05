@@ -21,19 +21,19 @@ function TransaksiStats({ data = [] }) {
       label: "Total Transaksi", 
       value: data.length, 
       color: "text-gray-800", 
-      sub: "Semua status" 
+      sub: "Semua waktu" 
     },
     { 
-      label: "Menunggu Pembayaran", 
+      label: "Pending Review", 
       value: pendingCount, 
       color: "text-orange-600", 
-      sub: "Status pending" 
+      sub: "Butuh konfirmasi manual" 
     },
     { 
       label: "Total Donatur", 
       value: uniqueDonors, 
       color: "text-[#A3C585]", 
-      sub: "Berdasarkan nomor HP" 
+      sub: "Semua donatur" 
     },
   ];
 
