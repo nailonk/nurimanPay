@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { CardContent } from "@/components/ui/card";
 import { 
   ScrollText, Receipt, FileText, ImageIcon, 
-  UploadCloud, Save, Loader2, ArrowLeft, Info, Eye, CheckCircle2 
+  UploadCloud, Save, Loader2, ArrowLeft, Info, Eye, CheckCircle2, Calendar 
 } from "lucide-react";
 import api from "@/api/axios";
 
@@ -23,17 +23,17 @@ function ProgramForm() {
     target_amount: "",
     image: "",
     status: "aktif",
-    collected_amount: 0
+    collected_amount: 0,
+    end_date: ""
   });
 
   useEffect(() => {
     if (isEdit) {
     const fetchProgram = async () => {
       try {
-        console.log("Mencari ID:", id); // Cek apakah ID ini sama persis dengan di Supabase
+        console.log("Mencari ID:", id);
         const response = await api.get(`/program/${id}`);
         
-        // DEBUG: Cek apakah data benar-benar array kosong
         if (response.data.data.length === 0) {
           console.error("Backend mengirim array kosong untuk ID ini!");
         }
@@ -41,13 +41,17 @@ function ProgramForm() {
         const data = Array.isArray(response.data.data) ? response.data.data[0] : response.data.data;
 
         if (data) {
+
+          const formattedDate = data.end_date ? data.end_date.split('T')[0] : "";
+
           setForm({
             title: data.title || "",
             description: data.description || "",
             target_amount: data.target_amount ? String(data.target_amount) : "", 
             image: data.image || "",
             status: data.status || "aktif",
-            collected_amount: data.collected_amount || 0
+            collected_amount: data.collected_amount || 0,
+            end_date: formattedDate
           });
         }
       } catch (err) {
@@ -82,6 +86,7 @@ function ProgramForm() {
 
     if (form.title.trim().length < 5) return alert("Judul minimal 5 karakter.");
     if (Number(form.target_amount) < 100000) return alert("Target minimal Rp 100.000.");
+    if (!form.end_date) return alert("Harap tentukan tanggal berakhir program.");
 
     setIsSubmitting(true);
     try {
@@ -170,6 +175,20 @@ function ProgramForm() {
                   required
                 />
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 text-[#A3C585] font-bold text-[11px] uppercase tracking-wider">
+                <Calendar size={16} /> <span className="text-gray-700">Batas Waktu</span>
+              </label>
+              <Input
+                name="end_date"
+                type="date"
+                value={form.end_date}
+                onChange={handleChange}
+                className="bg-gray-50 border-gray-100 rounded-xl h-12 text-sm focus:border-[#A3C585]"
+                required
+              />
             </div>
 
             {/* Deskripsi */}

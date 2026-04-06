@@ -105,7 +105,7 @@ const ProgramSection = ({ programs = [], isLoading = false }) => {
             return (
               <Card
                 key={item.id}
-                className="min-w-[280px] max-w-[280px] h-[420px] rounded-2xl border-0 shadow-md hover:shadow-xl transition flex flex-col overflow-hidden ring-0 focus:ring-0 focus-visible:ring-0 outline-none"
+                className="min-w-[280px] max-w-[280px] h-fit rounded-2xl border-none shadow-md hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden ring-0 focus:ring-0 outline-none p-0 !p-0 bg-white mb-2"
               >
                 <div className="h-40 w-full bg-gray-100 shrink-0 overflow-hidden rounded-t-2xl">
                   <img
@@ -124,7 +124,7 @@ const ProgramSection = ({ programs = [], isLoading = false }) => {
                     <h3 className="font-semibold text-gray-800 line-clamp-1">
                       {item.title}
                     </h3>
-                    <p className="text-sm text-gray-500 mt-1 line-clamp-2 h-10">
+                    <p className="text-sm text-gray-500 line-clamp-2">
                       {item.description}
                     </p>
 

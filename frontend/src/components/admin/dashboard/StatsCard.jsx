@@ -1,19 +1,41 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Megaphone, Wallet, HandCoins, Receipt } from "lucide-react"
+import { useState, useEffect } from "react"
 
 function StatsCard({ programs = [], transactions = [] }) {
-  
+  // State lokal untuk menampung total dana disalurkan dari database external
+  const [totalDistributed, setTotalDistributed] = useState(0);
+
+  useEffect(() => {
+    const fetchDistributions = async () => {
+      try {
+        // Mengambil data dari endpoint sesuai script kedua Anda
+        const distRes = await fetch("http://localhost:5000/api/distribution");
+        const distJson = await distRes.json();
+        const distributions = distJson.data || [];
+
+        const total = distributions.reduce(
+          (acc, curr) => acc + (Number(curr.amount) || 0),
+          0
+        );
+        setTotalDistributed(total);
+      } catch (error) {
+        console.error("Gagal memuat dana disalurkan:", error);
+      }
+    };
+
+    fetchDistributions();
+  }, []);
+
+  // Logika Kalkulasi Donasi Masuk (dari props)
   const safeTransactions = Array.isArray(transactions) ? transactions : [];
   const safePrograms = Array.isArray(programs) ? programs : [];
   const activeProgramIds = safePrograms.map(p => String(p.id));
 
   const totalDonasiValid = safeTransactions
     .filter(t => {
-
       const statusLunas = ['success', 'settlement', 'capture'].includes(t.status?.toLowerCase());
-
       const isProgramValid = !t.program_id || activeProgramIds.includes(String(t.program_id));
-      
       return statusLunas && isProgramValid;
     })
     .reduce((acc, curr) => {
@@ -50,7 +72,8 @@ function StatsCard({ programs = [], transactions = [] }) {
     },
     {
       title: "Dana Disalurkan",
-      value: "Rp 0", 
+      // Menggunakan state totalDistributed hasil fetch API
+      value: formatIDR(totalDistributed), 
       icon: HandCoins,
       bg: "bg-blue-50",
       iconColor: "text-blue-500",
