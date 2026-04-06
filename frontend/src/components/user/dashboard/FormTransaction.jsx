@@ -34,7 +34,7 @@ const FormTransaction = ({ programId, onSuccess, onError }) => {
         try {
           await transactionApi.checkStatus(orderId);
           if (status === "settlement" || status === "capture") {
-            onSuccess(); 
+            onSuccess();
           } else if (["deny", "cancel", "expire"].includes(status)) {
             onError("Transaksi gagal atau kedaluwarsa.");
           }
@@ -46,7 +46,7 @@ const FormTransaction = ({ programId, onSuccess, onError }) => {
       };
       syncStatus();
     }
-  }, [searchParams, onSuccess, onError]); 
+  }, [searchParams, onSuccess, onError]);
 
   const handleNominalChange = (e) => {
     let value = e.target.value.replace(/\D/g, "");

@@ -5,7 +5,7 @@ import masjidImg from "@/assets/masjid.jpg"
 
 export default function AboutSection() {
   return (
-     <section className="bg-white py-10">
+     <section className="bg-white py-20">
       <div className="w-full px-4 sm:max-w-7xl sm:mx-auto sm:px-6">
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-10 items-center">

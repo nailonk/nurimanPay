@@ -66,27 +66,20 @@ const DetailProgram = () => {
     setShowErrorAlert(true);
   };
 
-useEffect(() => {
-  const status = searchParams.get("transaction_status");
-  
-  if (status) {
-    if (status === "settlement" || status === "capture") {
-      setShowSuccessAlert(true);
+  useEffect(() => {
+    const status = searchParams.get("transaction_status");
 
-      // --- TAMBAHKAN LOGIKA INI ---
-      // 1. Ganti history sekarang jadi /dashboard
-      window.history.replaceState(null, "", "/"); 
-      // 2. Tumpuk lagi dengan halaman detail ini (biar user gak pindah dulu)
-      window.history.pushState(null, "", window.location.pathname);
-      // ----------------------------
+    if (status) {
+      if (status === "settlement" || status === "capture") {
+        setShowSuccessAlert(true);
 
-    } else if (["deny", "cancel", "expire"].includes(status)) {
-      setShowErrorAlert(true);
-      // Untuk gagal, cukup bersihkan URL saja
-      setSearchParams({}, { replace: true });
+        window.history.pushState(null, "", window.location.pathname);
+      } else if (["deny", "cancel", "expire"].includes(status)) {
+        setShowErrorAlert(true);
+        setSearchParams({}, { replace: true });
+      }
     }
-  }
-}, [searchParams, setSearchParams]);
+  }, [searchParams, setSearchParams]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -94,16 +87,16 @@ useEffect(() => {
         const res = await getPrograms();
         const list = Array.isArray(res.data) ? res.data : res.data?.data || [];
         const found = list.find((item) => String(item.id) === String(id));
-
-        if (found) {
-          setData(found);
-        }
+        if (found) setData(found);
 
         const donaturRes = await transactionApi.getDonaturByProgram(id);
         const donaturData = donaturRes?.data?.data || [];
-        const validDonatur = donaturData.filter((d) => d.status === "success");
+        const validDonatur = donaturData.filter((d) => {
+          const s = d.status?.toLowerCase();
+          return s === "success" || s === "settlement" || s === "capture";
+        });
 
-        setDonatur(validDonatur.slice(0, 5));
+        setDonatur(validDonatur.reverse().slice(0, 5));
         setTotalDonatur(validDonatur.length);
       } catch (err) {
         console.error("Fetch error:", err);
@@ -328,7 +321,7 @@ useEffect(() => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogAction
-              onClick={() => setShowSuccessAlert(false)} 
+              onClick={() => setShowSuccessAlert(false)}
               className="w-full bg-[#A3C585] hover:bg-[#92b874] border-0"
             >
               Tutup

@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import GambarMasjidHero from "@/assets/GambarMasjidHero.png"
+import GambarMasjidHero from "@/assets/GambarMasjidHero.png";
 
 const HeroSection = () => {
   const navigate = useNavigate();
@@ -11,10 +11,14 @@ const HeroSection = () => {
     if (location.pathname !== "/") {
       navigate("/");
       setTimeout(() => {
-        document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
+        document
+          .getElementById(sectionId)
+          ?.scrollIntoView({ behavior: "smooth" });
       }, 300);
     } else {
-      document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
+      document
+        .getElementById(sectionId)
+        ?.scrollIntoView({ behavior: "smooth" });
     }
   };
 
@@ -38,19 +42,17 @@ const HeroSection = () => {
         <h1 className="text-white text-2xl md:text-4xl font-bold leading-snug">
           Mari berbagi kebaikan bersama,
           <br />
-          <span className="text-yellow-400">
-            Masjid Nurul Iman
-          </span>
+          <span className="text-yellow-400">Masjid Nurul Iman</span>
         </h1>
 
         {/* SUBTITLE */}
         <p className="text-gray-200 text-sm md:text-base mt-4 max-w-xl">
-          Salurkan infaq, sedekah, dan zakat Anda untuk kemaslahatan umat
-          dan pembangunan rumah Allah.
+          Salurkan infaq, sedekah, dan zakat Anda untuk kemaslahatan umat dan
+          pembangunan rumah Allah.
         </p>
 
         {/* BUTTON */}
-        <button 
+        <button
           onClick={handleScrollToProgram}
           className="mt-6 bg-[#A3C585] hover:bg-[#92b874] transition-colors text-white px-6 py-3 rounded-xl font-medium"
         >
