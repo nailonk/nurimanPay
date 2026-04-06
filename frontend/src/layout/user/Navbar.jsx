@@ -1,7 +1,13 @@
 import React from "react"
 import { useNavigate, useLocation } from "react-router-dom"
-import { User } from "lucide-react"
+import { User, ChevronDown } from "lucide-react"
 import logo from "@/assets/logo.png"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 function Navbar() {
   const navigate = useNavigate()
@@ -24,7 +30,7 @@ function Navbar() {
     }
   }
 
-const handleUserClick = () => {
+  const handleUserClick = () => {
     navigate("/login")
   }
 
@@ -46,12 +52,28 @@ const handleUserClick = () => {
         
         {/* Navigation Links */}
         <div className="hidden sm:flex items-center gap-6 text-sm font-semibold text-gray-800">
-          <button 
-            onClick={() => handleScroll("program-section")}
-            className="hover:text-green-600 transition-colors"
-          >
-            Program
-          </button>
+          
+          {/* Dropdown Program */}
+          <DropdownMenu>
+            <DropdownMenuTrigger className="flex items-center gap-1 hover:text-green-600 transition-colors outline-none">
+              Program <ChevronDown size={14} />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-48 bg-white ring-0 outline-none">
+              <DropdownMenuItem 
+                onClick={() => handleScroll("program-section")}
+                className="cursor-pointer border-n font-medium hover:text-green-600"
+              >
+                Program Donasi
+              </DropdownMenuItem>
+             <DropdownMenuItem 
+                onClick={() => handleScroll("completed-program-section")} 
+                className="cursor-pointer font-medium hover:text-green-600"
+              >
+                Program Selesai
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           <button 
             onClick={() => handleScroll("about-section")}
             className="hover:text-green-600 transition-colors"

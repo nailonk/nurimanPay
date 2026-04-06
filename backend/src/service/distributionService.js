@@ -123,61 +123,6 @@ export const getProgramSummaryService = async (programId) => {
   };
 };
 
-export const updateDistributionService = async (
-  id,
-  { program_id, purpose, amount, description, image, distributed_at },
-) => {
-  const oldData = await pool.query("SELECT program_id, amount FROM distributions WHERE id = $1", [id]);
-  if (oldData.rows.length === 0) return null;
-
-  const targetProgramId = program_id || oldData.rows[0].program_id;
-
-  if (amount || program_id) {
-    const programCheck = await pool.query(
-      "SELECT collected_amount FROM programs WHERE id = $1",
-      [targetProgramId]
-    );
-    const collectedAmount = parseFloat(programCheck.rows[0].collected_amount);
-
-    const totalDistResult = await pool.query(
-      "SELECT COALESCE(SUM(amount), 0) as total FROM distributions WHERE program_id = $1 AND id != $2",
-      [targetProgramId, id] 
-    );
-    
-    const totalLainnya = parseFloat(totalDistResult.rows[0].total);
-    const sisaDana = collectedAmount - totalLainnya;
-    const newAmount = amount ? parseFloat(amount) : parseFloat(oldData.rows[0].amount);
-
-    if (newAmount > sisaDana) {
-      return { error: "INSUFFICIENT_FUNDS", sisaDana };
-    }
-  }
-  const updateQuery = `
-        UPDATE distributions 
-        SET 
-            program_id = COALESCE($1, program_id),
-            purpose = COALESCE($2, purpose),
-            amount = COALESCE($3, amount),
-            description = COALESCE($4, description),
-            image = COALESCE($5, image),
-            distributed_at = COALESCE($6, distributed_at),
-            updated_at = NOW()
-        WHERE id = $7
-        RETURNING *
-    `;
-  const values = [
-    program_id,
-    purpose,
-    amount,
-    description,
-    image,
-    distributed_at,
-    id,
-  ];
-  const result = await pool.query(updateQuery, values);
-  return result.rows[0] || null;
-};
-
 export const deleteDistributionService = async (id) => {
   const result = await pool.query(
     "DELETE FROM distributions WHERE id = $1 RETURNING *",

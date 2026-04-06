@@ -64,7 +64,7 @@ function Login() {
     <div className="relative min-h-screen flex items-center justify-center px-4 py-10">
       <div className="fixed inset-0 -z-10 bg-[radial-gradient(circle_at_20%_20%,#eaf5e4_0%,#c5e1a5_30%,#81c784_60%,#4caf50_80%,#2e7d32_100%)]" />
 
-      <button onClick={() => navigate(-1)} className="absolute top-5 left-5 text-white z-10">
+      <button onClick={() => navigate("/")} className="absolute top-5 left-5 text-white z-10">
         <ArrowLeft size={26} />
       </button>
 

@@ -27,9 +27,17 @@ export const getProgramByIdService = async (id) => {
 };
 
 export const getAllProgramsService = async () => {
-  const result = await pool.query(
-    "SELECT * FROM programs ORDER BY created_at DESC",
-  );
+  const query = `
+    SELECT 
+      p.*,
+      COALESCE(SUM(d.amount), 0) as total_distributed
+    FROM programs p
+    LEFT JOIN distributions d ON d.program_id = p.id
+    GROUP BY p.id
+    ORDER BY p.created_at DESC
+  `;
+
+  const result = await pool.query(query);
   return result.rows;
 };
 

@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import UserLayout from "@/layout/user/UserLayout";
 import UserDashboard from "@/pages/user/UserDashboard";
 import DetailProgram from "@/components/user/dashboard/DetailProgram";
+import DetailCompletedProgram from "@/components/user/dashboard/DetailCompletedProgram";
 import FormTransaction from "@/components/user/dashboard/FormTransaction";
 
 /* ADMIN */
@@ -63,6 +64,7 @@ export default function AppRoutes() {
       <Route element={<UserLayout />}>
         <Route path="/" element={<UserDashboard />} />
         <Route path="/detail-program/:id" element={<DetailProgram />} />
+        <Route path="/detail-completed-program/:id" element={<DetailCompletedProgram />} />
       </Route>
 
       {/* Tanpa Layout */}
