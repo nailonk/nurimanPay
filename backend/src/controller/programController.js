@@ -2,10 +2,8 @@ import * as programService from '../service/programService.js';
 
 export const createProgram = async (req, res) => {
   try {
-    // Ambil data dari body request
     const { title, description, target_amount, end_date, image } = req.body;
 
-    // Validasi sederhana di controller
     if (!title || !target_amount) {
       return res.status(400).json({ message: "Judul dan Target Donasi wajib diisi" });
     }

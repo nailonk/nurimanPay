@@ -28,11 +28,12 @@ export default function PenyaluranTable() {
   const [previewImage, setPreviewImage] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const itemsPerPage = 5
+  const API_URL = import.meta.env.VITE_API_URL
 
   const loadData = useCallback(async () => {
     setIsLoading(true)
     try {
-      const res = await fetch("http://localhost:5000/api/distribution")
+      const res = await fetch(`${API_URL}/distribution`)
       const result = await res.json()
       
       if (result.success) {
@@ -68,7 +69,7 @@ export default function PenyaluranTable() {
     if (!window.confirm("Yakin hapus data ini?")) return
     try {
       const token = localStorage.getItem("token")
-      const res = await fetch(`http://localhost:5000/api/distribution/${id}`, {
+      const res = await fetch(`${API_URL}/distribution/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       })

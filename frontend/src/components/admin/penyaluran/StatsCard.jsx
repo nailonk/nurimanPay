@@ -10,6 +10,7 @@ export default function StatsCard() {
     totalTarget: 0
   })
   const [loading, setLoading] = useState(true)
+  const API_URL = import.meta.env.VITE_API_URL
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -18,7 +19,7 @@ export default function StatsCard() {
         
         const [progRes, distRes] = await Promise.all([
           getPrograms(),
-          fetch("http://localhost:5000/api/distribution").then(res => res.json())
+          fetch(`${API_URL}/distribution`).then(res => res.json())
         ])
 
         const programs = Array.isArray(progRes.data) ? progRes.data : (progRes.data?.data || [])

@@ -12,12 +12,13 @@ export default function PenyaluranPage() {
   
   const [distributions, setDistributions] = useState([])
   const [loading, setLoading] = useState(true)
+   const API_URL = import.meta.env.VITE_API_URL
 
   // Fungsi muat data terpusat
   const loadData = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await fetch("http://localhost:5000/api/distribution")
+      const res = await fetch(`${API_URL}/distribution`)
       const result = await res.json()
       if (result.success) {
         setDistributions(result.data)

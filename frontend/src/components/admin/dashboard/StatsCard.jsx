@@ -5,12 +5,12 @@ import { useState, useEffect } from "react"
 function StatsCard({ programs = [], transactions = [] }) {
   // State lokal untuk menampung total dana disalurkan dari database external
   const [totalDistributed, setTotalDistributed] = useState(0);
+  const API_URL = import.meta.env.VITE_API_URL
 
   useEffect(() => {
     const fetchDistributions = async () => {
       try {
-        // Mengambil data dari endpoint sesuai script kedua Anda
-        const distRes = await fetch("http://localhost:5000/api/distribution");
+        const distRes = await fetch(`${API_URL}/distribution`);
         const distJson = await distRes.json();
         const distributions = distJson.data || [];
 
@@ -72,7 +72,6 @@ function StatsCard({ programs = [], transactions = [] }) {
     },
     {
       title: "Dana Disalurkan",
-      // Menggunakan state totalDistributed hasil fetch API
       value: formatIDR(totalDistributed), 
       icon: HandCoins,
       bg: "bg-blue-50",

@@ -30,10 +30,8 @@ export const getAllProgramsService = async () => {
   const query = `
     SELECT 
       p.*,
-      COALESCE(SUM(d.amount), 0) as total_distributed
+      (SELECT COALESCE(SUM(amount), 0) FROM distributions WHERE program_id = p.id) as total_distributed
     FROM programs p
-    LEFT JOIN distributions d ON d.program_id = p.id
-    GROUP BY p.id
     ORDER BY p.created_at DESC
   `;
 

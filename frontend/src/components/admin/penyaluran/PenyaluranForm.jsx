@@ -8,6 +8,7 @@ export default function FormPenyaluran({ refresh, setOpen }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [programs, setPrograms] = useState([]);
 
+ const API_URL = import.meta.env.VITE_API_URL
   const [form, setForm] = useState({
     tanggal: "",
     program: "",
@@ -20,7 +21,7 @@ export default function FormPenyaluran({ refresh, setOpen }) {
   useEffect(() => {
     const fetchPrograms = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/program");
+        const res = await fetch(`${API_URL}/program`);
         const data = await res.json();
         const allPrograms = data.data || [];
 
@@ -90,7 +91,7 @@ export default function FormPenyaluran({ refresh, setOpen }) {
         image: form.bukti, 
       };
 
-      const res = await fetch("http://localhost:5000/api/distribution/create", {
+      const res = await fetch(`${API_URL}/distribution/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
