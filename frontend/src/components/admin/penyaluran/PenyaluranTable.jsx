@@ -7,8 +7,8 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
-import { Trash2, ChevronLeft, ChevronRight, Image } from "lucide-react"
-import { useCallback, useEffect, useState } from "react"
+import { Trash2, ChevronLeft, ChevronRight, Image as ImageIcon, Loader2 } from "lucide-react"
+import { useCallback, useEffect, useState, useMemo } from "react"
 import {
   Dialog,
   DialogContent,
@@ -26,188 +26,206 @@ export default function PenyaluranTable() {
   const [data, setData] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
   const [previewImage, setPreviewImage] = useState(null)
+  const [isLoading, setIsLoading] = useState(true)
   const itemsPerPage = 5
 
-  // 1. Definisikan loadData terlebih dahulu
   const loadData = useCallback(async () => {
+    setIsLoading(true)
     try {
-      const res = await fetch("http://localhost:5000/api/distribution");
-      const result = await res.json();
+      const res = await fetch("http://localhost:5000/api/distribution")
+      const result = await res.json()
       
       if (result.success) {
-        const mapped = result.data.map((item) => ({
-          id: item.id,
-          tanggal: item.distributed_at?.split("T")[0] || "-",
-          program: item.program_title || "-",
-          tujuan: item.purpose || "-",
-          nominal: new Intl.NumberFormat("id-ID").format(Number(item.amount) || 0),
-          keterangan: item.description || "-",
-          bukti: item.image || item.proof_attachment || "", 
-        }));
-        setData(mapped);
+        setData(result.data || [])
       }
     } catch (err) {
-      console.error("Gagal ambil data:", err);
+      console.error("Gagal ambil data:", err)
+    } finally {
+      setIsLoading(false)
     }
-  }, []);
+  }, [])
 
   useEffect(() => {
-    loadData();
-  }, [loadData]);
+    loadData()
+  }, [loadData])
+
+  const processedItems = useMemo(() => {
+    const indexOfLast = currentPage * itemsPerPage
+    const indexOfFirst = indexOfLast - itemsPerPage
+    const currentRawData = data.slice(indexOfFirst, indexOfLast)
+
+    return currentRawData.map((item) => ({
+      ...item,
+      tanggal: item.distributed_at?.split("T")[0] || "-",
+      nominalFormat: new Intl.NumberFormat("id-ID").format(Number(item.amount) || 0),
+      bukti: item.image || item.proof_attachment || "",
+    }))
+  }, [data, currentPage])
+
+  const totalPages = Math.max(1, Math.ceil(data.length / itemsPerPage))
 
   const handleDelete = async (id) => {
-    const confirmDelete = window.confirm("Yakin hapus data ini?")
-    if (!confirmDelete) return
-
+    if (!window.confirm("Yakin hapus data ini?")) return
     try {
       const token = localStorage.getItem("token")
       const res = await fetch(`http://localhost:5000/api/distribution/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       })
-      
-      const result = await res.json()
-      if (res.ok && result.success) {
-        alert("Berhasil dihapus")
-        await loadData()
-      } else {
-        alert("Gagal hapus: " + (result.message || "Izin ditolak"))
+      if (res.ok) {
+        setData(prev => prev.filter(item => item.id !== id))
       }
-    } catch (err) {
-      console.error(err)
-      alert("Server error")
+    } catch {
+      alert("Gagal menghapus data")
     }
   }
 
-  const indexOfLast = currentPage * itemsPerPage
-  const indexOfFirst = indexOfLast - itemsPerPage
-  const currentItems = data.slice(indexOfFirst, indexOfLast)
-  const totalPages = Math.max(1, Math.ceil(data.length / itemsPerPage))
-
-  return (
-    <div className="bg-white">
-      <Table>
-        <TableHeader className="bg-gray-50/50">
-          <TableRow className="border-none">
-            <TableHead className="pl-6">Tanggal</TableHead>
-            <TableHead>Program</TableHead>
-            <TableHead>Tujuan</TableHead>
-            <TableHead>Nominal</TableHead>
-            <TableHead>Keterangan</TableHead>
-            <TableHead>Bukti</TableHead>
-            <TableHead className="text-center pr-6">Aksi</TableHead>
-          </TableRow>
-        </TableHeader>
-
-        <TableBody>
-          {currentItems.length === 0 ? (
+return (
+    <div className="w-full bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm">
+      <div className="overflow-x-auto w-full">
+        <Table className="min-w-[800px]">
+          <TableHeader className="bg-gray-50/50">
             <TableRow>
-              <TableCell colSpan={7} className="text-center py-10 text-gray-400">
-                Belum ada data
-              </TableCell>
+              <TableHead className="pl-6 h-14 text-gray-700 font-bold">Tanggal</TableHead>
+              <TableHead className="text-gray-700 font-bold">Program</TableHead>
+              <TableHead className="text-gray-700 font-bold">Tujuan</TableHead>
+              <TableHead className="text-right text-gray-700 font-bold">Nominal</TableHead>
+              <TableHead className="text-gray-700 font-bold">Keterangan</TableHead>
+              <TableHead className="text-gray-700 font-bold">Bukti</TableHead>
+              <TableHead className="text-center pr-6 text-gray-700 font-bold">Aksi</TableHead>
             </TableRow>
-          ) : (
-            currentItems.map((item) => (
-              <TableRow key={item.id} className="hover:bg-gray-50/50 transition-colors">
-                {/* Tanggal */}
-                <TableCell className="pl-6 align-top py-4 text-gray-600 font-medium">
-                  {item.tanggal}
-                </TableCell>
+          </TableHeader>
 
-                {/* Program */}
-                <TableCell className="align-top py-4">
-                  <Badge>{item.program}</Badge>
-                </TableCell>
-
-                {/* Tujuan - Diarahkan ke bawah jika tidak muat */}
-                <TableCell className="align-top py-4 max-w-[180px]">
-                  <div className="text-sm text-gray-700 font-semibold break-words leading-relaxed">
-                    {item.tujuan}
-                  </div>
-                </TableCell>
-
-                {/* Nominal */}
-                <TableCell className="align-top py-4">
-                  <div className="text-right pr-4">
-                    <p className="text-[10px] text-gray-400 uppercase font-extrabold">Rp</p>
-                    <p className="font-bold text-[#A3C585] text-sm">{item.nominal}</p>
-                  </div>
-                </TableCell>
-
-                {/* Keterangan - Diarahkan ke bawah jika tidak muat */}
-                <TableCell className="align-top py-4 max-w-[250px]">
-                  <div className="text-xs text-gray-500 whitespace-pre-wrap break-words leading-relaxed">
-                    {item.keterangan}
-                  </div>
-                </TableCell>
-
-                {/* Foto */}
-                <TableCell className="align-top py-4">
-                  <div
-                    onClick={() => setPreviewImage(item.bukti)}
-                    className="w-12 h-12 rounded-xl overflow-hidden bg-gray-100 cursor-pointer hover:ring-2 hover:ring-[#A3C585] transition-all active:scale-90 flex items-center justify-center border border-gray-100"
-                  >
-                    {item.bukti ? (
-                      <img 
-                        src={item.bukti} 
-                        alt="Bukti" 
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.target.onerror = null; 
-                          e.target.src = "https://placehold.co/100x100?text=Error";
-                        }}
-                      />
-                    ) : (
-                      <Image size={18} className="text-gray-400" />
-                    )}
-                  </div>
-                </TableCell>
-
-                {/* Aksi */}
-                <TableCell className="pr-6 align-top py-4">
-                  <div className="flex justify-center">
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      onClick={() => handleDelete(item.id)}
-                      className="h-9 w-9 hover:bg-red-50 hover:text-red-500 rounded-full transition-colors"
-                    >
-                      <Trash2 size={16} />
-                    </Button>
-                  </div>
+          <TableBody>
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={7} className="py-20 text-center">
+                   <div className="flex justify-center items-center gap-3">
+                      <Loader2 className="animate-spin text-[#A3C585]" />
+                      <span className="text-gray-500">Memuat data...</span>
+                   </div>
                 </TableCell>
               </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
+            ) : processedItems.map((item) => (
+              <TableRow key={item.id} className="group hover:bg-gray-50/50 transition-colors">
+                <TableCell className="pl-6 py-4 text-sm text-gray-600 whitespace-nowrap">
+                  {item.tanggal}
+                </TableCell>
+                
+                <TableCell className="py-4">
+                  <Badge>{item.program_title || item.program}</Badge>
+                </TableCell>
 
-      {/* Pagination */}
-      <div className="px-6 py-4 flex justify-between items-center border-t">
-        <p className="text-xs text-gray-400">Halaman {currentPage} dari {totalPages}</p>
-        <div className="flex items-center gap-2">
-          <button onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1}>
-            <ChevronLeft size={16} />
-          </button>
-          {[...Array(totalPages)].map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrentPage(i + 1)}
-              className={`px-2 text-sm ${currentPage === i + 1 ? "font-bold text-[#A3C585]" : "text-gray-400"}`}
-            >
-              {i + 1}
-            </button>
-          ))}
-          <button onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages}>
-            <ChevronRight size={16} />
-          </button>
+                <TableCell className="py-4 max-w-[200px]">
+                  <p className="text-sm font-semibold text-gray-800 break-words line-clamp-2">
+                    {item.purpose}
+                  </p>
+                </TableCell>
+
+                <TableCell className="py-4 text-right">
+                  <span className="text-xs text-gray-400 font-bold mr-1">RP</span>
+                  <span className="font-bold text-[#A3C585]">{item.nominalFormat}</span>
+                </TableCell>
+
+                <TableCell className="py-4 max-w-[250px]">
+                  <p className="text-xs text-gray-500 leading-relaxed break-words whitespace-pre-wrap">
+                    {item.description}
+                  </p>
+                </TableCell>
+
+                <TableCell className="py-4">
+                  <button
+                    onClick={() => setPreviewImage(item.bukti)}
+                    className="w-10 h-10 rounded-xl overflow-hidden border border-gray-200 hover:border-[#A3C585] transition-all"
+                  >
+                    {item.bukti ? (
+                      <img src={item.bukti} className="w-full h-full object-cover" />
+                    ) : (
+                      <ImageIcon size={16} className="mx-auto text-gray-300" />
+                    )}
+                  </button>
+                </TableCell>
+
+                <TableCell className="py-4 pr-6 text-center">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDelete(item.id)}
+                    className="text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full"
+                  >
+                    <Trash2 size={16} />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* Pagination Modern */}
+      <div className="px-6 py-4 flex justify-between items-center bg-gray-50/30 border-t border-gray-100">
+        <p className="text-[11px] text-gray-400 font-medium">
+          Menampilkan {processedItems.length} dari {data.length} Data
+        </p>
+        <div className="flex items-center gap-1">
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 w-8 p-0 rounded-md border-gray-200"
+            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            <ChevronLeft size={14} />
+          </Button>
+          
+          <div className="flex gap-1 px-2">
+            {[...Array(totalPages)].map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrentPage(i + 1)}
+                className={`w-8 h-8 rounded-md text-xs font-bold transition-all ${
+                  currentPage === i + 1 
+                  ? "bg-[#A3C585] text-white shadow-sm" 
+                  : "text-gray-400 hover:bg-gray-100"
+                }`}
+              >
+                {i + 1}
+              </button>
+            ))}
+          </div>
+
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 w-8 p-0 rounded-md border-gray-200"
+            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+          >
+            <ChevronRight size={14} />
+          </Button>
         </div>
       </div>
 
+      {/* Modal Preview Foto */}
       <Dialog open={!!previewImage} onOpenChange={() => setPreviewImage(null)}>
-        <DialogContent className="max-w-md rounded-2xl">
-          <DialogHeader><DialogTitle className="text-sm text-gray-600">Detail Bukti Penyaluran</DialogTitle></DialogHeader>
-          {previewImage && <img src={previewImage} className="w-full h-auto rounded-xl object-cover" />}
+        <DialogContent className="max-w-lg p-0 overflow-hidden rounded-3xl border-none">
+          <div className="p-6 bg-white">
+            <DialogHeader className="mb-4">
+              <DialogTitle className="text-gray-800 flex items-center gap-2">
+                <ImageIcon size={18} className="text-[#A3C585]" />
+                Bukti Penyaluran Dana
+              </DialogTitle>
+            </DialogHeader>
+            <div className="aspect-video w-full rounded-2xl overflow-hidden bg-gray-100 border border-gray-100">
+              <img src={previewImage} className="w-full h-full object-contain" alt="Preview" />
+            </div>
+            <Button 
+              className="w-full mt-6 bg-[#A3C585] hover:bg-[#8eb36d] text-white rounded-xl"
+              onClick={() => setPreviewImage(null)}
+            >
+              Tutup Detail
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

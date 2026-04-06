@@ -130,9 +130,9 @@ const CompletedProgramSection = () => {
           mergedData.map((item) => (
             <Card
               key={item.id}
-              className="min-w-[280px] max-w-[280px] h-[420px] rounded-2xl border-0 shadow-md hover:shadow-xl transition flex flex-col overflow-hidden ring-0 focus:ring-0 focus-visible:ring-0 outline-none"
+              className="min-w-[280px] max-w-[280px] h-fit rounded-2xl border-none shadow-md hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden p-0 !p-0 bg-white ring-0 focus:ring-0 outline-none mb-2"
             >
-              <div className="h-40 w-full bg-gray-100 shrink-0 overflow-hidden rounded-t-2xl relative">
+              <div className="h-44 w-full shrink-0 relative mt-0 overflow-hidden">
                 <div className="absolute top-3 left-3 z-10">
                   <span className="bg-white/90 backdrop-blur-sm text-[#A3C585] text-[10px] px-2 py-1 rounded font-bold uppercase border border-green-100 flex items-center gap-1 shadow-sm">
                     <CheckCircle size={10} /> Selesai
@@ -141,7 +141,7 @@ const CompletedProgramSection = () => {
                 <img
                   src={item.image || noImage}
                   alt={item.displayTitle}
-                  className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
+                  className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
                   onError={(e) => {
                     e.target.onerror = null;
                     e.target.src = noImage;
@@ -149,20 +149,20 @@ const CompletedProgramSection = () => {
                 />
               </div>
 
-              <div className="p-4 flex flex-col flex-1">
-                <div className="mb-auto">
+              <div className="p-4 flex flex-col bg-white">
+                <div>
                   <h3 className="font-semibold text-gray-800 line-clamp-1">
                     {item.displayTitle}
                   </h3>
-                  <p className="text-sm text-gray-500 mt-1 line-clamp-2 h-10">
+                  <p className="text-sm text-gray-500 mt-1 line-clamp-2">
                     {item.description}
                   </p>
 
-                  <div className="mt-4 pt-2">
-                    <div className="flex justify-between text-sm text-gray-600 mb-1">
+                  <div className="mt-2">
+                    <div className="flex justify-between text-[10px] text-gray-600 mb-1">
                       <p className="text-xs">
                         Tersalurkan:{" "}
-                        <span className="font-semibold text-[#A3C585] block sm:inline">
+                        <span className="font-semibold text-[#A3C585]">
                           {formatRupiah(item.amount)}
                         </span>
                       </p>
@@ -180,9 +180,9 @@ const CompletedProgramSection = () => {
                   onClick={() =>
                     navigate(`/detail-completed-program/${item.program_id}`)
                   }
-                  className="mt-4 w-full h-11 rounded-xl bg-white border border-[#A3C585] text-[#A3C585] hover:bg-[#A3C585] hover:text-white transition focus-visible:ring-0 shrink-0"
+                  className="mt-3 w-full h-10 rounded-xl bg-[#A3C585]/10 text-[#A3C585] hover:bg-[#A3C585] hover:text-white border-0 transition shadow-none ring-0 focus:ring-0"
                 >
-                  Detail Penyaluran
+                  Detail Penyaluran Dana
                 </Button>
               </div>
             </Card>

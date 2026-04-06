@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { ArrowLeft, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import StatsCard from "@/components/admin/penyaluran/StatsCard"
@@ -9,14 +9,35 @@ export default function PenyaluranPage() {
   const [open, setOpen] = useState(false)
   const [editData, setEditData] = useState(null)
   const [editIndex, setEditIndex] = useState(null)
+  
+  const [distributions, setDistributions] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  // Fungsi muat data terpusat
+  const loadData = useCallback(async () => {
+    setLoading(true)
+    try {
+      const res = await fetch("http://localhost:5000/api/distribution")
+      const result = await res.json()
+      if (result.success) {
+        setDistributions(result.data)
+      }
+    } catch (err) {
+      console.error("Gagal ambil data terpusat:", err)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    loadData()
+  }, [loadData])
 
   return (
-    <div className="p-4 md:p-6 space-y-6 bg-[#f9fafb] min-h-screen">
+    <div className="p-4 md:p-6 space-y-8 bg-[#f9fafb] min-h-screen">
       
       {open ? (
-        /* TAMPILAN FORM (TAMBAH/EDIT) */
         <div className="max-w-4xl mx-auto py-4 mb-20 px-6 animate-in fade-in zoom-in duration-300">
-          
           <button
             onClick={() => setOpen(false)}
             className="flex items-center gap-2 text-sm text-gray-400 hover:text-gray-600 mb-8 transition-colors font-medium group"
@@ -29,9 +50,6 @@ export default function PenyaluranPage() {
             <h1 className="text-2xl font-bold text-gray-800">
               {editData ? "Edit Laporan Penyaluran" : "Tambah Laporan Penyaluran Dana"}
             </h1>
-            <p className="text-gray-500 text-sm">
-              Silakan lengkapi formulir di bawah ini untuk mendokumentasikan distribusi dana bantuan.
-            </p>
           </div>
           
           <div className="bg-white shadow-sm rounded-[32px] border border-gray-100 overflow-hidden">
@@ -39,14 +57,12 @@ export default function PenyaluranPage() {
               setOpen={setOpen} 
               editData={editData} 
               editIndex={editIndex}
-              refresh={() => setOpen(false)} 
+              refresh={loadData}
             />
           </div>
         </div>
       ) : (
-        /* TAMPILAN DASHBOARD UTAMA */
         <>
-          {/* HEADER SECTION */}
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-2xl font-bold">Penyaluran Dana</h1>
@@ -60,27 +76,31 @@ export default function PenyaluranPage() {
                 setEditData(null); 
                 setOpen(true);    
               }}
-              className="bg-[#A3C585] hover:bg-[#A3C585]/70 flex gap-2 text-white"
+              className="bg-[#A3C585] hover:bg-[#8eb36d] flex gap-2 text-white px-6 py-5 rounded-xl shadow-md transition-all active:scale-95"
             >
-              <Plus size={16} />
+              <Plus size={18} />
               Tambah Laporan Penyaluran
             </Button>
           </div>
 
-          <StatsCard />
+          <StatsCard rawDistributions={distributions} isLoading={loading} />
 
-          <div className="bg-white rounded-[24px] shadow-sm border border-gray-100 overflow-hidden">
+          <div className="bg-white rounded-[28px] shadow-sm border border-gray-100 overflow-hidden">
             <PenyaluranTable
+              data={distributions}
+              loading={loading}
+              refresh={loadData}
               setOpen={setOpen}
               setEditData={setEditData}
               setEditIndex={setEditIndex}
             />
           </div>
-        <footer className="text-center py-6">
-          <p className="text-[11px] text-gray-400 font-medium tracking-wide">
-            © 2026 NurimanPay • Seluruh Hak Cipta Dilindungi
-          </p>
-        </footer>
+          
+          <footer className="text-center py-10">
+            <p className="text-[11px] text-gray-400 font-medium tracking-wide">
+              © 2026 NurimanPay • Seluruh Hak Cipta Dilindungi
+            </p>
+          </footer>
         </>
       )}
     </div>

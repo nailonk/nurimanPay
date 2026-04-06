@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Loader2, Table as TableIcon, Info } from "lucide-react";
+import { Loader2, Table as TableIcon, Info, X, Users } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button"; // Pastikan import Button
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { getPrograms } from "@/api/program";
 import { transactionApi } from "@/api/transaction";
@@ -22,6 +23,7 @@ const DetailCompletedProgram = () => {
   const [donatur, setDonatur] = useState([]);
   const [distributions, setDistributions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false); // State untuk Modal
 
   useEffect(() => {
     const fetchData = async () => {
@@ -62,7 +64,69 @@ const DetailCompletedProgram = () => {
     "border-0 shadow-xl rounded-2xl bg-white ring-1 ring-slate-100 overflow-hidden";
 
   return (
-    <div className="bg-gray-50 min-h-screen py-10 px-4 md:px-8">
+    <div className="bg-gray-50 min-h-screen py-10 px-4 md:px-8 relative">
+      {/* MODAL SEMUA DONATUR */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white w-full max-w-2xl max-h-[80vh] rounded-3xl overflow-hidden shadow-2xl flex flex-col">
+            <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-[#A3C585] text-white">
+              <div className="flex items-center gap-2">
+                <Users size={20} />
+                <h3 className="font-bold">Seluruh Daftar Donatur</h3>
+              </div>
+              <button 
+                onClick={() => setIsModalOpen(false)}
+                className="p-1 hover:bg-white/20 rounded-full transition-colors"
+              >
+                <X size={24} />
+              </button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto p-6">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="text-slate-400 uppercase text-[10px] font-bold border-b border-slate-100">
+                    <th className="pb-4">Donatur</th>
+                    <th className="pb-4 text-right">Jumlah</th>
+                  </tr>
+                </thead>
+                <tbody className="text-slate-600">
+                  {donatur.map((d, i) => (
+                    <tr key={i} className="border-b border-slate-50 last:border-0 hover:bg-slate-50/50 transition-colors">
+                      <td className="py-4 flex items-center gap-3">
+                        <Avatar className="h-8 w-8 border shadow-sm">
+                          <AvatarFallback className="font-bold text-[#A3C585] bg-slate-50 text-[10px]">
+                            {d.name?.substring(0, 2).toUpperCase() || "AN"}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-bold text-xs text-slate-800">{d.name}</p>
+                          <p className="text-[10px] text-slate-400">
+                            {new Date(d.created_at || Date.now()).toLocaleDateString("id-ID", { day: 'numeric', month: 'long', year: 'numeric' })}
+                          </p>
+                        </div>
+                      </td>
+                      <td className="py-4 text-right font-bold text-slate-700 text-xs">
+                        {formatRupiah(d.amount)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            
+            <div className="p-4 bg-slate-50 border-t border-slate-100 flex justify-end">
+              <Button 
+                onClick={() => setIsModalOpen(false)}
+                className="bg-[#A3C585] hover:bg-[#8eb171] text-white rounded-xl"
+              >
+                Tutup
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-6xl mx-auto">
         <div className="bg-[#FEF9C3] border border-yellow-100 p-4 rounded-lg mb-8 text-center shadow-sm">
           <p className="text-yellow-700 text-sm font-medium">
@@ -187,6 +251,15 @@ const DetailCompletedProgram = () => {
                 <h4 className="font-bold text-slate-800 text-sm">
                   Daftar Donatur
                 </h4>
+                {/* TOMBOL LIHAT SEMUA */}
+                {donatur.length > 5 && (
+                  <button 
+                    onClick={() => setIsModalOpen(true)}
+                    className="text-[10px] font-bold text-[#A3C585] hover:underline"
+                  >
+                    Lihat Semua
+                  </button>
+                )}
               </div>
               <div className="space-y-3">
                 {donatur.length > 0 ? (

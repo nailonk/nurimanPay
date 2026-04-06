@@ -12,13 +12,10 @@ function ProgramPage() {
   const navigate = useNavigate()
   const location = useLocation()
 
-  // --- STATE ---
   const [programs, setPrograms] = useState([])
   const [search, setSearch] = useState("")
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-
-  // Perbaikan deteksi halaman utama agar lebih fleksibel
   const isMainPage = location.pathname === "/admin/program" || location.pathname === "/admin/program/"
 
   const handleDelete = async (id) => {
@@ -27,14 +24,13 @@ function ProgramPage() {
         await deleteProgram(id)
         setPrograms((prev) => prev.filter((item) => item.id !== id))
         alert("Program berhasil dihapus.")
-      } catch (error) { // Mengganti 'err' menjadi 'error' untuk menghindari konflik
+      } catch (error) {
         console.error("Gagal menghapus:", error)
         alert("Gagal menghapus program.")
       }
     }
   }
 
-  // --- FETCH DATA ---
   const fetchPrograms = useCallback(async () => {
     try {
       setLoading(true)
@@ -59,11 +55,12 @@ function ProgramPage() {
           }).format(target),
           badge: p.status?.toUpperCase() || "AKTIF",
           image: isImageValid ? p.image : PLACEHOLDER,
+          end_date: p.end_date
         }
       })
       setPrograms(mappedData)
       setError(null)
-    } catch (error) { // Konsistensi menggunakan nama 'error'
+    } catch (error) {
       console.error("Fetch error:", error)
       setError("Gagal memuat data program.")
     } finally {
@@ -71,15 +68,12 @@ function ProgramPage() {
     }
   }, [])
 
-  // Effect untuk fetch data: Berjalan saat pertama kali mount 
-  // dan saat user kembali ke halaman utama dari halaman detail/edit
   useEffect(() => {
     if (isMainPage) {
       fetchPrograms()
     }
   }, [isMainPage, fetchPrograms])
 
-  // --- FILTERING ---
   const filteredPrograms = programs.filter((p) =>
     p.title.toLowerCase().includes(search.toLowerCase())
   )
