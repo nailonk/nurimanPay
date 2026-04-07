@@ -56,7 +56,7 @@ export default function StatsCard() {
     }
 
     fetchStats()
-  }, [])
+  }, [API_URL])
 
   const formatIDR = (amount) => {
     return new Intl.NumberFormat("id-ID", {

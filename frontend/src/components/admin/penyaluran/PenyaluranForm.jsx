@@ -37,7 +37,7 @@ export default function FormPenyaluran({ refresh, setOpen }) {
       }
     };
     fetchPrograms();
-  }, []);
+  }, [API_URL]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

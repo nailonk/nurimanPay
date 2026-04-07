@@ -27,16 +27,14 @@ export const getProgramByIdService = async (id) => {
 };
 
 export const getAllProgramsService = async () => {
-  const query = `
-    SELECT 
-      p.*,
-      (SELECT COALESCE(SUM(amount), 0) FROM distributions WHERE program_id = p.id) as total_distributed
-    FROM programs p
-    ORDER BY p.created_at DESC
-  `;
-
-  const result = await pool.query(query);
-  return result.rows;
+  try {
+    const query = `SELECT * FROM programs ORDER BY created_at DESC`;
+    const result = await pool.query(query);
+    return result.rows;
+  } catch (error) {
+    console.error("Error Get All:", error.message);
+    throw error;
+  }
 };
 
 export const getProgramTransactionsService = async (programId) => {
