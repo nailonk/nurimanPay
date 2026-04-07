@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Loader2, Table as TableIcon, Info, X, Users } from "lucide-react";
+import { Loader2, Table as TableIcon, Info, X, Users, Image as ImageIcon } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button"; // Pastikan import Button
+import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { getPrograms } from "@/api/program";
 import { transactionApi } from "@/api/transaction";
@@ -23,7 +23,7 @@ const DetailCompletedProgram = () => {
   const [donatur, setDonatur] = useState([]);
   const [distributions, setDistributions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false); // State untuk Modal
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -137,6 +137,7 @@ const DetailCompletedProgram = () => {
 
         <div className="grid lg:grid-cols-3 gap-8 items-start">
           <div className="lg:col-span-2 space-y-8">
+            {/* FOTO UTAMA DARI PROGRAM */}
             <div className="relative rounded-2xl overflow-hidden shadow-xl aspect-video bg-slate-200">
               <img
                 src={data.image || noImage}
@@ -184,7 +185,7 @@ const DetailCompletedProgram = () => {
               </div>
             </Card>
 
-            {/* CARD RINCIAN PENYALURAN DANA */}
+            {/* CARD RINCIAN PENYALURAN DANA + DOKUMENTASI FOTO */}
             <Card className={cardStyle}>
               <div className="bg-[#A3C585] p-4 flex items-center gap-2 text-white">
                 <TableIcon size={18} />
@@ -192,7 +193,8 @@ const DetailCompletedProgram = () => {
                   Rincian Penyaluran Dana
                 </h3>
               </div>
-              <div className="p-6">
+              <div className="p-6 space-y-8">
+                {/* Tabel Rincian */}
                 <div className="overflow-x-auto">
                   <table className="w-full text-left">
                     <thead>
@@ -242,6 +244,29 @@ const DetailCompletedProgram = () => {
                     </tbody>
                   </table>
                 </div>
+
+                {/* FOTO DOKUMENTASI (DI DALAM CARD YANG SAMA) */}
+                {distributions.some(dist => dist.image) && (
+                  <div className="pt-6 border-t border-slate-100">
+                    <h4 className="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+                      <ImageIcon size={16} className="text-[#A3C585]" />
+                      Dokumentasi Penyaluran
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {distributions.map((item, idx) => (
+                        item.image && (
+                          <div key={idx} className="group relative rounded-xl overflow-hidden border border-slate-100 shadow-sm">
+                            <img 
+                              src={item.image} 
+                              alt={`Dokumentasi ${item.purpose}`} 
+                              className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
+                            />
+                          </div>
+                        )
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </Card>
 
@@ -251,7 +276,6 @@ const DetailCompletedProgram = () => {
                 <h4 className="font-bold text-slate-800 text-sm">
                   Daftar Donatur
                 </h4>
-                {/* TOMBOL LIHAT SEMUA */}
                 {donatur.length > 5 && (
                   <button 
                     onClick={() => setIsModalOpen(true)}

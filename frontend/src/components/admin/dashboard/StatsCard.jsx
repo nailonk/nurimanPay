@@ -3,7 +3,6 @@ import { Megaphone, Wallet, HandCoins, Receipt } from "lucide-react"
 import { useState, useEffect } from "react"
 
 function StatsCard({ programs = [], transactions = [] }) {
-  // State lokal untuk menampung total dana disalurkan dari database external
   const [totalDistributed, setTotalDistributed] = useState(0);
   const API_URL = import.meta.env.VITE_API_URL
 
@@ -27,7 +26,6 @@ function StatsCard({ programs = [], transactions = [] }) {
     fetchDistributions();
   }, []);
 
-  // Logika Kalkulasi Donasi Masuk (dari props)
   const safeTransactions = Array.isArray(transactions) ? transactions : [];
   const safePrograms = Array.isArray(programs) ? programs : [];
   const activeProgramIds = safePrograms.map(p => String(p.id));
