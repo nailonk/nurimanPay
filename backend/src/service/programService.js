@@ -106,6 +106,7 @@ export const deleteProgramService = async (id) => {
 
     await client.query('COMMIT');
     return result.rows[0];
+<<<<<<< HEAD
 
   } catch (error) {
     await client.query('ROLLBACK');
@@ -117,4 +118,9 @@ export const deleteProgramService = async (id) => {
   } finally {
     client.release();
   }
+=======
+    } catch (error) {
+        console.error("Ada masalah:", error);
+    }
+>>>>>>> develop
 };
