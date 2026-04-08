@@ -81,10 +81,32 @@ export const updateProgramService = async (id, data) => {
   );
   return result.rows[0];
 };
+
 export const deleteProgramService = async (id) => {
-  const result = await pool.query(
-    "DELETE FROM programs WHERE id = $1 RETURNING *",
-    [id],
-  );
-  return result.rows[0];
+  const client = await pool.connect();
+
+  try {
+    await client.query('BEGIN');
+    await client.query(`
+      DELETE FROM midtrans_payment 
+      WHERE order_id IN (SELECT order_id FROM transactions WHERE program_id = $1)
+    `, [id]);
+    await client.query(
+      "DELETE FROM transactions WHERE program_id = $1",
+      [id]
+    );
+    await client.query(
+      "DELETE FROM distributions WHERE program_id = $1",
+      [id]
+    ).catch(() => null);
+    const result = await client.query(
+      "DELETE FROM programs WHERE id = $1 RETURNING *",
+      [id]
+    );
+
+    await client.query('COMMIT');
+    return result.rows[0];
+    } catch (error) {
+        console.error("Ada masalah:", error);
+    }
 };

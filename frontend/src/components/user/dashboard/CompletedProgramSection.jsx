@@ -55,7 +55,7 @@ const CompletedProgramSection = () => {
             displayTitle: programMatch
               ? programMatch.title
               : "Program Penyaluran",
-            displayImage: dist.image || programMatch?.image || noImage,
+            displayImage: programMatch?.image || dist.image || noImage,
           };
         });
 
@@ -139,7 +139,7 @@ const CompletedProgramSection = () => {
                   </span>
                 </div>
                 <img
-                  src={item.image || noImage}
+                  src={item.displayImage}
                   alt={item.displayTitle}
                   className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
                   onError={(e) => {

@@ -14,7 +14,6 @@ export default function PenyaluranPage() {
   const [loading, setLoading] = useState(true)
    const API_URL = import.meta.env.VITE_API_URL
 
-  // Fungsi muat data terpusat
   const loadData = useCallback(async () => {
     setLoading(true)
     try {
@@ -38,7 +37,7 @@ export default function PenyaluranPage() {
     <div className="p-4 md:p-6 space-y-8 bg-[#f9fafb] min-h-screen">
       
       {open ? (
-        <div className="max-w-4xl mx-auto py-4 mb-20 px-6 animate-in fade-in zoom-in duration-300">
+        <div className="max-w-4xl mx-auto py-10 mb-20 px-6 animate-in fade-in zoom-in duration-300">
           <button
             onClick={() => setOpen(false)}
             className="flex items-center gap-2 text-sm text-gray-400 hover:text-gray-600 mb-8 transition-colors font-medium group"
@@ -47,13 +46,16 @@ export default function PenyaluranPage() {
             Kembali ke Daftar Penyaluran
           </button>
 
-          <div className="space-y-2 mb-6">
+          <div className="space-y-2">
             <h1 className="text-2xl font-bold text-gray-800">
               {editData ? "Edit Laporan Penyaluran" : "Tambah Laporan Penyaluran Dana"}
             </h1>
+            <p className="text-sm text-gray-400">
+              Silahkan lengkapi formulir dibawah ini untuk mendokumentasikan distribusi dana bantuan.
+            </p>
           </div>
           
-          <div className="bg-white shadow-sm rounded-[32px] border border-gray-100 overflow-hidden">
+          <div>
             <FormPenyaluran 
               setOpen={setOpen} 
               editData={editData} 

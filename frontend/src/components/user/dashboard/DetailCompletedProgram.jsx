@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Loader2, Table as TableIcon, Info, X, Users } from "lucide-react";
+import { Loader2, Table as TableIcon, Info, X, Users, Image as ImageIcon } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button"; // Pastikan import Button
+import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { getPrograms } from "@/api/program";
 import { transactionApi } from "@/api/transaction";
@@ -23,7 +23,7 @@ const DetailCompletedProgram = () => {
   const [donatur, setDonatur] = useState([]);
   const [distributions, setDistributions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false); // State untuk Modal
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -61,7 +61,7 @@ const DetailCompletedProgram = () => {
     return <div className="text-center py-20">Data tidak ditemukan</div>;
 
   const cardStyle =
-    "border-0 shadow-xl rounded-2xl bg-white ring-1 ring-slate-100 overflow-hidden";
+    "shadow-xl rounded-2xl bg-white ring-1 ring-slate-100 overflow-hidden border-none";
 
   return (
     <div className="bg-gray-50 min-h-screen py-10 px-4 md:px-8 relative">
@@ -137,6 +137,7 @@ const DetailCompletedProgram = () => {
 
         <div className="grid lg:grid-cols-3 gap-8 items-start">
           <div className="lg:col-span-2 space-y-8">
+            {/* FOTO UTAMA DARI PROGRAM */}
             <div className="relative rounded-2xl overflow-hidden shadow-xl aspect-video bg-slate-200">
               <img
                 src={data.image || noImage}
@@ -184,15 +185,19 @@ const DetailCompletedProgram = () => {
               </div>
             </Card>
 
-            {/* CARD RINCIAN PENYALURAN DANA */}
-            <Card className={cardStyle}>
-              <div className="bg-[#A3C585] p-4 flex items-center gap-2 text-white">
+            {/* CARD RINCIAN PENYALURAN DANA + DOKUMENTASI FOTO */}
+            <div className={`${cardStyle} border-none`}>
+              {/* Header Hijau - Sekarang pasti menempel ke pinggir karena tidak ada padding di parent */}
+              <div className="bg-[#A3C585] p-4 flex items-center gap-2 text-white w-full">
                 <TableIcon size={18} />
                 <h3 className="font-bold text-xs uppercase tracking-widest">
                   Rincian Penyaluran Dana
                 </h3>
               </div>
-              <div className="p-6">
+
+              {/* Bungkus isi konten dengan padding di sini, agar teks tidak nempel ke pinggir */}
+              <div className="p-6 space-y-8">
+                {/* Tabel Rincian */}
                 <div className="overflow-x-auto">
                   <table className="w-full text-left">
                     <thead>
@@ -205,24 +210,12 @@ const DetailCompletedProgram = () => {
                     <tbody className="text-slate-600">
                       {distributions.length > 0 ? (
                         distributions.map((item) => (
-                          <tr
-                            key={item.id}
-                            className="border-b border-slate-50 last:border-0 hover:bg-slate-50/50 transition-colors"
-                          >
+                          <tr key={item.id} className="border-b border-slate-50 last:border-0 hover:bg-slate-50/50 transition-colors">
                             <td className="py-5 px-2 text-[11px]">
-                              {new Date(item.created_at).toLocaleDateString(
-                                "id-ID",
-                                {
-                                  day: "numeric",
-                                  month: "short",
-                                  year: "numeric",
-                                },
-                              )}
+                              {new Date(item.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}
                             </td>
                             <td className="py-5 px-2">
-                              <p className="text-xs font-bold text-slate-700">
-                                {item.purpose}
-                              </p>
+                              <p className="text-xs font-bold text-slate-700">{item.purpose}</p>
                             </td>
                             <td className="py-5 px-2 text-right font-bold text-[#A3C585] text-xs">
                               {formatRupiah(item.amount)}
@@ -231,10 +224,7 @@ const DetailCompletedProgram = () => {
                         ))
                       ) : (
                         <tr>
-                          <td
-                            colSpan="3"
-                            className="py-10 text-center text-slate-400 text-xs italic"
-                          >
+                          <td colSpan="3" className="py-10 text-center text-slate-400 text-xs italic">
                             Belum ada data penyaluran yang tercatat.
                           </td>
                         </tr>
@@ -242,8 +232,31 @@ const DetailCompletedProgram = () => {
                     </tbody>
                   </table>
                 </div>
+
+                {/* FOTO DOKUMENTASI */}
+                {distributions.some(dist => dist.image) && (
+                  <div className="pt-6 border-t border-slate-100">
+                    <h4 className="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+                      <ImageIcon size={16} className="text-[#A3C585]" />
+                      Dokumentasi Penyaluran
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {distributions.map((item, idx) => (
+                        item.image && (
+                          <div key={idx} className="group relative rounded-xl overflow-hidden border border-slate-100 shadow-sm">
+                            <img 
+                              src={item.image} 
+                              alt={`Dokumentasi ${item.purpose}`} 
+                              className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
+                            />
+                          </div>
+                        )
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
-            </Card>
+            </div>
 
             {/* CARD DAFTAR DONATUR */}
             <Card className={`p-6 ${cardStyle}`}>
@@ -251,7 +264,6 @@ const DetailCompletedProgram = () => {
                 <h4 className="font-bold text-slate-800 text-sm">
                   Daftar Donatur
                 </h4>
-                {/* TOMBOL LIHAT SEMUA */}
                 {donatur.length > 5 && (
                   <button 
                     onClick={() => setIsModalOpen(true)}
