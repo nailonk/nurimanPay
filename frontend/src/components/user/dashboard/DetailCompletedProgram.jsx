@@ -137,7 +137,6 @@ const DetailCompletedProgram = () => {
 
         <div className="grid lg:grid-cols-3 gap-8 items-start">
           <div className="lg:col-span-2 space-y-8">
-            {/* FOTO UTAMA DARI PROGRAM */}
             <div className="relative rounded-2xl overflow-hidden shadow-xl aspect-video bg-slate-200">
               <img
                 src={data.image || noImage}
@@ -156,7 +155,6 @@ const DetailCompletedProgram = () => {
               {data.title}
             </h1>
 
-            {/* CARD LAPORAN KEBERHASILAN PROGRAM */}
             <Card className={`p-8 ${cardStyle}`}>
               <h2 className="text-lg font-bold text-slate-800 mb-4">
                 Laporan Keberhasilan Program
@@ -185,27 +183,15 @@ const DetailCompletedProgram = () => {
               </div>
             </Card>
 
-            {/* CARD RINCIAN PENYALURAN DANA + DOKUMENTASI FOTO */}
-<<<<<<< HEAD
             <Card className={cardStyle}>
-              <div className="bg-[#A3C585] p-4 flex items-center gap-2 text-white">
-=======
-            <div className={`${cardStyle} border-none`}>
-              {/* Header Hijau - Sekarang pasti menempel ke pinggir karena tidak ada padding di parent */}
               <div className="bg-[#A3C585] p-4 flex items-center gap-2 text-white w-full">
->>>>>>> develop
                 <TableIcon size={18} />
                 <h3 className="font-bold text-xs uppercase tracking-widest">
                   Rincian Penyaluran Dana
                 </h3>
               </div>
-<<<<<<< HEAD
-=======
 
-              {/* Bungkus isi konten dengan padding di sini, agar teks tidak nempel ke pinggir */}
->>>>>>> develop
               <div className="p-6 space-y-8">
-                {/* Tabel Rincian */}
                 <div className="overflow-x-auto">
                   <table className="w-full text-left">
                     <thead>
@@ -241,11 +227,6 @@ const DetailCompletedProgram = () => {
                   </table>
                 </div>
 
-<<<<<<< HEAD
-                {/* FOTO DOKUMENTASI (DI DALAM CARD YANG SAMA) */}
-=======
-                {/* FOTO DOKUMENTASI */}
->>>>>>> develop
                 {distributions.some(dist => dist.image) && (
                   <div className="pt-6 border-t border-slate-100">
                     <h4 className="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
@@ -268,9 +249,8 @@ const DetailCompletedProgram = () => {
                   </div>
                 )}
               </div>
-            </div>
+            </Card>
 
-            {/* CARD DAFTAR DONATUR */}
             <Card className={`p-6 ${cardStyle}`}>
               <div className="flex justify-between items-center mb-5">
                 <h4 className="font-bold text-slate-800 text-sm">
