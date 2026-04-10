@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Donasi Midtrans</title>
+    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="SB-Mid-client-xxxxxxxxxx"></script>
+</head>
+<body>
+    <h2>Form Donasi</h2>
+    <form id="donasiForm">
+        <input type="text" id="nama" placeholder="Nama" value="John Doe" required /><br>
+        <input type="text" id="no_hp" placeholder="No HP" value="08123456789" required /><br>
+        <input type="number" id="nominal" placeholder="Nominal" value="50000" required /><br>
+        <textarea id="catatan" placeholder="Catatan (opsional)">Doa terbaik</textarea><br>
+        <button type="submit">Donasi Sekarang</button>
+    </form>
+
+    <script>
+        document.getElementById('donasiForm').onsubmit = async (e) => {
+            e.preventDefault();
+             const API_URL = import.meta.env.VITE_API_URL
+            
+            const res = await fetch(`${API_URL}/donasi/create`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    nama: document.getElementById('nama').value,
+                    no_hp: document.getElementById('no_hp').value,
+                    nominal: parseInt(document.getElementById('nominal').value),
+                    catatan: document.getElementById('catatan').value
+                })
+            });
+            
+            const data = await res.json();
+            if(data.success) {
+                snap.pay(data.token);
+            }
+        };
+    </script>
+</body>
+</html>
