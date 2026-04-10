@@ -21,17 +21,7 @@ Install Dependencies
 ```bash
 npm install
 ```
-Buat file .env
-```bash
-DATABASE_URL=""
-JWT_EXPIRES_IN=""
-JWT_SECRET=""
-MIDTRANS_CLIENT_KEY=""
-MIDTRANS_MERCHANT_ID=""
-MIDTRANS_SERVER_KEY=""
-PORT=""
-VITE_API_URL=""
-```
+Buat file .env dengan template di .env.example
 
 ### 4. Setup Frontend
 Buka terminal baru, lalu masuk ke folder frontend
@@ -42,10 +32,8 @@ Install Dependencies
 ```bash
 npm install
 ```
-Buat file .env
-```bash
-VITE_API_URL=
-```
+Buat file .env dengan template di .env.example
+
 ## Cara Menjalankan Aplikasi
 ### Run di localhost
 Jalankan Backend dahulu
@@ -60,6 +48,6 @@ npm run dev
 ```
 Buka aplikasi di browser
 http://localhost:5173
+
 ### Deployment
-- Backend: https://nurimanpay-production.up.railway.app/api
 - Frontend: https://nuriman-fe.vercel.app
