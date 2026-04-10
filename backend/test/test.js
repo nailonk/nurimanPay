@@ -60,6 +60,7 @@ describe('NURIMANPAY API - COMPLETE TEST (ALL TABLES)', () => {
       const newProgram = { 
         title: `TEST Program P ${Date.now()}`, 
         target_amount: 50000000,
+        end_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
         description: 'Program untuk testing lengkap',
         image: 'https://example.com/image-test.jpg'
       };
@@ -101,33 +102,6 @@ describe('NURIMANPAY API - COMPLETE TEST (ALL TABLES)', () => {
         });
 
       console.log('Create transaction (with program) status:', res.statusCode);
-      expect([200, 201, 500]).toContain(res.statusCode);
-    });
-
-    it('should create transaction without program_id', async () => {
-      const res = await request(server)
-        .post('/api/transaction/create')
-        .send({
-          name: `TEST Donor General ${Date.now()}`,
-          phone_number: '08123456788',
-          amount: 75000,
-          message: 'TEST general donation'
-        });
-
-      console.log('Create transaction (general) status:', res.statusCode);
-      expect([200, 201, 500]).toContain(res.statusCode);
-    });
-
-    it('should create third transaction', async () => {
-      const res = await request(server)
-        .post('/api/transaction/create')
-        .send({
-          name: `TEST Donor 3 ${Date.now()}`,
-          phone_number: '08123456787',
-          amount: 200000,
-          message: 'TEST donation 3'
-        });
-
       expect([200, 201, 500]).toContain(res.statusCode);
     });
   });

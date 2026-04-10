@@ -2,6 +2,24 @@ import * as transactionService from '../service/transactionService.js';
 
 export const createTransaction = async (req, res) => {
   try {
+    const { program_id, amount, name } = req.body;
+
+    if (!program_id) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Gagal memproses transaksi', 
+        details: 'program_id wajib diisi. Donasi harus ditujukan pada program tertentu.' 
+      });
+    }
+
+    if (!amount || amount <= 0) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Gagal memproses transaksi', 
+        details: 'Jumlah donasi harus lebih dari 0.' 
+      });
+    }
+
     const result = await transactionService.createDonationService(req.body);
     res.json({ success: true, ...result });
   } catch (error) {

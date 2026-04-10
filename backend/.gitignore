@@ -1,6 +1,2 @@
 .env
-.vercel
-.env*.local
 node_modules
-sessions
-.env.test
