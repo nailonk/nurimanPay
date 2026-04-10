@@ -29,8 +29,8 @@ JWT_SECRET=""
 MIDTRANS_CLIENT_KEY=""
 MIDTRANS_MERCHANT_ID=""
 MIDTRANS_SERVER_KEY=""
-PORT="5000"
-VITE_API_URL="http://localhost:5173"
+PORT=""
+VITE_API_URL=""
 ```
 
 ### 4. Setup Frontend
@@ -44,7 +44,7 @@ npm install
 ```
 Buat file .env
 ```bash
-VITE_API_URL=http://localhost:5000/api
+VITE_API_URL=
 ```
 ## Cara Menjalankan Aplikasi
 ### Run di localhost
